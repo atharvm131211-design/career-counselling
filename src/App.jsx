@@ -2,23 +2,29 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Compass, Sparkles, BookOpen, GraduationCap, Globe, 
   CheckCircle2, ArrowRight, ArrowLeft, Shield, User, Mail, 
-  Lock, LogOut, RefreshCw, Award, Search, Camera,
-  FileSpreadsheet, ExternalLink, Check, Database,
-  Sliders, Eye, EyeOff, Bookmark, Zap, Activity, Brain, 
-  Printer, Scale, Feather, Heart, Radio, Microscope,
-  Landmark, Palette, Dumbbell, Grid, Rocket, Plane, Anchor,
-  Building
+  Lock, LogOut, ChevronRight, Download, RefreshCw, 
+  DollarSign, Award, Layers, Search, Briefcase, Camera,
+  FileSpreadsheet, ExternalLink, HelpCircle, Check, Database,
+  TrendingUp, AlertCircle, Eye, EyeOff, Building, Users,
+  HeartHandshake, Lightbulb, BarChart3, Target, Bookmark,
+  CheckSquare, Zap, Activity, Brain, Share2, Printer,
+  Scale, Feather, Heart, Radio, ShieldCheck, Microscope,
+  Dna, Flame, Landmark, Palette, Dumbbell, Flag, Grid,
+  Sliders, ChevronDown, Award as Trophy, PieChart, Rocket
 } from 'lucide-react';
 
 const ASSESSMENT_BATTERY = [
-  // 1-10: COGNITIVE APTITUDE & MATH PUZZLES
+  // ==========================================
+  // PILLAR 1: COGNITIVE APTITUDE & MATH PUZZLES (10 QUESTIONS)
+  // ==========================================
   {
     id: 'q1',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
     prompt: 'NUMBER PATTERN: Look at this sequence: 4, 9, 19, 39, 79, ... What number comes next?',
     options: [
-      { id: 'q1_a', text: '159 ', scoreType: 'logic', points: 5 },
+      { id: 'q1_a', text: '159 (Pattern: Each number is multiplied by 2 and then 1 is added: 79 × 2 + 1 = 159)', scoreType: 'logic', points: 5 },
       { id: 'q1_b', text: '149', scoreType: 'logic', points: 1 },
       { id: 'q1_c', text: '169', scoreType: 'logic', points: 1 },
       { id: 'q1_d', text: '158', scoreType: 'logic', points: 1 }
@@ -27,34 +33,37 @@ const ASSESSMENT_BATTERY = [
   {
     id: 'q2',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'DISTANCE & SPEED: A military reconnaissance vehicle drives 120 km at 40 km/h, then returns along the same route at 60 km/h. What is its average speed?',
+    prompt: 'DISTANCE & SPEED: A cyclist rides 36 km in 2 hours. If they double their speed, how long will it take them to cover 72 km?',
     options: [
-      { id: 'q2_a', text: '48 km/h ', scoreType: 'logic', points: 5 },
-      { id: 'q2_b', text: '50 km/h', scoreType: 'logic', points: 1 },
-      { id: 'q2_c', text: '45 km/h', scoreType: 'logic', points: 1 },
-      { id: 'q2_d', text: '52 km/h', scoreType: 'logic', points: 1 }
+      { id: 'q2_a', text: '2 hours (Original speed = 18 km/h. Doubled speed = 36 km/h. Time = 72 ÷ 36 = 2 hrs)', scoreType: 'logic', points: 5 },
+      { id: 'q2_b', text: '1 hour', scoreType: 'logic', points: 1 },
+      { id: 'q2_c', text: '3 hours', scoreType: 'logic', points: 1 },
+      { id: 'q2_d', text: '4 hours', scoreType: 'logic', points: 1 }
     ]
   },
   {
     id: 'q3',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'CIVIL STRUCTURAL RATIO: A concrete mix requires cement, sand, and gravel in a 1 : 2 : 4 ratio by volume. If an engineer uses 14 cubic meters of gravel, how much cement is needed?',
+    prompt: 'RATIO IN NATURE: A farmer mixes organic fertilizer with water in a 2 : 7 ratio. If he uses 35 liters of water, how much fertilizer does he need?',
     options: [
-      { id: 'q3_a', text: '3.5 cubic meters ', scoreType: 'civil', points: 5 },
-      { id: 'q3_b', text: '7 cubic meters', scoreType: 'civil', points: 1 },
-      { id: 'q3_c', text: '2.5 cubic meters', scoreType: 'civil', points: 1 },
-      { id: 'q3_d', text: '4 cubic meters', scoreType: 'civil', points: 1 }
+      { id: 'q3_a', text: '10 liters (7 units = 35 liters, so 1 unit = 5 liters. 2 units = 10 liters)', scoreType: 'logic', points: 5 },
+      { id: 'q3_b', text: '12 liters', scoreType: 'logic', points: 1 },
+      { id: 'q3_c', text: '14 liters', scoreType: 'logic', points: 1 },
+      { id: 'q3_d', text: '8 liters', scoreType: 'logic', points: 1 }
     ]
   },
   {
     id: 'q4',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'SPATIAL CUT: A solid metal cube is painted black on all 6 sides and sawed into 64 equal smaller cubes. How many small cubes have ZERO black painted faces?',
+    prompt: 'SPATIAL CUT: A wooden solid cube is painted blue on all 6 sides. It is then sawed into 64 equal smaller cubes. How many small cubes have ZERO painted faces?',
     options: [
-      { id: 'q4_a', text: '8 smaller cubes ', scoreType: 'logic', points: 5 },
+      { id: 'q4_a', text: '8 smaller cubes (The inner 2×2×2 core of the 4×4×4 cube has no exposed faces)', scoreType: 'logic', points: 5 },
       { id: 'q4_b', text: '16 smaller cubes', scoreType: 'logic', points: 1 },
       { id: 'q4_c', text: '0 smaller cubes', scoreType: 'logic', points: 1 },
       { id: 'q4_d', text: '4 smaller cubes', scoreType: 'logic', points: 1 }
@@ -63,508 +72,897 @@ const ASSESSMENT_BATTERY = [
   {
     id: 'q5',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'AERODYNAMIC LOGIC: An aircraft flies into a headwind of 50 km/h with an airspeed of 450 km/h. What is its ground speed over the territory?',
+    prompt: 'LOGICAL DEDUCTION: Statement 1: All fighter pilots undergo centrifuge G-force training. Statement 2: Captain Vikram underwent centrifuge G-force training. Which deduction is valid?',
     options: [
-      { id: 'q5_a', text: '400 km/h ', scoreType: 'aerospace', points: 5 },
-      { id: 'q5_b', text: '500 km/h', scoreType: 'aerospace', points: 1 },
-      { id: 'q5_c', text: '425 km/h', scoreType: 'aerospace', points: 1 },
-      { id: 'q5_d', text: '450 km/h', scoreType: 'aerospace', points: 1 }
+      { id: 'q5_a', text: 'Captain Vikram might be a fighter pilot, but he could also be an astronaut or test volunteer.', scoreType: 'logic', points: 5 },
+      { id: 'q5_b', text: 'Captain Vikram is 100% definitely a fighter pilot.', scoreType: 'logic', points: 1 },
+      { id: 'q5_c', text: 'Centrifuge training is only taken by civilians.', scoreType: 'logic', points: 1 },
+      { id: 'q5_d', text: 'No pilot ever takes centrifuge training.', scoreType: 'logic', points: 1 }
     ]
   },
   {
     id: 'q6',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'PERCENTAGE MARGIN: A medical equipment manufacturer offers a 20% discount on ultrasound scanners but still makes a 20% profit on production cost. If the production cost is ₹1,00,000, what is the marked list price?',
+    prompt: 'PERCENTAGE LOGIC: A book seller discounts a novel by 20%, but still earns a 20% profit on his cost price. If the cost price is ₹200, what was the printed mark price?',
     options: [
-      { id: 'q6_a', text: '₹1,50,000 ', scoreType: 'logic', points: 5 },
-      { id: 'q6_b', text: '₹1,40,000', scoreType: 'logic', points: 1 },
-      { id: 'q6_c', text: '₹1,30,000', scoreType: 'logic', points: 1 },
-      { id: 'q6_d', text: '₹1,60,000', scoreType: 'logic', points: 1 }
+      { id: 'q6_a', text: '₹300 (Selling price = ₹240 with 20% profit. If ₹240 is 80% of mark price, Mark Price = ₹300)', scoreType: 'logic', points: 5 },
+      { id: 'q6_b', text: '₹280', scoreType: 'logic', points: 1 },
+      { id: 'q6_c', text: '₹260', scoreType: 'logic', points: 1 },
+      { id: 'q6_d', text: '₹320', scoreType: 'logic', points: 1 }
     ]
   },
   {
     id: 'q7',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'PRESSURE DEPTH: In naval submarine navigation, hydrostatic water pressure increases by roughly 1 atmosphere for every 10 meters of depth. At 250 meters depth, what is the approximate water pressure?',
+    prompt: 'FAMILY RELATION LOGIC: Pointing to a photograph of a woman, a man says: "Her daughter is the only granddaughter of my mother." Who is the woman to the man?',
     options: [
-      { id: 'q7_a', text: '25 to 26 atmospheres ', scoreType: 'navy', points: 5 },
-      { id: 'q7_b', text: '15 atmospheres', scoreType: 'navy', points: 1 },
-      { id: 'q7_c', text: '50 atmospheres', scoreType: 'navy', points: 1 },
-      { id: 'q7_d', text: '10 atmospheres', scoreType: 'navy', points: 1 }
+      { id: 'q7_a', text: 'His wife (or his sister, assuming single lineage)', scoreType: 'logic', points: 5 },
+      { id: 'q7_b', text: 'His grandmother', scoreType: 'logic', points: 1 },
+      { id: 'q7_c', text: 'His niece', scoreType: 'logic', points: 1 },
+      { id: 'q7_d', text: 'His aunt', scoreType: 'logic', points: 1 }
     ]
   },
   {
     id: 'q8',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'ENGINEERING WORK & TIME: 6 civil engineers can complete a bridge foundation blueprint in 12 days. How many days will 9 engineers take at the same pace?',
+    prompt: 'WORK & TIME: 4 artisans can weave 4 handloom carpets in 4 days. At the exact same rate, how many days will 8 artisans take to weave 8 carpets?',
     options: [
-      { id: 'q8_a', text: '8 days ', scoreType: 'civil', points: 5 },
-      { id: 'q8_b', text: '10 days', scoreType: 'civil', points: 1 },
-      { id: 'q8_c', text: '6 days', scoreType: 'civil', points: 1 },
-      { id: 'q8_d', text: '9 days', scoreType: 'civil', points: 1 }
+      { id: 'q8_a', text: '4 days (1 artisan takes 4 days to weave 1 carpet; therefore 8 artisans take 4 days to weave 8 carpets)', scoreType: 'logic', points: 5 },
+      { id: 'q8_b', text: '8 days', scoreType: 'logic', points: 1 },
+      { id: 'q8_c', text: '2 days', scoreType: 'logic', points: 1 },
+      { id: 'q8_d', text: '16 days', scoreType: 'logic', points: 1 }
     ]
   },
   {
     id: 'q9',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'ORBITAL CIRCUMFERENCE: A satellite orbits Earth at an altitude giving it an orbit radius of 7,000 km. What distance does it travel in 1 full circular orbit? (Use π ≈ 22/7)',
+    prompt: 'GEOMETRY INTUITION: A circular running track has a radius of 70 meters. If an athlete runs exactly 2 complete laps around it, what approximate distance did they cover? (Use π ≈ 22/7)',
     options: [
-      { id: 'q9_a', text: '44,000 km ', scoreType: 'aerospace', points: 5 },
-      { id: 'q9_b', text: '22,000 km', scoreType: 'aerospace', points: 1 },
-      { id: 'q9_c', text: '35,000 km', scoreType: 'aerospace', points: 1 },
-      { id: 'q9_d', text: '50,000 km', scoreType: 'aerospace', points: 1 }
+      { id: 'q9_a', text: '880 meters (Perimeter of 1 lap = 2 × 22/7 × 70 = 440 meters. 2 laps = 880 meters)', scoreType: 'logic', points: 5 },
+      { id: 'q9_b', text: '440 meters', scoreType: 'logic', points: 1 },
+      { id: 'q9_c', text: '660 meters', scoreType: 'logic', points: 1 },
+      { id: 'q9_d', text: '1200 meters', scoreType: 'logic', points: 1 }
     ]
   },
   {
     id: 'q10',
     pillar: 'Cognitive & Math Logic',
+    pillarCode: 'math_logic',
     type: 'puzzle',
-    prompt: 'DEDUCTION: All combat commandos undergo intensive survival training. Some survival experts are mountaineers. Which conclusion is guaranteed?',
+    prompt: 'SYLLOGISM: Some stones are diamonds. All diamonds sparkle in the dark. Which conclusion is guaranteed?',
     options: [
-      { id: 'q10_a', text: 'Some commandos might be mountaineers, but it is not 100% guaranteed for all.', scoreType: 'army', points: 5 },
-      { id: 'q10_b', text: 'All mountaineers are commandos.', scoreType: 'army', points: 1 },
-      { id: 'q10_c', text: 'No commando ever climbs mountains.', scoreType: 'army', points: 1 },
-      { id: 'q10_d', text: 'Every survival expert is an army soldier.', scoreType: 'army', points: 1 }
+      { id: 'q10_a', text: 'Some stones sparkle in the dark.', scoreType: 'logic', points: 5 },
+      { id: 'q10_b', text: 'All stones sparkle in the dark.', scoreType: 'logic', points: 1 },
+      { id: 'q10_c', text: 'No stones sparkle in the dark.', scoreType: 'logic', points: 1 },
+      { id: 'q10_d', text: 'Diamonds are not stones.', scoreType: 'logic', points: 1 }
     ]
   },
 
-  // 11-14: DEFENSE & TACTICAL INSTINCTS
+  // ==========================================
+  // PILLAR 2: CAREER DECIDEDNESS & CLARITY INDEX (8 QUESTIONS)
+  // ==========================================
   {
     id: 'q11',
-    pillar: 'Defense & Tactical Instincts',
-    prompt: 'If you were selected for an armed forces commission, which operational theater excites your soul the most?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'When someone asks you: "What do you want to become in life?", what is your honest gut feeling?',
     options: [
-      { id: 'q11_a', text: 'The Indian Army: Ground combat, infantry battalions, tank regiments in deserts, and Siachen glacier posts.', scoreType: 'army', points: 5 },
-      { id: 'q11_b', text: 'The Indian Air Force: Cockpit of a Sukhoi Su-30MKI or Rafale flying at Mach 1.8 above the clouds.', scoreType: 'airforce', points: 5 },
-      { id: 'q11_c', text: 'The Indian Navy: Guided missile destroyers, aircraft carrier flight decks, and stealth submarines in the Arabian Sea.', scoreType: 'navy', points: 5 },
-      { id: 'q11_d', text: 'Defense Research (DRDO/ISRO): Designing intercontinental ballistic missiles, radar domes, and military satellites.', scoreType: 'aerospace', points: 5 }
+      { id: 'q11_a', text: 'I have 1 or 2 specific dream fields that I have loved for years, and I am working toward them.', scoreType: 'decided', points: 5 },
+      { id: 'q11_b', text: 'I have 4 or 5 different interests, but I find it really hard to pick just one path.', scoreType: 'exploring', points: 4 },
+      { id: 'q11_c', text: 'To be completely honest, I feel confused and overwhelmed by all the options.', scoreType: 'confused', points: 5 },
+      { id: 'q11_d', text: 'I usually repeat whatever career my parents or elder siblings tell me to pursue.', scoreType: 'pressured', points: 5 }
     ]
   },
   {
     id: 'q12',
-    pillar: 'Defense & Tactical Instincts',
-    prompt: 'In high-adrenaline crisis conditions, what kind of pressure suits your mindset best?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'How much influence do your parents, relatives, or neighbors have on your career thoughts?',
     options: [
-      { id: 'q12_a', text: 'Physical tactical combat: Boots on the ground, extreme endurance, leading soldiers face-to-face under fire.', scoreType: 'army', points: 5 },
-      { id: 'q12_b', text: 'Split-second 3D air combat: G-force physical stress, rapid instrument cross-checks, and supersonic dogfight decisions.', scoreType: 'airforce', points: 5 },
-      { id: 'q12_c', text: 'Isolated endurance & ocean warfare: Navigating deep ocean currents, sonar tracking, and weeks at sea with disciplined crews.', scoreType: 'navy', points: 5 },
-      { id: 'q12_d', text: 'Engineering precision under countdown pressure: Ensuring a rocket engine does not explode during high-vibration liftoff.', scoreType: 'aerospace', points: 5 }
+      { id: 'q12_a', text: 'They strongly suggest conventional degrees (Engineering / MBBS / Govt job), even if my heart wants something else.', scoreType: 'pressured', points: 5 },
+      { id: 'q12_b', text: 'They are completely supportive and encourage me to follow whatever suits my true talent.', scoreType: 'decided', points: 4 },
+      { id: 'q12_c', text: 'They give advice, but I feel so undecided that I easily get swayed by anyone’s opinion.', scoreType: 'confused', points: 4 },
+      { id: 'q12_d', text: 'I am researching colleges and careers independently and educating my family about new options.', scoreType: 'exploring', points: 5 }
     ]
   },
   {
     id: 'q13',
-    pillar: 'Defense & Tactical Instincts',
-    prompt: 'Which technical subject would you genuinely enjoy reading manuals about during free evenings?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'When thinking about 11th/12th stream selection or your college major:',
     options: [
-      { id: 'q13_a', text: 'Infantry assault tactics, battlefield terrain maps, artillery ballistic tables, and commando ambushes.', scoreType: 'army', points: 5 },
-      { id: 'q13_b', text: 'Jet turbine aerodynamics, head-up display avionics, missile radar lock-on mechanisms, and aerial refueling.', scoreType: 'airforce', points: 5 },
-      { id: 'q13_c', text: 'Naval hull hydrodynamics, sonar acoustic signatures, torpedo tracking systems, and marine diesel turbines.', scoreType: 'navy', points: 5 },
-      { id: 'q13_d', text: 'Orbital mechanics, cryogenic rocket propellants, carbon composite thermal shielding, and satellite telemetry.', scoreType: 'aerospace', points: 5 }
+      { id: 'q13_a', text: 'I know the exact subjects I need and the exact entrance exams required.', scoreType: 'decided', points: 5 },
+      { id: 'q13_b', text: 'I like a few subjects (like Biology or History or Math) but don’t know which careers they lead to.', scoreType: 'exploring', points: 4 },
+      { id: 'q13_c', text: 'I am terrified of making a wrong stream choice that might ruin my future.', scoreType: 'confused', points: 5 },
+      { id: 'q13_d', text: 'I am just choosing the same stream that most of my close friends are taking.', scoreType: 'pressured', points: 4 }
     ]
   },
   {
     id: 'q14',
-    pillar: 'Defense & Tactical Instincts',
-    prompt: 'When you imagine earning national military or defense honors, which image makes your chest swell with pride?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'Do you ever spend your free time watching YouTube videos or reading books about any specific profession?',
     options: [
-      { id: 'q14_a', text: 'Wearing olive-green uniform with Para-commando balidaan badge, leading troops on the front lines.', scoreType: 'army', points: 5 },
-      { id: 'q14_b', text: 'Wearing flight overalls and G-suit, walking toward your fighter jet on the tarmac before sunrise.', scoreType: 'airforce', points: 5 },
-      { id: 'q14_c', text: 'Wearing crisp white naval officer uniform with gold epaulettes, saluting on the bridge of a warship.', scoreType: 'navy', points: 5 },
-      { id: 'q14_d', text: 'Standing in the ISRO/DRDO mission control room as the rocket you designed successfully injects its satellite into orbit.', scoreType: 'aerospace', points: 5 }
+      { id: 'q14_a', text: 'Yes! Frequently watching documentaries on space rockets, trials, psychology, or defense.', scoreType: 'decided', points: 5 },
+      { id: 'q14_b', text: 'I watch random things across art, tech, science, and history without one specific focus.', scoreType: 'exploring', points: 4 },
+      { id: 'q14_c', text: 'Rarely, because I don’t feel excited enough about any one particular job yet.', scoreType: 'confused', points: 4 },
+      { id: 'q14_d', text: 'I only watch what is directly assigned in my school syllabus.', scoreType: 'pressured', points: 3 }
     ]
   },
-
-  // 15-18: MEDICAL & HEALTHCARE DOMAIN
   {
     id: 'q15',
-    pillar: 'Medical & Healthcare Domain',
-    prompt: 'When you imagine yourself in a hospital wearing a white coat, where do you feel your calling lies?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'What scares you the most when you imagine yourself working 8 hours every day in the future?',
     options: [
-      { id: 'q15_a', text: 'Inside the Operating Theatre (OT): Wearing sterile green scrubs, holding a scalpel, stitching tissue, saving lives with steady hands.', scoreType: 'surgeon', points: 5 },
-      { id: 'q15_b', text: 'The Cardiology / Critical Care Unit: Reading complex ECG rhythms, performing catheter stentings, stabilizing failing hearts.', scoreType: 'cardiology', points: 5 },
-      { id: 'q15_c', text: 'The Neurosciences Ward: Diagnosing brain tumors, managing stroke recoveries, analyzing neural pathways and reflexes.', scoreType: 'neurology', points: 5 },
-      { id: 'q15_d', text: 'The Therapy Clinic: Sitting one-on-one with troubled individuals, diagnosing behavioral disorders, guiding them through emotional healing.', scoreType: 'psychology', points: 5 }
+      { id: 'q15_a', text: 'Being trapped in a dull, monotonous desk routine that doesn’t help people or challenge me.', scoreType: 'exploring', points: 4 },
+      { id: 'q15_b', text: 'Not earning enough money to give my family a comfortable and secure life.', scoreType: 'decided', points: 4 },
+      { id: 'q15_c', text: 'Choosing a degree that everyone praised, only to realize too late that I hate doing it.', scoreType: 'confused', points: 5 },
+      { id: 'q15_d', text: 'Disappointing my parents who sacrificed so much for my education.', scoreType: 'pressured', points: 5 }
     ]
   },
   {
     id: 'q16',
-    pillar: 'Medical & Healthcare Domain',
-    prompt: 'How do your hands and mind react to the sight of surgical blood, deep open incisions, and biological human organs?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'If you had a magic chance to shadow a professional for 1 whole week at their actual job:',
     options: [
-      { id: 'q16_a', text: 'Completely steady and focused: I am captivated by human anatomy and surgical precision.', scoreType: 'surgeon', points: 5 },
-      { id: 'q16_b', text: 'I prefer vascular catheters, heart monitors, and pharmaceutical interventions over open flesh incisions.', scoreType: 'cardiology', points: 5 },
-      { id: 'q16_c', text: 'I am drawn to electrical impulses, brain MRI scans, and the nervous system rather than general blood work.', scoreType: 'neurology', points: 5 },
-      { id: 'q16_d', text: 'I feel uncomfortable around open surgical wounds; I prefer working purely with the psychological mind and words.', scoreType: 'psychology', points: 5 }
+      { id: 'q16_a', text: 'I already know the exact professional I would shadow (e.g. an ISRO Rocket Engineer, Army Officer, or Doctor).', scoreType: 'decided', points: 5 },
+      { id: 'q16_b', text: 'I would want to shadow 3 or 4 completely different people to compare how their days look.', scoreType: 'exploring', points: 5 },
+      { id: 'q16_c', text: 'I would feel totally lost on who to pick.', scoreType: 'confused', points: 4 },
+      { id: 'q16_d', text: 'I would shadow whoever my parents believe earns the highest respect in society.', scoreType: 'pressured', points: 4 }
     ]
   },
   {
     id: 'q17',
-    pillar: 'Medical & Healthcare Domain',
-    prompt: 'Which biological mystery would you spend 5 years in intensive university research to solve?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'Have you ever taken a career counseling test before this one?',
     options: [
-      { id: 'q17_a', text: 'Minimally invasive laparoscopic and robotic surgery techniques to eliminate post-operation infections.', scoreType: 'surgeon', points: 5 },
-      { id: 'q17_b', text: 'Reversing arterial plaque blockages and developing artificial heart pumps that never wear out.', scoreType: 'cardiology', points: 5 },
-      { id: 'q17_c', text: 'Curing Alzheimer\'s memory loss, repairing damaged spinal nerves, and deciphering consciousness.', scoreType: 'neurology', points: 5 },
-      { id: 'q17_d', text: 'Treating severe adolescent depression, chronic anxiety, and trauma without addictive psychiatric medications.', scoreType: 'psychology', points: 5 }
+      { id: 'q17_a', text: 'Yes, in school or online, but the results were too generic or only gave 1 broad computer answer.', scoreType: 'exploring', points: 4 },
+      { id: 'q17_b', text: 'Never. This is my very first detailed career diagnostic.', scoreType: 'exploring', points: 3 },
+      { id: 'q17_c', text: 'Yes, but it confused me even more with complicated jargon.', scoreType: 'confused', points: 5 },
+      { id: 'q17_d', text: 'I usually just rely on family elder discussions.', scoreType: 'pressured', points: 4 }
     ]
   },
   {
     id: 'q18',
-    pillar: 'Medical & Healthcare Domain',
-    prompt: 'How do you handle patient interactions when a family is crying in severe emotional distress?',
+    pillar: 'Career Clarity & Decidedness',
+    pillarCode: 'clarity',
+    prompt: 'How confident do you feel that you will find a career where you will be both happy and successful?',
     options: [
-      { id: 'q18_a', text: 'I deliver direct, honest surgical facts calmly and rush back inside to fight for the patient\'s life on the table.', scoreType: 'surgeon', points: 4 },
-      { id: 'q18_b', text: 'I explain the heart vitals, blood oxygen stats, and medication plan clearly so they understand the treatment.', scoreType: 'cardiology', points: 4 },
-      { id: 'q18_c', text: 'I map out the cognitive reflexes, MRI findings, and recovery prognosis with methodical care.', scoreType: 'neurology', points: 4 },
-      { id: 'q18_d', text: 'I sit down beside them, listen deeply with profound empathy, and provide psychological comfort and grounding.', scoreType: 'psychology', points: 5 }
+      { id: 'q18_a', text: 'Very confident. With hard work and clear guidance, I know I will succeed.', scoreType: 'decided', points: 5 },
+      { id: 'q18_b', text: 'Moderately confident, once I get a clear, step-by-step roadmap.', scoreType: 'exploring', points: 4 },
+      { id: 'q18_c', text: 'Anxious and doubtful right now because I don’t know where my real strength lies.', scoreType: 'confused', points: 5 },
+      { id: 'q18_d', text: 'I feel pressured because expectations on me are very high.', scoreType: 'pressured', points: 5 }
     ]
   },
 
-  // 19-22: ENGINEERING & INFRASTRUCTURE
+  // ==========================================
+  // PILLAR 3: BIG FIVE PERSONALITY & PSYCHOLOGICAL TRAITS (15 QUESTIONS)
+  // ==========================================
   {
     id: 'q19',
-    pillar: 'Engineering & Construction Systems',
-    prompt: 'If you were given a ₹500 Crore government engineering grant, what monument of human progress would you build?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'EXTRAVERSION: After spending a full week studying alone for exams, how do you recharge your mind?',
     options: [
-      { id: 'q19_a', text: 'A reusable heavy-lift rocket capable of landing satellite payloads on the lunar south pole.', scoreType: 'aerospace', points: 5 },
-      { id: 'q19_b', text: 'A mega sea-link suspension bridge or high-speed mountain tunnel connecting isolated Himalayan valleys.', scoreType: 'civil', points: 5 },
-      { id: 'q19_c', text: 'An autonomous AI supercomputing data center securing national defense networks against global cyber warfare.', scoreType: 'cs_ai', points: 5 },
-      { id: 'q19_d', text: 'A futuristic zero-carbon smart city with green parks, renewable solar grids, and sustainable housing.', scoreType: 'architect', points: 5 }
+      { id: 'q19_a', text: 'Going outside to play team sports, talk to friends, and be around a crowd of people.', scoreType: 'extravert', points: 5 },
+      { id: 'q19_b', text: 'Staying in my quiet room, reading, listening to music, or going for a peaceful walk alone.', scoreType: 'introvert', points: 5 },
+      { id: 'q19_c', text: 'Catching up with 1 or 2 trusted best friends in a calm setting.', scoreType: 'introvert', points: 4 },
+      { id: 'q19_d', text: 'Organizing a group outing or dinner for our entire neighborhood circle.', scoreType: 'extravert', points: 5 }
     ]
   },
   {
     id: 'q20',
-    pillar: 'Engineering & Construction Systems',
-    prompt: 'What kind of failure keeps you awake at night and pushes you to double-check every calculation?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'CONSCIENTIOUSNESS: When you have a big school project due in 2 weeks:',
     options: [
-      { id: 'q20_a', text: 'A rocket fuel valve seal leaking under cryogenic cold, causing a catastrophic launchpad explosion.', scoreType: 'aerospace', points: 5 },
-      { id: 'q20_b', text: 'A bridge foundation settling unevenly or a dam wall developing micro-cracks under hydraulic pressure.', scoreType: 'civil', points: 5 },
-      { id: 'q20_c', text: 'A critical software bug allowing foreign hackers to paralyze national electricity grids or bank servers.', scoreType: 'cs_ai', points: 5 },
-      { id: 'q20_d', text: 'An aesthetic building flaw that makes an entire residential tower gloomy, unlivable, and poorly ventilated.', scoreType: 'architect', points: 5 }
+      { id: 'q20_a', text: 'I make a daily checklist immediately, start day 1, and finish everything 2 days early.', scoreType: 'conscientious', points: 5 },
+      { id: 'q20_b', text: 'I start with great energy, then relax, and finish in a quick burst the night before.', scoreType: 'spontaneous', points: 4 },
+      { id: 'q20_c', text: 'I prefer doing work in sudden creative bursts whenever inspiration strikes.', scoreType: 'spontaneous', points: 5 },
+      { id: 'q20_d', text: 'I keep reminding myself, but often end up feeling stressed due to last-minute rush.', scoreType: 'spontaneous', points: 4 }
     ]
   },
   {
     id: 'q21',
-    pillar: 'Engineering & Construction Systems',
-    prompt: 'Where would you rather spend your active workdays?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'OPENNESS: How do you react when you encounter an idea or culture completely opposite to what you grew up with?',
     options: [
-      { id: 'q21_a', text: 'At a space launch center (Sriharikota) running telemetry simulations and inspecting rocket stages.', scoreType: 'aerospace', points: 5 },
-      { id: 'q21_b', text: 'Wearing a yellow hard-hat on site, inspecting massive steel rebar cages, pouring concrete, and supervising heavy cranes.', scoreType: 'civil', points: 5 },
-      { id: 'q21_c', text: 'In a modern tech lab with multi-monitor workstation setups, writing neural networks, and optimizing backend systems.', scoreType: 'cs_ai', points: 5 },
-      { id: 'q21_d', text: 'In an architectural design studio drawing 3D CAD blueprints, modeling miniature physical buildings, and choosing textures.', scoreType: 'architect', points: 5 }
+      { id: 'q21_a', text: 'I become intensely curious and want to ask questions to understand how they see the world.', scoreType: 'openness', points: 5 },
+      { id: 'q21_b', text: 'I respect it, but prefer sticking firmly to traditional and proven methods that have worked for generations.', scoreType: 'conventional', points: 4 },
+      { id: 'q21_c', text: 'I analyze whether their system produces better objective facts and results.', scoreType: 'openness', points: 4 },
+      { id: 'q21_d', text: 'I feel slightly uneasy whenever established rules and traditions are questioned.', scoreType: 'conventional', points: 5 }
     ]
   },
   {
     id: 'q22',
-    pillar: 'Engineering & Construction Systems',
-    prompt: 'When inspecting a construction site or rocket assembly hangar, what catches your sharp attention first?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'AGREEABLENESS & EMPATHY: When a classmate fails badly and looks humiliated in front of the class:',
     options: [
-      { id: 'q22_a', text: 'The aerodynamic wing taper, rocket nozzle expansion ratio, and lightweight carbon composite skin.', scoreType: 'aerospace', points: 5 },
-      { id: 'q22_b', text: 'The soil bearing capacity, pillar depth, beam deflection, and foundation load distribution.', scoreType: 'civil', points: 5 },
-      { id: 'q22_c', text: 'The digital sensor telemetry, automated PLC logic, and server network connectivity.', scoreType: 'cs_ai', points: 5 },
-      { id: 'q22_d', text: 'The sunlight ingress angles, room acoustics, aesthetic exterior facade, and pedestrian walkways.', scoreType: 'architect', points: 5 }
+      { id: 'q22_a', text: 'I physically feel their pain in my chest and sit with them after class to comfort them.', scoreType: 'empathy', points: 5 },
+      { id: 'q22_b', text: 'I consider why they didn’t prepare properly and think about what study plan they should follow.', scoreType: 'logic', points: 4 },
+      { id: 'q22_c', text: 'I crack a light joke or distract them with sports to take their mind off the embarrassment.', scoreType: 'extravert', points: 4 },
+      { id: 'q22_d', text: 'I step up and speak to the teacher if I feel the student was unfairly shamed.', scoreType: 'courage', points: 5 }
     ]
   },
-
-  // 23-26: CAREER CLARITY & PRESSURE
   {
     id: 'q23',
-    pillar: 'Career Clarity & Pressure',
-    prompt: 'When relatives ask: "What are your future career plans?", what is your honest internal reaction?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'NEUROTICISM / STRESS RESILIENCE: You are about to speak on stage in front of 400 people:',
     options: [
-      { id: 'q23_a', text: 'I have 1 or 2 specific dream vocations that I have loved for years, and I explain them with confidence.', scoreType: 'decided', points: 5 },
-      { id: 'q23_b', text: 'I have 4 or 5 different interests, but I find it hard to pick just one specific career path.', scoreType: 'exploring', points: 4 },
-      { id: 'q23_c', text: 'I feel deeply confused and worried because I have no clear picture of my path.', scoreType: 'confused', points: 5 },
-      { id: 'q23_d', text: 'I usually repeat whatever degree my parents or elder cousins tell me to say.', scoreType: 'pressured', points: 5 }
+      { id: 'q23_a', text: 'My heart beats fast, but once I step on stage, adrenaline kicks in and I deliver with pride.', scoreType: 'resilient', points: 5 },
+      { id: 'q23_b', text: 'I feel intense dread, sweating hands, and wish I could disappear or hand the mic to someone else.', scoreType: 'sensitive', points: 5 },
+      { id: 'q23_c', text: 'I treat it like an intellectual challenge: I have my bullet points memorized and execute calmly.', scoreType: 'resilient', points: 4 },
+      { id: 'q23_d', text: 'I actually love being in the spotlight and command the audience’s attention naturally.', scoreType: 'extravert', points: 5 }
     ]
   },
   {
     id: 'q24',
-    pillar: 'Career Clarity & Pressure',
-    prompt: 'How much do family expectations influence your decision regarding 11th/12th stream selection?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'INTUITION VS DETAIL: When reading a mystery story or learning a science concept:',
     options: [
-      { id: 'q24_a', text: 'They strongly insist on conventional secure options (doctor/engineer/govt job), even if my heart differs.', scoreType: 'pressured', points: 5 },
-      { id: 'q24_b', text: 'They are completely supportive and encourage me to follow whatever matches my genuine skills.', scoreType: 'decided', points: 4 },
-      { id: 'q24_c', text: 'I am so undecided myself that I easily adopt whatever opinion someone shares with me.', scoreType: 'confused', points: 4 },
-      { id: 'q24_d', text: 'I am researching entrance exams and college roadmaps on my own and discussing them openly with my family.', scoreType: 'exploring', points: 5 }
+      { id: 'q24_a', text: 'I quickly grasp the big-picture "vibe" and predict the ending using my gut instinct.', scoreType: 'intuitive', points: 5 },
+      { id: 'q24_b', text: 'I note down every single clue, date, and factual step to verify proof before guessing.', scoreType: 'observant', points: 5 },
+      { id: 'q24_c', text: 'I focus on why the characters behaved emotionally the way they did.', scoreType: 'empathy', points: 4 },
+      { id: 'q24_d', text: 'I try to visualize how the physical scene looked in 3D.', scoreType: 'tactical', points: 4 }
     ]
   },
   {
     id: 'q25',
-    pillar: 'Career Clarity & Pressure',
-    prompt: 'What is your biggest fear when thinking about your working life at age 28?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'ORDER & DISCIPLINE: How tidy is your study table or bedroom shelf right now?',
     options: [
-      { id: 'q25_a', text: 'Getting stuck in a boring, repetitive desk job doing paperwork that creates zero impact.', scoreType: 'exploring', points: 4 },
-      { id: 'q25_b', text: 'Not earning enough money to provide my parents and family with a secure, honorable life.', scoreType: 'decided', points: 4 },
-      { id: 'q25_c', text: 'Studying for 5 years in a field everyone praised, only to realize I hate the daily work.', scoreType: 'confused', points: 5 },
-      { id: 'q25_d', text: 'Failing to meet family expectations and letting down those who sacrificed for me.', scoreType: 'pressured', points: 5 }
+      { id: 'q25_a', text: 'Every book, pen, and notebook is placed in its dedicated drawer or neat stack.', scoreType: 'conscientious', points: 5 },
+      { id: 'q25_b', text: 'It looks chaotic to others, but I know exactly where every single sheet of paper is.', scoreType: 'spontaneous', points: 4 },
+      { id: 'q25_c', text: 'I clean it up only when someone orders me to or when visitors are coming.', scoreType: 'spontaneous', points: 3 },
+      { id: 'q25_d', text: 'I keep only the 1 book I am reading right now; everything else is put away.', scoreType: 'conscientious', points: 4 }
     ]
   },
   {
     id: 'q26',
-    pillar: 'Career Clarity & Pressure',
-    prompt: 'If college entrance fee or competition was not a factor, what would you pursue without hesitation?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'CRITICISM: If a teacher or coach firmly tells you that your performance was poor:',
     options: [
-      { id: 'q26_a', text: 'Fighter pilot, naval commander, or army officer serving on national frontlines.', scoreType: 'army', points: 5 },
-      { id: 'q26_b', text: 'Rocket engineer, astrophysicist, or advanced AI robotics inventor.', scoreType: 'aerospace', points: 5 },
-      { id: 'q26_c', text: 'Specialized brain surgeon, cardiologist, or mental health healer.', scoreType: 'surgeon', points: 5 },
-      { id: 'q26_d', text: 'High court judge, civil district magistrate (IAS), or enterprise founder.', scoreType: 'civil_services', points: 5 }
+      { id: 'q26_a', text: 'I swallow my pride, ask specifically what needs fixing, and practice 3 times harder.', scoreType: 'resilient', points: 5 },
+      { id: 'q26_b', text: 'I feel deeply hurt inside and replay their harsh words in my mind for several days.', scoreType: 'sensitive', points: 5 },
+      { id: 'q26_c', text: 'I question whether their critique was factually fair and defend my work with evidence.', scoreType: 'logic', points: 4 },
+      { id: 'q26_d', text: 'I feel motivated by anger to prove them completely wrong next time.', scoreType: 'courage', points: 5 }
     ]
   },
-
-  // 27-32: PERSONALITY & TEMPERAMENT
   {
     id: 'q27',
-    pillar: 'Personality & Temperament',
-    prompt: 'EXTRAVERSION: After spending 5 consecutive days studying alone for tough exams, how do you recharge?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'CURIOSITY: In a science laboratory, when the teacher leaves the room for 5 minutes:',
     options: [
-      { id: 'q27_a', text: 'Playing football, running outdoors with peers, and laughing with a group.', scoreType: 'extravert', points: 5 },
-      { id: 'q27_b', text: 'Staying in my quiet room, reading books, listening to music, or taking a solitary walk.', scoreType: 'introvert', points: 5 },
-      { id: 'q27_c', text: 'Meeting my 1 or 2 closest friends for peaceful, deep conversation.', scoreType: 'introvert', points: 4 },
-      { id: 'q27_d', text: 'Organizing an outing or festival gathering for our entire school circle.', scoreType: 'extravert', points: 5 }
+      { id: 'q27_a', text: 'I am tempted to touch the glass beakers, mix chemicals, or look down the microscope lenses.', scoreType: 'openness', points: 5 },
+      { id: 'q27_b', text: 'I stay seated and ensure no student accidentally breaks safety protocols or causes an accident.', scoreType: 'conscientious', points: 5 },
+      { id: 'q27_c', text: 'I chat and joke with friends at the lab bench.', scoreType: 'extravert', points: 4 },
+      { id: 'q27_d', text: 'I read the lab manual carefully to make sure my experiment will yield 100% correct data.', scoreType: 'logic', points: 4 }
     ]
   },
   {
     id: 'q28',
-    pillar: 'Personality & Temperament',
-    prompt: 'DISCIPLINE: When assigned a major project due in two weeks:',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'MORAL INSTINCT: If your closest childhood friend stole money from the school charity box:',
     options: [
-      { id: 'q28_a', text: 'I break it down into daily milestones immediately and finish 2 days ahead of schedule.', scoreType: 'conscientious', points: 5 },
-      { id: 'q28_b', text: 'I start with good intentions, relax mid-way, and finish in a late-night burst of adrenaline.', scoreType: 'spontaneous', points: 4 },
-      { id: 'q28_c', text: 'I work best when sudden creative inspiration strikes, rather than following rigid routines.', scoreType: 'spontaneous', points: 5 },
-      { id: 'q28_d', text: 'I struggle with procrastination and feel stressed near the deadline.', scoreType: 'spontaneous', points: 4 }
+      { id: 'q28_a', text: 'I confront them privately, force them to return every rupee, and help them admit their mistake with dignity.', scoreType: 'conscientious', points: 5 },
+      { id: 'q28_b', text: 'I protect them from punishment because loyalty to my friend comes first, then counsel them.', scoreType: 'empathy', points: 4 },
+      { id: 'q28_c', text: 'I report it anonymously to school authorities because upholding law and integrity is non-negotiable.', scoreType: 'courage', points: 5 },
+      { id: 'q28_d', text: 'I try to understand if their family is starving or in desperate medical need before deciding.', scoreType: 'intuitive', points: 5 }
     ]
   },
   {
     id: 'q29',
-    pillar: 'Personality & Temperament',
-    prompt: 'MORAL COURAGE: In a group project, when an older peer tries to bully a quiet classmate:',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'ROUTINE VS NOVELTY: If every single day of your job followed the exact same 9 AM to 5 PM routine:',
     options: [
-      { id: 'q29_a', text: 'I stand up immediately, look the bully in the eye, and firmly order them to back off.', scoreType: 'courage', points: 5 },
-      { id: 'q29_b', text: 'I pull the quiet classmate away safely and report the behavior to teachers with proof.', scoreType: 'empathy', points: 4 },
-      { id: 'q29_c', text: 'I logically dissect the bully\'s false claims until they feel foolish and back down.', scoreType: 'logic', points: 4 },
-      { id: 'q29_d', text: 'I console the victim afterward and ensure they do not feel alone.', scoreType: 'empathy', points: 5 }
+      { id: 'q29_a', text: 'I would love it! Predictability, clear safety, and stable hours give me peace of mind.', scoreType: 'conventional', points: 5 },
+      { id: 'q29_b', text: 'I would suffocate! I need unexpected challenges, field travel, or creative freedom.', scoreType: 'openness', points: 5 },
+      { id: 'q29_c', text: 'As long as the job is intellectually stimulating, the routine doesn’t bother me.', scoreType: 'logic', points: 4 },
+      { id: 'q29_d', text: 'I prefer physical action outdoors over sitting inside four walls all day.', scoreType: 'tactical', points: 5 }
     ]
   },
   {
     id: 'q30',
-    pillar: 'Personality & Temperament',
-    prompt: 'PRESSURE TOLERANCE: When an unexpected emergency shatters your team\'s plan 1 hour before presentation:',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'DECISION STYLE: When making an important life choice (like buying a laptop or picking a school):',
     options: [
-      { id: 'q30_a', text: 'My heart rate stays steady; I take command, delegate backup tasks, and find a solution.', scoreType: 'courage', points: 5 },
-      { id: 'q30_b', text: 'I analyze the root failure on paper first, calculate the fastest fix, and execute.', scoreType: 'logic', points: 5 },
-      { id: 'q30_c', text: 'I check on team morale first to ensure nobody is having a panic breakdown.', scoreType: 'empathy', points: 5 },
-      { id: 'q30_d', text: 'I feel deeply shaken inside and need a moment to collect my thoughts.', scoreType: 'sensitive', points: 4 }
+      { id: 'q30_a', text: 'I create an Excel comparison sheet of technical specs, reviews, and benchmark prices.', scoreType: 'logic', points: 5 },
+      { id: 'q30_b', text: 'I trust my inner instinct and vibe within the first 5 minutes of seeing it.', scoreType: 'intuitive', points: 5 },
+      { id: 'q30_c', text: 'I ask 10 different people for advice until I find a consensus.', scoreType: 'empathy', points: 4 },
+      { id: 'q30_d', text: 'I pick whatever is most durable, rugged, and practical.', scoreType: 'tactical', points: 4 }
     ]
   },
   {
     id: 'q31',
-    pillar: 'Personality & Temperament',
-    prompt: 'DETAIL FOCUS: How patient are you when doing repetitive mathematical verifications or safety checks?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'ENERGY IN CONFLICT: When two friends are screaming at each other in a heated dispute:',
     options: [
-      { id: 'q31_a', text: 'Extremely patient: Missing even one decimal error can cause a bridge or rocket to fail.', scoreType: 'conscientious', points: 5 },
-      { id: 'q31_b', text: 'I get restless quickly; I prefer hands-on physical action or talking to people.', scoreType: 'spontaneous', points: 4 },
-      { id: 'q31_c', text: 'I automate the repetitive check using code so I never have to do it manually.', scoreType: 'cs_ai', points: 5 },
-      { id: 'q31_d', text: 'I can do it if required, but my heart is in creative storytelling or design.', scoreType: 'artistic', points: 4 }
+      { id: 'q31_a', text: 'I step between them calmly, listen to both sides impartially, and negotiate a fair treaty.', scoreType: 'empathy', points: 5 },
+      { id: 'q31_b', text: 'I raise my voice firmly with authority and command both to shut up and cool down.', scoreType: 'courage', points: 5 },
+      { id: 'q31_c', text: 'I walk away because witnessing raw anger makes me feel uncomfortable and drained.', scoreType: 'sensitive', points: 4 },
+      { id: 'q31_d', text: 'I analyze who broke the ground rules logically and point out the root misunderstanding.', scoreType: 'logic', points: 4 }
     ]
   },
   {
     id: 'q32',
-    pillar: 'Personality & Temperament',
-    prompt: 'OUTDOOR WEATHER GRIT: How do you handle extreme physical hardship (scorching heat, monsoon mud, or freezing cold)?',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'PATIENCE: When explaining a simple concept to someone who keeps failing to understand it:',
     options: [
-      { id: 'q32_a', text: 'I thrive in tough elements: Outdoor grit, mud, and physical sweat make me feel alive.', scoreType: 'army', points: 5 },
-      { id: 'q32_b', text: 'I don\'t mind heavy weather as long as I am inspecting a construction site or farm.', scoreType: 'civil', points: 4 },
-      { id: 'q32_c', text: 'I strongly prefer modern, air-conditioned hospitals, research laboratories, or corporate towers.', scoreType: 'surgeon', points: 4 },
-      { id: 'q32_d', text: 'I prefer working from a quiet study room or computer terminal.', scoreType: 'cs_ai', points: 4 }
+      { id: 'q32_a', text: 'I smile warmly, invent 3 real-world analogies, and keep guiding them until the lightbulb clicks.', scoreType: 'teaching', points: 5 },
+      { id: 'q32_b', text: 'I start feeling restless inside and wonder why they are struggling with such simple logic.', scoreType: 'logic', points: 4 },
+      { id: 'q32_c', text: 'I physically demonstrate how to do it with my own hands.', scoreType: 'tactical', points: 4 },
+      { id: 'q32_d', text: 'I encourage them emotionally so they don’t lose self-belief.', scoreType: 'empathy', points: 4 }
+    ]
+  },
+  {
+    id: 'q33',
+    pillar: 'Personality & Psychological Traits',
+    pillarCode: 'personality',
+    prompt: 'ADVENTURE & RISK: If offered a chance to go on a high-altitude Himalayan mountaineering expedition:',
+    options: [
+      { id: 'q33_a', text: 'Yes, pack my bags! Physical stamina, high peaks, and pushing human endurance thrill me.', scoreType: 'tactical', points: 5 },
+      { id: 'q33_b', text: 'Only if certified mountain guides and medical oxygen kits ensure 100% safety parameters.', scoreType: 'conscientious', points: 4 },
+      { id: 'q33_c', text: 'I would go to photograph the snow landscapes and write poetic reflections.', scoreType: 'openness', points: 4 },
+      { id: 'q33_d', text: 'I prefer staying in the base camp cabin reading a great book with hot tea.', scoreType: 'introvert', points: 4 }
     ]
   },
 
-  // 33-37: VOCATIONAL PASSION & RIASEC DOMAINS
-  {
-    id: 'q33',
-    pillar: 'Vocational Calling',
-    prompt: 'When you visit a rural village or agricultural district in India, what thought grabs your mind?',
-    options: [
-      { id: 'q33_a', text: 'Treating injured livestock and deploying agricultural drones for soil sensors and drip irrigation.', scoreType: 'agri_vet', points: 5 },
-      { id: 'q33_b', text: 'Building durable concrete canals, paved roads, and flood protection embankments for the village.', scoreType: 'civil', points: 5 },
-      { id: 'q33_c', text: 'Serving as District Collector (IAS) to ensure schools, hospitals, and ration schemes reach every family.', scoreType: 'civil_services', points: 5 },
-      { id: 'q33_d', text: 'Setting up free medical health camps to diagnose heart murmurs, cataracts, and nerve illnesses.', scoreType: 'cardiology', points: 5 }
-    ]
-  },
+  // ==========================================
+  // PILLAR 4: RIASEC VOCATIONAL DOMAINS & INTERESTS (18 QUESTIONS)
+  // ==========================================
   {
     id: 'q34',
-    pillar: 'Vocational Calling',
-    prompt: 'If you had to read a 400-page book from cover to cover this weekend, which title would you pick?',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'REALISTIC (Hands-on): When a bicycle chain, ceiling fan, or water pump breaks down at home:',
     options: [
-      { id: 'q34_a', text: '"Rocket Propulsion Elements & Space Mission Architectures"', scoreType: 'aerospace', points: 5 },
-      { id: 'q34_b', text: '"Principles of Trauma Surgery & Battlefield Operative Medicine"', scoreType: 'surgeon', points: 5 },
-      { id: 'q34_c', text: '"The Art of Military Strategy & Battlefield Command: From NDA to Kargil"', scoreType: 'army', points: 5 },
-      { id: 'q34_d', text: '"Constitutional Law of India & Landmark Supreme Court Judgments"', scoreType: 'lawyer', points: 5 }
+      { id: 'q34_a', text: 'I grab screwdrivers and grease, take the parts apart, and fix the mechanical mechanism myself.', scoreType: 'realistic', points: 5 },
+      { id: 'q34_b', text: 'I immediately call a technician because I don’t enjoy getting my hands dirty with grease.', scoreType: 'conventional', points: 3 },
+      { id: 'q34_c', text: 'I look up the physics of how the motor works on Wikipedia.', scoreType: 'investigative', points: 4 },
+      { id: 'q34_d', text: 'I wonder who designed such an appliance and how it could look sleek.', scoreType: 'artistic', points: 4 }
     ]
   },
   {
     id: 'q35',
-    pillar: 'Vocational Calling',
-    prompt: 'Which tool or equipment would you handle with the most natural instinct and curiosity?',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'INVESTIGATIVE (Scientific Inquiry): Which magazine or documentary topic pulls your attention first?',
     options: [
-      { id: 'q35_a', text: 'A flight joystick, throttle quadrant, and radar screen.', scoreType: 'airforce', points: 5 },
-      { id: 'q35_b', text: 'A precision surgical needle-holder, scalpel, and suture threads.', scoreType: 'surgeon', points: 5 },
-      { id: 'q35_c', text: 'A laser surveying total station, concrete compression tester, and CAD soil blueprints.', scoreType: 'civil', points: 5 },
-      { id: 'q35_d', text: 'An oscilloscope, rocket fuel injector nozzle, and cryogenic valve test rig.', scoreType: 'aerospace', points: 5 }
+      { id: 'q35_a', text: 'How liquid rocket engines, orbital maneuvers, and satellite constellations reach outer space.', scoreType: 'investigative', points: 5 },
+      { id: 'q35_b', text: 'Undercover operations that caught corrupt international cartels.', scoreType: 'courage', points: 4 },
+      { id: 'q35_c', text: 'How young entrepreneurs built a ₹1,000 crore startup from a rural garage.', scoreType: 'enterprising', points: 4 },
+      { id: 'q35_d', text: 'How psychological therapy helped soldiers heal severe war post-traumatic stress.', scoreType: 'social', points: 4 }
     ]
   },
   {
     id: 'q36',
-    pillar: 'Vocational Calling',
-    prompt: 'How do you feel about national uniform discipline, physical salutes, and rank hierarchy?',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'ARTISTIC (Creative Expression): In school exhibitions or annual festivals, which role do you enjoy most?',
     options: [
-      { id: 'q36_a', text: 'Supreme honor and purpose: Living by military code, honor, and serving the motherland is the highest calling.', scoreType: 'army', points: 5 },
-      { id: 'q36_b', text: 'I respect it deeply, but I prefer contributing to national strength through science, rocketry, or medicine.', scoreType: 'aerospace', points: 4 },
-      { id: 'q36_c', text: 'I prefer civil governance authority like IAS/IPS over strict regimented barracks life.', scoreType: 'civil_services', points: 4 },
-      { id: 'q36_d', text: 'I prefer intellectual freedom in university academia, hospitals, or private enterprise.', scoreType: 'professor', points: 4 }
+      { id: 'q36_a', text: 'Writing the script, designing stage backdrops, composing music, or directing plays.', scoreType: 'artistic', points: 5 },
+      { id: 'q36_b', text: 'Managing the ticket sales, sponsorships, and budget finances.', scoreType: 'conventional', points: 4 },
+      { id: 'q36_c', text: 'Managing stage security, crowd queues, and emergency exits.', scoreType: 'realistic', points: 4 },
+      { id: 'q36_d', text: 'Welcoming guests, hosting the microphone anchor role, and introducing speakers.', scoreType: 'social', points: 4 }
     ]
   },
   {
     id: 'q37',
-    pillar: 'Vocational Calling',
-    prompt: 'When you hear about an earthquake striking an Indian state, where do you want to be helping?',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'SOCIAL (Helping & Healing): Which of these acts would give your life the most enduring sense of pride?',
     options: [
-      { id: 'q37_a', text: 'In Army/NDRF combat rescue boats and helicopters, pulling trapped citizens from collapsed rubble.', scoreType: 'army', points: 5 },
-      { id: 'q37_b', text: 'In the emergency trauma tent performing emergency amputations and stabilizing crush injuries.', scoreType: 'surgeon', points: 5 },
-      { id: 'q37_c', text: 'Inspecting damaged bridges, dams, and structural pillars to prevent catastrophic collapses.', scoreType: 'civil', points: 5 },
-      { id: 'q37_d', text: 'Directing the district administration control room, food logistics, and relief funds as District Magistrate.', scoreType: 'civil_services', points: 5 }
+      { id: 'q37_a', text: 'Guiding a depressed teenager out of dark thoughts back into a smiling, thriving life.', scoreType: 'social', points: 5 },
+      { id: 'q37_b', text: 'Building an automated AI robot or aerospace rocket that pushes human knowledge boundaries.', scoreType: 'investigative', points: 5 },
+      { id: 'q37_c', text: 'Leading a military rescue battalion that evacuates 500 flood victims from roofs.', scoreType: 'courage', points: 5 },
+      { id: 'q37_d', text: 'Founding a company that creates 1,000 well-paying jobs in your home district.', scoreType: 'enterprising', points: 4 }
     ]
   },
-
-  // 38-40: LIFE PURPOSE, VALUES & WORK STYLE
   {
     id: 'q38',
-    pillar: 'Life Purpose & Legacy',
-    prompt: 'At age 75 looking back at your journey, what will make you feel your life had true meaning?',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'ENTERPRISING (Influence & Leadership): Imagine you are elected student council president:',
     options: [
-      { id: 'q38_a', text: 'I defended my motherland with honor, stood firm on our borders, and protected millions of citizens.', scoreType: 'army', points: 5 },
-      { id: 'q38_b', text: 'I built spacecraft, explored the cosmos, and pushed the frontiers of scientific knowledge.', scoreType: 'aerospace', points: 5 },
-      { id: 'q38_c', text: 'I operated on thousands of sick patients and pulled human beings back from the edge of death.', scoreType: 'surgeon', points: 5 },
-      { id: 'q38_d', text: 'I designed bridges, highways, and infrastructure that will safely carry millions of travelers for 100 years.', scoreType: 'civil', points: 5 }
+      { id: 'q38_a', text: 'I love delivering passionate speeches, rallying students behind big ideas, and negotiating with the principal.', scoreType: 'enterprising', points: 5 },
+      { id: 'q38_b', text: 'I focus on auditing the school library records and ensuring strict disciplinary rules.', scoreType: 'conventional', points: 4 },
+      { id: 'q38_c', text: 'I organize peer tutoring circles so weaker students get free academic coaching.', scoreType: 'social', points: 5 },
+      { id: 'q38_d', text: 'I build a student mobile app to report broken canteen taps and benches.', scoreType: 'investigative', points: 4 }
     ]
   },
   {
     id: 'q39',
-    pillar: 'Life Purpose & Legacy',
-    prompt: 'Which equation of reward matters to you most in your professional career?',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'CONVENTIONAL (Data, Audit & Structure): When dealing with numbers, bank records, or spreadsheets:',
     options: [
-      { id: 'q39_a', text: 'Supreme national honor, military respect, official quarters, and lifelong brotherly camaraderie.', scoreType: 'army', points: 5 },
-      { id: 'q39_b', text: 'Intellectual breakthrough: Seeing a rocket or satellite you designed roar into orbit.', scoreType: 'aerospace', points: 5 },
-      { id: 'q39_c', text: 'Medical healing: Walking out of surgery to tell a weeping family that their child is alive and will walk again.', scoreType: 'surgeon', points: 5 },
-      { id: 'q39_d', text: 'Building legacy: Seeing a grand suspension bridge or highway you engineered stand proudly across a river.', scoreType: 'civil', points: 5 }
+      { id: 'q39_a', text: 'I enjoy finding the exact 1 rupee discrepancy in balance sheets and keeping records 100% clean.', scoreType: 'conventional', points: 5 },
+      { id: 'q39_b', text: 'I get a headache looking at rows of financial accounts and want to do something creative instead.', scoreType: 'artistic', points: 4 },
+      { id: 'q39_c', text: 'I only care about what story the numbers tell about human behavior.', scoreType: 'social', points: 3 },
+      { id: 'q39_d', text: 'I write a Python script to automate the calculation so I don’t have to do it manually.', scoreType: 'investigative', points: 4 }
     ]
   },
   {
     id: 'q40',
-    pillar: 'Life Purpose & Legacy',
-    prompt: 'FINAL SELF-REFLECTION: When you close your eyes and picture yourself 10 years from now, which image makes you proudest?',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'MILITARY / POLICE TACTICAL: How do you feel about wearing a crisp armed forces uniform with rank badges?',
     options: [
-      { id: 'q40_a', text: 'Commanding troops in uniform, or piloting a supersonic fighter jet, or commanding a naval warship.', scoreType: 'army', points: 5 },
-      { id: 'q40_b', text: 'Working as a Senior ISRO/DRDO Aerospace Scientist building deep space probes and rocket engines.', scoreType: 'aerospace', points: 5 },
-      { id: 'q40_c', text: 'Leading surgical procedures or treating heart and neurological conditions as an elite doctor.', scoreType: 'surgeon', points: 5 },
-      { id: 'q40_d', text: 'Chief Structural Engineer building state mega-projects or leading district governance as an IAS officer.', scoreType: 'civil', points: 5 }
+      { id: 'q40_a', text: 'Supreme honor and goosebumps! Leading troops, upholding military discipline, and serving India is my calling.', scoreType: 'courage', points: 5 },
+      { id: 'q40_b', text: 'I deeply respect our soldiers, but I prefer contributing to India as a civilian scientist, engineer, or teacher.', scoreType: 'social', points: 4 },
+      { id: 'q40_c', text: 'I prefer aerospace rocket design, code-breaking, or intelligence gathering over frontline physical warfare.', scoreType: 'investigative', points: 5 },
+      { id: 'q40_d', text: 'I dislike strict hierarchy and salute commands; I value complete personal freedom.', scoreType: 'artistic', points: 4 }
+    ]
+  },
+  {
+    id: 'q41',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'TEACHING & MENTORSHIP: When you master a hard math or history chapter before anyone else in class:',
+    options: [
+      { id: 'q41_a', text: 'I naturally gather 4 classmates around my bench and teach them step-by-step until their doubts vanish.', scoreType: 'teaching', points: 5 },
+      { id: 'q41_b', text: 'I quietly move on to the next advanced chapter to challenge my own mind.', scoreType: 'investigative', points: 4 },
+      { id: 'q41_c', text: 'I write concise summary notes and sell or share them as study guides.', scoreType: 'enterprising', points: 4 },
+      { id: 'q41_d', text: 'I keep my preparation private so I can score the highest marks in class.', scoreType: 'conventional', points: 3 }
+    ]
+  },
+  {
+    id: 'q42',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'CRIMINOLOGY & FORENSICS: If a sealed museum room was burgled without any doors being forced:',
+    options: [
+      { id: 'q42_a', text: 'I want to dust for microscopic fingerprint powders, examine laser trip sensors, and run DNA tests.', scoreType: 'investigative', points: 5 },
+      { id: 'q42_b', text: 'I want to interrogate the night security guards and look for micro-tremors in their voices to catch the lie.', scoreType: 'social', points: 4 },
+      { id: 'q42_c', text: 'I want to seal the town roads with armed patrol barricades to intercept the getaway vehicle.', scoreType: 'courage', points: 5 },
+      { id: 'q42_d', text: 'I want to write the breaking news front-page article explaining how the heist shocked the nation.', scoreType: 'artistic', points: 4 }
+    ]
+  },
+  {
+    id: 'q43',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'VETERINARY & ANIMAL CARE: When a stray street dog or calf is injured with a bleeding wound:',
+    options: [
+      { id: 'q43_a', text: 'I immediately approach gently, clean the wound with antiseptic, bandage it, and feed the animal.', scoreType: 'realistic', points: 5 },
+      { id: 'q43_b', text: 'I feel pity from a distance, but I am terrified of animals biting me or catching rabies.', scoreType: 'sensitive', points: 3 },
+      { id: 'q43_c', text: 'I call the municipal animal welfare ambulance and follow up until they arrive.', scoreType: 'social', points: 4 },
+      { id: 'q43_d', text: 'I research what antibiotic injection is scientifically required for that species.', scoreType: 'investigative', points: 4 }
+    ]
+  },
+  {
+    id: 'q44',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'JOURNALISM & MEDIA EXPOSÉ: When powerful individuals bribe officials to cover up illegal river pollution:',
+    options: [
+      { id: 'q44_a', text: 'I want to secretly record water samples, interview poisoned villagers, and publish an exposé.', scoreType: 'artistic', points: 5 },
+      { id: 'q44_b', text: 'I want to file a public interest litigation (PIL) in the High Court and argue before the Chief Justice.', scoreType: 'courage', points: 5 },
+      { id: 'q44_c', text: 'I want to build water filtration plants to purify the contaminated supply.', scoreType: 'realistic', points: 4 },
+      { id: 'q44_d', text: 'I want to become the District Collector (IAS) and shut down the polluting factory with official orders.', scoreType: 'enterprising', points: 5 }
+    ]
+  },
+  {
+    id: 'q45',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'SPORTS & PHYSICAL TRAINING: In school physical education (PT) periods:',
+    options: [
+      { id: 'q45_a', text: 'I sprint, sweat, practice football/cricket tactics, and love physical exhaustion.', scoreType: 'realistic', points: 5 },
+      { id: 'q45_b', text: 'I prefer sitting under a shady tree reading or discussing with friends.', scoreType: 'introvert', points: 4 },
+      { id: 'q45_c', text: 'I enjoy acting as the referee, keeping score, and ensuring fair play rules.', scoreType: 'conventional', points: 4 },
+      { id: 'q45_d', text: 'I coach weaker runners on their breathing rhythms and stride posture.', scoreType: 'teaching', points: 5 }
+    ]
+  },
+  {
+    id: 'q46',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'SPATIAL & ARCHITECTURAL AESTHETICS: When entering a newly built home or airport terminal:',
+    options: [
+      { id: 'q46_a', text: 'I notice the ceiling height, daylight angles, marble textures, and how the space makes people feel.', scoreType: 'artistic', points: 5 },
+      { id: 'q46_b', text: 'I calculate the estimated construction cost and cement tonnage required.', scoreType: 'conventional', points: 4 },
+      { id: 'q46_c', text: 'I inspect the fire emergency sprinkler pipes and structural pillar strength.', scoreType: 'realistic', points: 4 },
+      { id: 'q46_d', text: 'I just look for where the free Wi-Fi and charging points are located.', scoreType: 'investigative', points: 3 }
+    ]
+  },
+  {
+    id: 'q47',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'MEDICINE & SURGERY: How do you react to the sight of surgical scalpels, stitches, and blood in a clinic?',
+    options: [
+      { id: 'q47_a', text: 'My hands remain completely steady; I am fascinated by anatomy, human organs, and surgical precision.', scoreType: 'investigative', points: 5 },
+      { id: 'q47_b', text: 'I feel dizzy or faint at the sight of deep cuts and blood.', scoreType: 'sensitive', points: 4 },
+      { id: 'q47_c', text: 'I care deeply about reassuring the patient’s worried family members in the waiting lobby.', scoreType: 'social', points: 5 },
+      { id: 'q47_d', text: 'I am more interested in the hospital’s computerized MRI machines and diagnostic lasers.', scoreType: 'realistic', points: 4 }
+    ]
+  },
+  {
+    id: 'q48',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'LAW & CONSTITUTIONAL ARGUMENT: When two opposing viewpoints argue about capital punishment or internet bans:',
+    options: [
+      { id: 'q48_a', text: 'I dissect constitutional articles, cite precedent cases, and build bulletproof logical arguments.', scoreType: 'enterprising', points: 5 },
+      { id: 'q48_b', text: 'I focus on the human emotional suffering on both sides of the issue.', scoreType: 'social', points: 4 },
+      { id: 'q48_c', text: 'I check the crime rate statistics before and after the laws were introduced.', scoreType: 'investigative', points: 4 },
+      { id: 'q48_d', text: 'I prefer enforcing whatever law is already on the statute book without endless debate.', scoreType: 'courage', points: 4 }
+    ]
+  },
+  {
+    id: 'q49',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'AGRICULTURE & BOTANY: Spending a full sunrise morning walking across rural farmland:',
+    options: [
+      { id: 'q49_a', text: 'I love the smell of fertile soil, inspecting crop leaves for pests, and seeing tractor mechanics.', scoreType: 'realistic', points: 5 },
+      { id: 'q49_b', text: 'I think about how satellite weather forecasting and drone sensors could double crop yields.', scoreType: 'investigative', points: 5 },
+      { id: 'q49_c', text: 'I find rural life too quiet and crave the high energy of city malls and metro stations.', scoreType: 'enterprising', points: 3 },
+      { id: 'q49_d', text: 'I feel inspired to write poetry about rural tranquility and farmer resilience.', scoreType: 'artistic', points: 4 }
+    ]
+  },
+  {
+    id: 'q50',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'SPACE PROPULSION & SATELLITES: When you watch a Chandrayaan or SpaceX rocket launching into orbit:',
+    options: [
+      { id: 'q50_a', text: 'I want to calculate the cryogenic thrust equations, stage separation aerodynamics, and orbital trajectory.', scoreType: 'investigative', points: 5 },
+      { id: 'q50_b', text: 'I wonder how much money the satellite payload will save for telecommunications and weather alerts.', scoreType: 'conventional', points: 4 },
+      { id: 'q50_c', text: 'I feel a patriotic surge seeing our national tricolor flag painted on the rocket fuselage.', scoreType: 'courage', points: 5 },
+      { id: 'q50_d', text: 'I photograph the flame plume against the night sky and marvel at the visual beauty.', scoreType: 'artistic', points: 4 }
+    ]
+  },
+  {
+    id: 'q51',
+    pillar: 'Vocational Interests (RIASEC)',
+    pillarCode: 'riasec',
+    prompt: 'ENTREPRENEURIAL RISK: If you had ₹50,000 saved up at age 18:',
+    options: [
+      { id: 'q51_a', text: 'I would buy raw materials, hire 2 friends, and launch a small business selling a unique product.', scoreType: 'enterprising', points: 5 },
+      { id: 'q51_b', text: 'I would deposit it into a guaranteed government fixed deposit (FD) earning 7% interest.', scoreType: 'conventional', points: 5 },
+      { id: 'q51_c', text: 'I would donate half to a village animal shelter and use the rest to buy books.', scoreType: 'social', points: 4 },
+      { id: 'q51_d', text: 'I would buy electronic toolkits, Raspberry Pi chips, or rocketry simulation kits.', scoreType: 'investigative', points: 5 }
+    ]
+  },
+
+  // ==========================================
+  // PILLAR 5: TEAMWORK, LEADERSHIP & GROUP DYNAMICS (12 QUESTIONS)
+  // ==========================================
+  {
+    id: 'q52',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'In a group of 5 students assigned to build a science working model:',
+    options: [
+      { id: 'q52_a', text: 'I naturally take charge: assign roles, set deadlines, and keep the team focused on victory.', scoreType: 'leadership', points: 5 },
+      { id: 'q52_b', text: 'I happily take my assigned portion, go to my desk, and execute it with 100% accuracy.', scoreType: 'conscientious', points: 4 },
+      { id: 'q52_c', text: 'I make sure everyone in the group feels heard and nobody feels left out or ignored.', scoreType: 'empathy', points: 5 },
+      { id: 'q52_d', text: 'I bring the creative, crazy ideas that make our model look spectacular and unique.', scoreType: 'artistic', points: 5 }
+    ]
+  },
+  {
+    id: 'q53',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'When two members of your project team get into a shouting match over whose idea is better:',
+    options: [
+      { id: 'q53_a', text: 'I create a calm compromise that blends the best parts of both concepts.', scoreType: 'empathy', points: 5 },
+      { id: 'q53_b', text: 'I call for an objective vote based on hard facts and time feasibility.', scoreType: 'logic', points: 4 },
+      { id: 'q53_c', text: 'I step in authoritatively and dictate the final decision as team captain.', scoreType: 'courage', points: 5 },
+      { id: 'q53_d', text: 'I let them fight it out while I quietly keep working on the presentation slides.', scoreType: 'introvert', points: 3 }
+    ]
+  },
+  {
+    id: 'q54',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'When your team wins first prize in an inter-school competition:',
+    options: [
+      { id: 'q54_a', text: 'I make sure the quietest member who worked in the background gets the trophy and spotlight.', scoreType: 'empathy', points: 5 },
+      { id: 'q54_b', text: 'I proudly hold the trophy and give the victory speech on behalf of the squad.', scoreType: 'enterprising', points: 5 },
+      { id: 'q54_c', text: 'I analyze what small errors we still made so we can perform even better in state finals.', scoreType: 'logic', points: 4 },
+      { id: 'q54_d', text: 'I celebrate with loud cheers, high-fives, and team snacks.', scoreType: 'extravert', points: 4 }
+    ]
+  },
+  {
+    id: 'q55',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'If you realize the team leader has chosen a completely flawed strategy that will cause failure:',
+    options: [
+      { id: 'q55_a', text: 'I speak up immediately and respectfully present mathematical/logical proof of why it will fail.', scoreType: 'logic', points: 5 },
+      { id: 'q55_b', text: 'I take the leader aside privately so I don’t embarrass them in front of the others.', scoreType: 'empathy', points: 5 },
+      { id: 'q55_c', text: 'I rally the other members to demand a change of command.', scoreType: 'courage', points: 4 },
+      { id: 'q55_d', text: 'I keep silent because they are the appointed authority and I follow chain of command.', scoreType: 'conventional', points: 3 }
+    ]
+  },
+  {
+    id: 'q56',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'Do you work better alone in deep silence or surrounded by an energetic, chatting team?',
+    options: [
+      { id: 'q56_a', text: 'Completely alone in silence. Constant noise and interruptions ruin my deep thinking.', scoreType: 'introvert', points: 5 },
+      { id: 'q56_b', text: 'Surrounded by people! Brainstorming aloud and bouncing thoughts off teammates gives me energy.', scoreType: 'extravert', points: 5 },
+      { id: 'q56_c', text: 'A hybrid: brainstorming with a group for 30 minutes, then going alone to finish my portion.', scoreType: 'conscientious', points: 4 },
+      { id: 'q56_d', text: 'Outdoors in motion, doing physical tasks with teammates.', scoreType: 'tactical', points: 5 }
+    ]
+  },
+  {
+    id: 'q57',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'When someone in your peer group is feeling left out and sitting quietly in a corner during lunch:',
+    options: [
+      { id: 'q57_a', text: 'I walk over, sit next to them, share my food, and ask how their day is going.', scoreType: 'empathy', points: 5 },
+      { id: 'q57_b', text: 'I wave at them and shout across the canteen to come sit at the big table.', scoreType: 'extravert', points: 4 },
+      { id: 'q57_c', text: 'I assume they enjoy their private alone time and respect their space.', scoreType: 'introvert', points: 4 },
+      { id: 'q57_d', text: 'I invite them to join our team game of volleyball or badminton.', scoreType: 'tactical', points: 4 }
+    ]
+  },
+  {
+    id: 'q58',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'What kind of leader do you respect the most?',
+    options: [
+      { id: 'q58_a', text: 'The commander who leads from the front in mud and rain, sharing every hardship with their team.', scoreType: 'courage', points: 5 },
+      { id: 'q58_b', text: 'The brilliant scientist or aerospace pioneer whose deep intellect solves impossible technical riddles.', scoreType: 'investigative', points: 5 },
+      { id: 'q58_c', text: 'The compassionate mentor who nurtures everyone’s personal growth and emotional well-being.', scoreType: 'teaching', points: 5 },
+      { id: 'q58_d', text: 'The charismatic orator who inspires millions and wins tough negotiations.', scoreType: 'enterprising', points: 4 }
+    ]
+  },
+  {
+    id: 'q59',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'DELEGATION: When you are leading a project, how comfortable are you assigning tasks to others?',
+    options: [
+      { id: 'q59_a', text: 'Very comfortable. I assess each person’s unique strength and trust them to deliver.', scoreType: 'leadership', points: 5 },
+      { id: 'q59_b', text: 'Difficult for me. I fear they won’t do it properly, so I end up doing too much myself.', scoreType: 'conscientious', points: 4 },
+      { id: 'q59_c', text: 'I coach them patiently on how to do it before stepping back.', scoreType: 'teaching', points: 5 },
+      { id: 'q59_d', text: 'I prefer when everyone just chooses whatever task they feel like doing.', scoreType: 'spontaneous', points: 3 }
+    ]
+  },
+  {
+    id: 'q60',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'FEEDBACK DELIVERY: How do you deliver constructive criticism to a peer whose work was sloppy?',
+    options: [
+      { id: 'q60_a', text: 'Sandwich method: praise their effort first, point out the specific error gently, then encourage them.', scoreType: 'empathy', points: 5 },
+      { id: 'q60_b', text: 'Direct and blunt: "This does not meet standard quality. Redo section 2 by 4 PM."', scoreType: 'courage', points: 4 },
+      { id: 'q60_c', text: 'I sit beside them and tutor them through the fix together.', scoreType: 'teaching', points: 5 },
+      { id: 'q60_d', text: 'I find it hard to give negative feedback because I don’t want to hurt their feelings.', scoreType: 'sensitive', points: 4 }
+    ]
+  },
+  {
+    id: 'q61',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'PEER PRESSURE RESISTANCE: When everyone in your friend circle is doing something you know is wrong or dangerous:',
+    options: [
+      { id: 'q61_a', text: 'I stand completely firm on my principles, say "NO" loudly, and try to stop them.', scoreType: 'courage', points: 5 },
+      { id: 'q61_b', text: 'I quietly excuse myself and walk away without confronting them.', scoreType: 'introvert', points: 4 },
+      { id: 'q61_c', text: 'I logically explain the exact legal or health consequences of their foolish act.', scoreType: 'logic', points: 4 },
+      { id: 'q61_d', text: 'I feel tremendous pressure inside and struggle to say no.', scoreType: 'sensitive', points: 4 }
+    ]
+  },
+  {
+    id: 'q62',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'PUBLIC SPEAKING & PERSUASION: When asked to pitch an idea to convince school authorities:',
+    options: [
+      { id: 'q62_a', text: 'I structure a compelling story with emotional appeal and clear benefits that wins them over.', scoreType: 'enterprising', points: 5 },
+      { id: 'q62_b', text: 'I present hard data charts, cost calculations, and comparative case studies.', scoreType: 'logic', points: 5 },
+      { id: 'q62_c', text: 'I prefer bringing a live working prototype that demonstrates itself visually.', scoreType: 'realistic', points: 4 },
+      { id: 'q62_d', text: 'I prefer letting someone else do the speaking while I prepare the research documents.', scoreType: 'introvert', points: 4 }
+    ]
+  },
+  {
+    id: 'q63',
+    pillar: 'Group Dynamics & Teamwork',
+    pillarCode: 'teamwork',
+    prompt: 'HUMOR IN GROUPS: What role does humor play in your daily interactions with peers?',
+    options: [
+      { id: 'q63_a', text: 'I am often the witty one cracking clever jokes, lightening tension, and keeping the squad laughing.', scoreType: 'extravert', points: 5 },
+      { id: 'q63_b', text: 'I enjoy laughing at good jokes, but I am usually more serious, thoughtful, and observant.', scoreType: 'introvert', points: 4 },
+      { id: 'q63_c', text: 'I use humor carefully to put nervous people at ease during tense meetings.', scoreType: 'empathy', points: 4 },
+      { id: 'q63_d', text: 'I prefer deep philosophical conversations over lighthearted banter.', scoreType: 'investigative', points: 4 }
+    ]
+  },
+
+  // ==========================================
+  // PILLAR 6: WORK ENVIRONMENTS, LIFE VALUES & PURPOSE (12 QUESTIONS)
+  // ==========================================
+  {
+    id: 'q64',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'WORKPLACE PREFERENCE: If you had to choose where you spend 40 hours every week for the next 15 years:',
+    options: [
+      { id: 'q64_a', text: 'Active outdoors: military outposts, sports stadiums, wildlife sanctuaries, or rocket launch pads.', scoreType: 'tactical', points: 5 },
+      { id: 'q64_b', text: 'A clean, modern corporate tower in Gurgaon or Bangalore with high-speed computers and meeting rooms.', scoreType: 'enterprising', points: 4 },
+      { id: 'q64_c', text: 'A quiet consulting room or clinic counseling people one-on-one.', scoreType: 'social', points: 5 },
+      { id: 'q64_d', text: 'A high-tech cleanroom laboratory with wind tunnels, microscopes, or satellite testing fixtures.', scoreType: 'investigative', points: 5 },
+      { id: 'q64_e', text: 'A creative studio filled with sketchpads, cameras, editing screens, and music instruments.', scoreType: 'artistic', points: 5 }
+    ]
+  },
+  {
+    id: 'q65',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'PRIME MOTIVATOR: When you look back at age 70, which accomplishment will matter to you the most?',
+    options: [
+      { id: 'q65_a', text: 'Serving my country with supreme honor and protecting innocent lives from danger.', scoreType: 'courage', points: 5 },
+      { id: 'q65_b', text: 'Designing spacecraft, discovering new scientific truth, or engineering breakthroughs for humanity.', scoreType: 'investigative', points: 5 },
+      { id: 'q65_c', text: 'Healing thousands of suffering patients or mentoring thousands of young students to great futures.', scoreType: 'social', points: 5 },
+      { id: 'q65_d', text: 'Building financial abundance, owning beautiful properties, and ensuring immense family wealth.', scoreType: 'enterprising', points: 5 }
+    ]
+  },
+  {
+    id: 'q66',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'MONEY VS FREEDOM: Which equation would you choose if forced to decide right now?',
+    options: [
+      { id: 'q66_a', text: 'A high salary (₹30 LPA) with strict 12-hour workdays, rigid company hierarchy, and little free time.', scoreType: 'enterprising', points: 4 },
+      { id: 'q66_b', text: 'A respectable salary (₹12 LPA) with huge personal autonomy, 2-month summer breaks, and time for research/family.', scoreType: 'teaching', points: 5 },
+      { id: 'q66_c', text: 'Government gazetted scientist or civil rank with official quarters, security, and prestige.', scoreType: 'courage', points: 5 },
+      { id: 'q66_d', text: 'Freelance creative freedom where my income fluctuates, but I choose which documentary/art projects I do.', scoreType: 'artistic', points: 5 }
+    ]
+  },
+  {
+    id: 'q67',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'GLOBAL POSTINGS: How eager are you to study or work in foreign countries (USA, UK, Singapore, Europe)?',
+    options: [
+      { id: 'q67_a', text: 'Very eager! I dream of studying at Oxford, MIT, Caltech, or Stanford and exploring international career markets.', scoreType: 'openness', points: 5 },
+      { id: 'q67_b', text: 'I want to study abroad to gain elite skills, but then return to build and serve my motherland India.', scoreType: 'courage', points: 5 },
+      { id: 'q67_c', text: 'I prefer staying in India close to my parents, native culture, and local community.', scoreType: 'social', points: 4 },
+      { id: 'q67_d', text: 'I am equally open to both; wherever I find the highest intellectual challenge.', scoreType: 'investigative', points: 4 }
+    ]
+  },
+  {
+    id: 'q68',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'DEALING WITH REPETITION: How do you handle doing the exact same manual calculation 50 times in a row?',
+    options: [
+      { id: 'q68_a', text: 'I maintain intense concentration and catch every single deviation; precision gives me satisfaction.', scoreType: 'conventional', points: 5 },
+      { id: 'q68_b', text: 'My brain rebels after the 3rd repetition; I must automate it or do something creative.', scoreType: 'investigative', points: 4 },
+      { id: 'q68_c', text: 'I do it if required, but prefer engaging with living human beings.', scoreType: 'social', points: 3 },
+      { id: 'q68_d', text: 'I prefer physical movement over repetitive paperwork.', scoreType: 'tactical', points: 4 }
+    ]
+  },
+  {
+    id: 'q69',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'EXPOSURE TO CRIME & TRAGEDY: Could you handle examining a crime scene or treating severe accident trauma daily?',
+    options: [
+      { id: 'q69_a', text: 'Yes. I possess strong psychological compartmentalization; I remain calm and focus on evidence and duty.', scoreType: 'courage', points: 5 },
+      { id: 'q69_b', text: 'No. Seeing human bloodshed and violence would give me recurring nightmares and break my spirit.', scoreType: 'sensitive', points: 5 },
+      { id: 'q69_c', text: 'I could handle the psychological side (hearing their stories) rather than the physical gore.', scoreType: 'social', points: 5 },
+      { id: 'q69_d', text: 'I can handle it if I am in the laboratory examining physical test tubes, not the active scene.', scoreType: 'investigative', points: 4 }
+    ]
+  },
+  {
+    id: 'q70',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'COMMUNITY & ROOTS: What is your perspective on helping rural and tier-3 towns in India?',
+    options: [
+      { id: 'q70_a', text: 'Deeply committed. Real India lives in villages; improving rural schools, farming, and health is my dream.', scoreType: 'social', points: 5 },
+      { id: 'q70_b', text: 'I believe developing mega-city infrastructure, tech hubs, and capital markets will lift the whole nation.', scoreType: 'enterprising', points: 4 },
+      { id: 'q70_c', text: 'I want to modernise agriculture through satellite drones and soil robotics.', scoreType: 'realistic', points: 5 },
+      { id: 'q70_d', text: 'I want to ensure constitutional rule of law and police protection reach every remote corner.', scoreType: 'courage', points: 5 }
+    ]
+  },
+  {
+    id: 'q71',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'CONTINUOUS STUDY: In careers like Medicine, Law, and Advanced Aerospace Engineering, you must study new books even at age 45:',
+    options: [
+      { id: 'q71_a', text: 'I love that! Being a perpetual student and reading new research forever sounds wonderful.', scoreType: 'investigative', points: 5 },
+      { id: 'q71_b', text: 'I want to finish college studies by age 23 and then just practice practical real-world work.', scoreType: 'enterprising', points: 4 },
+      { id: 'q71_c', text: 'I prefer physical training and hands-on skill mastery over continuous theoretical reading.', scoreType: 'tactical', points: 4 },
+      { id: 'q71_d', text: 'I enjoy teaching what I know more than reading dense academic journals.', scoreType: 'teaching', points: 4 }
+    ]
+  },
+  {
+    id: 'q72',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'STABILITY VS REWARD: Between a guaranteed government pension job vs a high-risk tech startup with stock options:',
+    options: [
+      { id: 'q72_a', text: 'Government job: Lifetime security, medical benefits, and social respect mean everything to me.', scoreType: 'conventional', points: 5 },
+      { id: 'q72_b', text: 'Startup / Private: High ceiling, limitless wealth potential, and merit-based growth excite me.', scoreType: 'enterprising', points: 5 },
+      { id: 'q72_c', text: 'Military / Space Scientist / Civil Services: National pride and serving the motherland come first.', scoreType: 'courage', points: 5 },
+      { id: 'q72_d', text: 'Independent clinic or consulting practice where I am my own boss helping people.', scoreType: 'social', points: 4 }
+    ]
+  },
+  {
+    id: 'q73',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'FITNESS & PHYSICAL DISCIPLINE: How important is daily physical exercise, running, or martial arts to you?',
+    options: [
+      { id: 'q73_a', text: 'Non-negotiable part of who I am. Physical fitness keeps my mind sharp, disciplined, and energized.', scoreType: 'tactical', points: 5 },
+      { id: 'q73_b', text: 'I exercise occasionally when I feel sluggish, but my main focus is on mental and academic work.', scoreType: 'investigative', points: 4 },
+      { id: 'q73_c', text: 'I prefer mental yoga, meditation, and quiet breathing over intense sweating and pushups.', scoreType: 'empathy', points: 4 },
+      { id: 'q73_d', text: 'I honestly find intense exercise exhausting and avoid it when possible.', scoreType: 'introvert', points: 3 }
+    ]
+  },
+  {
+    id: 'q74',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'IMPACT OVER INCOME: Would you accept a career that pays a modest salary if you were transforming 100 lives every month?',
+    options: [
+      { id: 'q74_a', text: 'Yes, 100%! Making a genuine difference in human lives brings genuine happiness that money cannot buy.', scoreType: 'social', points: 5 },
+      { id: 'q74_b', text: 'No. I want to earn significant wealth first so I have financial security, then do philanthropy later.', scoreType: 'enterprising', points: 5 },
+      { id: 'q74_c', text: 'I want a role that balances decent compensation with meaningful national duty.', scoreType: 'courage', points: 5 },
+      { id: 'q74_d', text: 'I care mostly about whether my intellectual curiosity is satisfied every day.', scoreType: 'investigative', points: 4 }
+    ]
+  },
+  {
+    id: 'q75',
+    pillar: 'Work Environment & Life Purpose',
+    pillarCode: 'purpose',
+    prompt: 'FINAL SELF-HONEST REFLECTION: When you think about stepping out into the real world as a young adult:',
+    options: [
+      { id: 'q75_a', text: 'I feel ready to face tough battles with courage, discipline, and protect those who depend on me.', scoreType: 'courage', points: 5 },
+      { id: 'q75_b', text: 'I feel deep empathy for the suffering in society and want to dedicate my life to healing and counseling.', scoreType: 'social', points: 5 },
+      { id: 'q75_c', text: 'I want to master science, solve deep technical and math mysteries, and build the future.', scoreType: 'investigative', points: 5 },
+      { id: 'q75_d', text: 'I want to build organizations, master economics and law, and lead communities with authority.', scoreType: 'enterprising', points: 5 }
     ]
   }
 ];
 
-// 15 COMPREHENSIVE CAREERS DATABASE
+// ==========================================
+// 15 COMPREHENSIVE CAREER PROFILES
+// ==========================================
 const CAREER_DATABASE = {
-  'army_defence_officer': {
-    id: 'army_defence_officer',
-    title: 'Indian Armed Forces Officer (Army Infantry & Special Forces)',
-    category: 'National Defense, Battlefield Command & Armed Strategy',
-    iconName: 'Shield',
-    idealTraits: ['army', 'courage'],
-    description: 'Lead infantry platoons, armored tank regiments, and commando units. You command soldiers with discipline, make tactical decisions under fire, and safeguard national borders in high-altitude and desert theaters.',
-    dailyLife: 'Early morning physical conditioning, tactical weapons inspection, combat simulation drills, troop administration, and border operational readiness.',
-    salaryIndia: '₹9,50,000 to ₹34,00,000+ per year (Lieutenant to Brigadier/General) + Official cantonment bungalow, defense healthcare, and military pension privileges.',
-    salaryAbroad: 'United Nations (UN) Peacekeeping Missions ($85,000 to $145,000 tax-free allowances) and military diplomatic postings in foreign embassies.',
-    highSchoolStream: 'Any stream (Science, Commerce, or Arts) for Army wing. Physics, Chemistry & Math (PCM) recommended for technical entries.',
-    indianPathways: [
-      'National Defence Academy (NDA, Khadakwasla, Pune) - right after 12th',
-      'Indian Military Academy (IMA Dehradun) - post graduation via CDS exam',
-      'Technical Entry Scheme (TES) - direct SSB selection based on 12th PCM marks',
-      'Officers Training Academy (OTA Chennai) - Short Service Commission'
-    ],
-    globalPathways: [
-      'Royal Military Academy Sandhurst (United Kingdom) - officer exchange courses',
-      'United States Military Academy (West Point, USA) - strategic command symposiums',
-      'Defence Services Staff College (DSSC) international command modules'
-    ],
-    keyEntranceExams: 'NDA Exam (UPSC), CDS Exam (UPSC), 5-Day SSB Interview, Medical Fitness Standards.',
-    employers: ['Indian Army', 'Para-Special Forces', 'Rashtriya Rifles', 'National Security Guard (NSG)', 'Assam Rifles']
-  },
-
-  'airforce_fighter_pilot': {
-    id: 'airforce_fighter_pilot',
-    title: 'Indian Air Force Fighter Pilot & Aeronautical Navigator',
-    category: 'Aerial Combat, Supersonic Aviation & Airspace Defense',
-    iconName: 'Plane',
-    idealTraits: ['airforce', 'courage'],
-    description: 'Pilot supersonic fighter jets (Rafale, Sukhoi Su-30MKI, Tejas) at speeds exceeding Mach 1.8. You execute precision air-to-air dogfights, tactical radar strikes, and defend Indian skies from enemy intrusions.',
-    dailyLife: 'Pre-flight weather and combat briefing, high-G tactical combat sorties, supersonic instrument cross-checks, simulator flight runs, and squadron strategy reviews.',
-    salaryIndia: '₹12,00,000 to ₹38,00,000+ per year (Flying Officer to Air Marshal) + Flying allowances, defense housing, and specialized flight medical care.',
-    salaryAbroad: 'Joint international air combat drills (Cope India, Pitch Black Australia, Red Flag USA) and defense diplomatic attaché postings.',
-    highSchoolStream: '11th & 12th in Science with Physics and Mathematics (PCM) is mandatory.',
-    indianPathways: [
-      'National Defence Academy (NDA Khadakwasla - Air Force Wing)',
-      'Air Force Academy (AFA Dundigal, Hyderabad) - Flying Branch',
-      'Air Force Common Admission Test (AFCAT) post-graduation route'
-    ],
-    globalPathways: [
-      'Royal Air Force College Cranwell (United Kingdom)',
-      'US Air Force Academy (Colorado Springs, USA)',
-      'Joint international flight weapon school modules'
-    ],
-    keyEntranceExams: 'NDA Exam (UPSC), AFCAT, 5-Day AFSB Interview, Computerised Pilot Selection System (CPSS) Test.',
-    employers: ['Indian Air Force (IAF)', 'Fighter Squadrons', 'Aircraft and Systems Testing Establishment (ASTE)', 'Surya Kiran Aerobatics']
-  },
-
-  'navy_warship_commander': {
-    id: 'navy_warship_commander',
-    title: 'Indian Navy Warship Surface Commander & Submariner',
-    category: 'Maritime Warfare, Guided Missile Destroyers & Submarine Patrols',
-    iconName: 'Anchor',
-    idealTraits: ['navy', 'courage'],
-    description: 'Command stealth guided-missile destroyers, aircraft carriers, or nuclear-powered attack submarines. You dominate international sea lanes, track undersea acoustic signatures, and enforce maritime sovereignty.',
-    dailyLife: 'Bridge watch navigation, missile battery tracking, sonar acoustic sweeps, damage control drills, replenishment at sea, and international anti-piracy patrols.',
-    salaryIndia: '₹10,50,000 to ₹35,00,000+ per year (Sub-Lieutenant to Admiral) + Submarine/Diving allowances, naval officer housing, and medical privileges.',
-    salaryAbroad: 'Global naval deployments across Indo-Pacific, Gulf of Aden, and joint fleet exercises (MALABAR, Milan, Varuna) with US and French Navies.',
-    highSchoolStream: '11th & 12th in Science with Physics and Mathematics (PCM) is mandatory.',
-    indianPathways: [
-      'Indian Naval Academy (INA Ezhimala, Kerala - 4-Year B.Tech Cadets)',
-      'National Defence Academy (NDA Khadakwasla - Navy Wing)',
-      'Combined Defence Services (CDS) Naval Executive Branch'
-    ],
-    globalPathways: [
-      'Britannia Royal Naval College (Dartmouth, UK)',
-      'United States Naval Academy (Annapolis, USA)',
-      'International Submarine Warfare Command Courses'
-    ],
-    keyEntranceExams: 'NDA Exam (UPSC), INA 10+2 B.Tech Entry, CDS Exam (UPSC), 5-Day Naval SSB Interview.',
-    employers: ['Indian Navy', 'Western & Eastern Naval Commands', 'Submarine Fleet', 'MARCOS (Marine Commandos)']
-  },
-
   'aerospace_engineer': {
     id: 'aerospace_engineer',
     title: 'Aerospace, Rocket Propulsion & Satellite Systems Engineer',
     category: 'Space Exploration, Aerodynamics & Satellite Defense',
     iconName: 'Rocket',
-    idealTraits: ['aerospace', 'logic'],
-    description: 'Design and manufacture cryogenic rockets, lunar exploration probes, satellite constellations, and supersonic defense systems. You master aerodynamics, rocket propulsion, orbital mechanics, and thermal heat shields.',
+    idealTraits: ['logic', 'investigative'],
+    description: 'You design and manufacture rockets, satellite constellations, supersonic aircraft, and space exploration probes. You work on thermodynamics, propulsion fuels, orbital mechanics, and spacecraft structural resilience.',
     dailyLife: 'Running wind tunnel simulations, writing CFD (Computational Fluid Dynamics) code, testing liquid propulsion rocket engines, analyzing telemetry data, and assembling satellite avionics.',
-    salaryIndia: '₹8,50,000 to ₹35,00,000+ per year (ISRO Scientist/Engineer \'SC\' grade offers gazetted rank with official quarters; private space startups offer ₹12–28 LPA).',
+    salaryIndia: '₹8,00,000 to ₹35,00,000+ per year (ISRO Scientist/Engineer \'SC\' grade offers gazetted rank with official quarters; private space startups like Skyroot & Agnikul offer ₹12–25 LPA).',
     salaryAbroad: '$105,000 to $220,000+ per year (NASA, ESA, SpaceX, Blue Origin, Boeing, Airbus, Rolls-Royce Aerospace).',
     highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Mathematics (PCM).',
     indianPathways: [
@@ -578,164 +976,111 @@ const CAREER_DATABASE = {
       'Delft University of Technology (TU Delft - Netherlands)',
       'Cranfield University (UK - Aerospace Excellence)'
     ],
-    keyEntranceExams: 'JEE Advanced (for IITs and IIST), JEE Main, GATE (Aerospace), GRE & TOEFL/IELTS for overseas MS/Ph.D.',
+    keyEntranceExams: 'JEE Advanced (for IITs and IIST), JEE Main, GATE (Aerospace Engineering), GRE & TOEFL/IELTS for overseas MS/Ph.D.',
     employers: ['ISRO (Indian Space Research Organisation)', 'DRDO', 'Skyroot Aerospace', 'Agnikul Cosmos', 'HAL', 'Boeing', 'Airbus']
   },
 
-  'civil_engineer': {
-    id: 'civil_engineer',
-    title: 'Civil & Structural Infrastructure Engineer',
-    category: 'Mega Bridges, Tunnels, Dams & High-Speed Transit Systems',
-    iconName: 'Building',
-    idealTraits: ['civil', 'logic'],
-    description: 'Design, calculate, and construct monumental suspension bridges, mountain rail tunnels, multi-tier flyovers, hydroelectric dams, and earthquake-resistant skyscrapers that serve millions for generations.',
-    dailyLife: 'Reviewing soil mechanics reports, running finite element structural load software (STAAD.Pro / ETABS), inspecting high-grade concrete pouring on site, and managing heavy cranes.',
-    salaryIndia: '₹7,00,000 to ₹32,00,000+ per year (L&T, Afcons, NHAI, and Central Engineering Services offer strong growth).',
-    salaryAbroad: '$90,000 to $180,000 per year (High global demand across Dubai mega-projects, Australia, Canada, and UK infrastructure firms).',
-    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Mathematics (PCM).',
+  'army_defence_officer': {
+    id: 'army_defence_officer',
+    title: 'Indian Armed Forces Officer (Army / Navy / Air Force)',
+    category: 'National Defence, Tactical Strategy & Armed Command',
+    iconName: 'Shield',
+    idealTraits: ['courage', 'tactical'],
+    description: 'You command platoons, warships, or supersonic fighter squadrons. You lead soldiers with discipline, make split-second tactical decisions under fire, and safeguard national borders during wartime and disaster relief.',
+    dailyLife: 'Early morning physical PT drills, weapons inspection, tactical maneuvers, border reconnaissance, battalion troop administration, and crisis strategy exercises.',
+    salaryIndia: '₹9,50,000 to ₹34,00,000+ per year (Lieutenant to Brigadier/General) + Free Officer bungalow, military hospital care, ration allowances, and lifetime defense benefits.',
+    salaryAbroad: 'United Nations (UN) Peacekeeping Missions ($85,000 to $145,000 tax-free allowances) and international military diplomatic postings in Indian Embassies worldwide.',
+    highSchoolStream: '11th & 12th in Science (PCM) is required for Air Force & Navy wings. Any stream (Science, Commerce, or Arts) is eligible for the Indian Army wing.',
     indianPathways: [
-      'Indian Institutes of Technology (IIT Roorkee - Asia\'s oldest civil engineering faculty)',
-      'IIT Delhi / IIT Bombay / IIT Kharagpur (B.Tech Civil Engineering)',
-      'National Institutes of Technology (NIT Trichy, NIT Surathkal)',
-      'College of Engineering Guindy (Anna University) & VJTI Mumbai'
+      'National Defence Academy (NDA, Khadakwasla, Pune) - right after 12th',
+      'Combined Defence Services (CDS) / IMA Dehradun / OTA Chennai - post graduation',
+      'Technical Entry Scheme (TES) - direct SSB based on 12th PCM marks',
+      'Air Force Academy (AFA Dundigal) & Indian Naval Academy (INA Ezhimala)'
     ],
     globalPathways: [
-      'University of California, Berkeley - Civil & Environmental Engineering (USA)',
-      'Imperial College London (UK - Department of Civil and Environmental Engineering)',
-      'National University of Singapore (NUS) - Civil Engineering',
-      'ETH Zurich (Switzerland)'
+      'Royal Military Academy Sandhurst (United Kingdom) - officer exchange courses',
+      'United States Military Academy (West Point, USA) - joint strategic defense symposiums',
+      'Defence Services Staff College (DSSC) international command modules'
     ],
-    keyEntranceExams: 'JEE Main, JEE Advanced, GATE (Civil Engineering), UPSC Indian Engineering Services (IES/ESE).',
-    employers: ['Larsen & Toubro (L&T)', 'National Highways Authority of India (NHAI)', 'Afcons Infrastructure', 'Delhi Metro (DMRC)', 'Tata Projects']
-  },
-
-  'specialized_surgeon': {
-    id: 'specialized_surgeon',
-    title: 'Specialized Surgeon (Trauma & Operative Surgery)',
-    category: 'Operative Medicine, Trauma Care & Precision Surgical Operations',
-    iconName: 'Activity',
-    idealTraits: ['surgeon', 'courage'],
-    description: 'Operate inside high-stakes operating rooms to repair ruptured organs, remove tumors, reattach severed vessels, and manage trauma accidents with razor-sharp physical precision.',
-    dailyLife: 'Sterile scrubbing, performing 3-to-6 hour surgeries, monitoring intensive care units (ICU), reviewing pre-op diagnostic scans, and conducting post-op patient rounds.',
-    salaryIndia: '₹14,00,000 to ₹65,00,000+ per year (Senior consultant surgeons in top private and trust hospitals can exceed ₹1 Crore annually).',
-    salaryAbroad: '$220,000 to $450,000+ per year (USA - USMLE pathway, UK - FRCS pathway, Canada, Australia).',
-    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Biology (PCB).',
-    indianPathways: [
-      'All India Institute of Medical Sciences (AIIMS New Delhi & Regional AIIMS)',
-      'Christian Medical College (CMC Vellore)',
-      'Armed Forces Medical College (AFMC Pune)',
-      'Maulana Azad Medical College (MAMC New Delhi)'
-    ],
-    globalPathways: [
-      'Johns Hopkins University School of Medicine (USA)',
-      'Oxford University Medical School (UK)',
-      'Harvard Medical School (USA)',
-      'Royal College of Surgeons (England/Edinburgh)'
-    ],
-    keyEntranceExams: 'NEET-UG, NEET-PG / INI-CET (for MS General Surgery), followed by M.Ch superspecialty examinations.',
-    employers: ['AIIMS', 'Apollo Hospitals', 'Fortis Healthcare', 'Medanta The Medicity', 'Armed Forces Medical Services']
-  },
-
-  'cardiologist_specialist': {
-    id: 'cardiologist_specialist',
-    title: 'Cardiologist & Cardiovascular Interventionist',
-    category: 'Heart Physiology, Angioplasty Stenting & Cardiac Rhythm Care',
-    iconName: 'Heart',
-    idealTraits: ['cardiology', 'logic'],
-    description: 'Diagnose and treat heart attacks, arterial blockages, and congenital valve defects. You perform catheter angioplasties in cath-labs, implant pacemakers, and save failing hearts.',
-    dailyLife: 'Conducting coronary angiographies, implanting cardiac stents, analyzing echocardiograms, managing coronary care units (CCU), and optimizing cardiovascular drugs.',
-    salaryIndia: '₹15,00,000 to ₹70,00,000+ per year (Interventional cardiologists command top packages across hospital networks).',
-    salaryAbroad: '$240,000 to $480,000+ per year (High global demand in USA, UK, Germany, and Gulf medical centers).',
-    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Biology (PCB).',
-    indianPathways: [
-      'AIIMS New Delhi (DM Cardiology)',
-      'Postgraduate Institute of Medical Education & Research (PGIMER Chandigarh)',
-      'Sri Jayadeva Institute of Cardiovascular Sciences (Bengaluru)',
-      'King Edward Memorial Hospital (KEM Mumbai)'
-    ],
-    globalPathways: [
-      'Cleveland Clinic Lerner College of Medicine (USA - World #1 in Cardiology)',
-      'Mayo Clinic Alix School of Medicine (USA)',
-      'Imperial College Healthcare NHS Trust (UK)'
-    ],
-    keyEntranceExams: 'NEET-UG (MBBS) -> NEET-PG (MD Internal Medicine) -> NEET-SS / INI-SS (DM Cardiology).',
-    employers: ['Narayana Health', 'Asian Heart Institute', 'Apollo Heart Centres', 'Max Healthcare', 'Government Medical Colleges']
-  },
-
-  'neurologist_physician': {
-    id: 'neurologist_physician',
-    title: 'Neurologist & Cognitive Neuroscientist',
-    category: 'Brain Physiology, Stroke Management & Central Nervous Systems',
-    iconName: 'Brain',
-    idealTraits: ['neurology', 'logic'],
-    description: 'Solve intricate mysteries of the human brain, spinal cord, and peripheral nerves. You diagnose strokes, epilepsy, Parkinson\'s disease, memory loss, and neuromuscular disorders.',
-    dailyLife: 'Analyzing brain MRI/CT scans, interpreting EEG wave recordings, conducting cranial nerve reflex tests, and managing acute stroke thrombolysis units.',
-    salaryIndia: '₹13,00,000 to ₹60,00,000+ per year (High demand in specialized neuro-centers and academic medical faculties).',
-    salaryAbroad: '$210,000 to $420,000+ per year (Elite academic hospitals across USA, Switzerland, and UK).',
-    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Biology (PCB).',
-    indianPathways: [
-      'National Institute of Mental Health and Neurosciences (NIMHANS, Bengaluru)',
-      'Sree Chitra Tirunal Institute for Medical Sciences and Technology (Trivandrum)',
-      'AIIMS New Delhi (DM Neurology)',
-      'PGIMER Chandigarh'
-    ],
-    globalPathways: [
-      'UCL Queen Square Institute of Neurology (London, UK)',
-      'Johns Hopkins Department of Neurology (USA)',
-      'Karolinska Institute (Sweden)'
-    ],
-    keyEntranceExams: 'NEET-UG (MBBS) -> NEET-PG (MD Medicine/Pediatrics) -> NEET-SS (DM Neurology).',
-    employers: ['NIMHANS Bengaluru', 'Apollo Institute of Neurosciences', 'Manipal Hospitals', 'Sir Ganga Ram Hospital', 'Research Institutes']
+    keyEntranceExams: 'NDA Exam (UPSC), CDS Exam (UPSC), AFCAT (Air Force), 5-Day SSB Interview, CPSS Pilot Aptitude Test.',
+    employers: ['Indian Army', 'Indian Air Force', 'Indian Navy', 'Coast Guard', 'Paramilitary (NSG, Assam Rifles, BSF)']
   },
 
   'clinical_psychologist': {
     id: 'clinical_psychologist',
     title: 'Clinical Psychologist & Mental Health Psychotherapist',
-    category: 'Mental Health, Behavioral Science & Psychotherapy',
+    category: 'Mental Healthcare, Behavioral Science & Neuropsychology',
     iconName: 'Heart',
-    idealTraits: ['psychology', 'empathy'],
-    description: 'Diagnose mental health conditions, guide individuals through depression, grief, anxiety, and trauma, administer psychometric assessments, and restore peace to troubled minds.',
+    idealTraits: ['empathy', 'social'],
+    description: 'You understand the deep inner workings of the human mind. You diagnose mental health disorders, counsel individuals through depression, grief, anxiety, and trauma, administer psychometric tests, and restore peace to troubled lives.',
     dailyLife: 'Conducting one-on-one 50-minute clinical therapy sessions, psychometric diagnostic evaluations, cognitive behavioral therapy (CBT), and family counseling.',
-    salaryIndia: '₹6,00,000 to ₹25,00,000+ per year (Private clinical consultants earn ₹1,500 to ₹3,500 per therapy hour).',
-    salaryAbroad: '$90,000 to $165,000 per year (High demand across UK NHS, Canada, Australia, and USA).',
-    highSchoolStream: 'Any stream in 11th & 12th with Psychology as an elective (Humanities or Science with Biology preferred).',
+    salaryIndia: '₹6,00,000 to ₹25,00,000+ per year (Established private clinical consultants earn ₹1,500 to ₹3,500 per therapy hour).',
+    salaryAbroad: '$90,000 to $165,000 per year (High global demand across UK National Health Service - NHS, Canada, Australia, and USA).',
+    highSchoolStream: 'Any stream in 11th & 12th with Psychology as an elective (Humanities or Science with Biology is particularly advantageous).',
     indianPathways: [
-      'NIMHANS Bengaluru (M.Phil / Psy.D in Clinical Psychology)',
-      'Tata Institute of Social Sciences (TISS Mumbai)',
-      'Delhi University (Lady Shri Ram College / Daulat Ram College)',
-      'Central Institute of Psychiatry (CIP Ranchi)'
+      'National Institute of Mental Health and Neurosciences (NIMHANS, Bengaluru)',
+      'Tata Institute of Social Sciences (TISS, Mumbai)',
+      'Delhi University (Lady Shri Ram College / Daulat Ram College) BA/BSc Psychology',
+      'Central Institute of Psychiatry (CIP, Ranchi) for M.Phil in Clinical Psychology'
     ],
     globalPathways: [
       'University of Oxford - Department of Experimental Psychology (UK)',
       'Harvard University - Department of Psychology (USA)',
-      'University of Melbourne - School of Psychological Sciences (Australia)'
+      'University of Melbourne - School of Psychological Sciences (Australia)',
+      'University of British Columbia (Canada)'
     ],
-    keyEntranceExams: 'CUET-UG/PG, NIMHANS M.Phil Entrance Exam, RCI Licensing Examination.',
-    employers: ['NIMHANS', 'Private Mental Wellness Clinics', 'Top Multispecialty Hospitals', 'Schools & Universities']
+    keyEntranceExams: 'CUET-UG (for Central Universities), NIMHANS M.Phil Entrance Exam, TISS-NET, GRE Psychology Subject Test.',
+    employers: ['NIMHANS', 'Private Mental Wellness Clinics', 'Top Multispecialty Hospitals', 'Schools & Universities', 'Corporate Wellness Divisions']
+  },
+
+  'education_professor': {
+    id: 'education_professor',
+    title: 'University Professor, School Educator & EdTech Scholar',
+    category: 'Academic Research, Teaching & Educational Leadership',
+    iconName: 'BookOpen',
+    idealTraits: ['teaching', 'social'],
+    description: 'You shape the intellect and character of the next generation. You make complex concepts accessible, mentor aspiring students, conduct research, write textbooks, and reform educational curricula.',
+    dailyLife: 'Delivering interactive lectures, guiding student dissertations, assessing research papers, planning innovative lab workshops, and heading academic committees.',
+    salaryIndia: '₹6,50,000 to ₹22,00,000+ per year (UGC 7th Pay Commission pay scales with university quarters and long vacation benefits).',
+    salaryAbroad: '$75,000 to $165,000 per year (Tenured university professors and international school educators in Europe, Singapore, UAE, and USA).',
+    highSchoolStream: 'Any stream (Science, Commerce, or Humanities) matching the subject you are passionate about teaching.',
+    indianPathways: [
+      'Regional Institutes of Education (RIE, NCERT - integrated B.Ed/B.Sc/B.A)',
+      'Delhi University (Central Institute of Education - CIE)',
+      'Jawaharlal Nehru University (JNU New Delhi) for Master\'s & Ph.D.',
+      'Indian Institute of Science (IISc Bengaluru) & Top Central Universities'
+    ],
+    globalPathways: [
+      'University of Cambridge Faculty of Education (UK)',
+      'Columbia University Teachers College (New York, USA)',
+      'National Institute of Education (NIE, NTU Singapore)'
+    ],
+    keyEntranceExams: 'CUET-UG/PG, UGC-NET / CSIR-NET (for Assistant Professorship & JRF), CTET (Central Teacher Eligibility Test).',
+    employers: ['Central Universities (DU, JNU, BHU)', 'IITs and NITs (Humanities/Sciences departments)', 'Kendriya Vidyalayas & Top International Schools', 'NCERT / EdTech Platforms']
   },
 
   'civil_services_ias': {
     id: 'civil_services_ias',
     title: 'District Magistrate (IAS / IPS / IFS) & Public Administrator',
-    category: 'Civil Administration, Law Enforcement & Public Governance',
+    category: 'Civil Administration, Public Governance & Foreign Diplomacy',
     iconName: 'Landmark',
-    idealTraits: ['civil_services', 'courage'],
-    description: 'Hold supreme executive authority over entire administrative districts. You manage police law and order, direct disaster relief, supervise rural hospitals and schools, and drive government policy.',
-    dailyLife: 'Chairing district development meetings, reviewing police and revenue court disputes, conducting field inspections, and advising state ministries.',
-    salaryIndia: '₹9,50,000 to ₹28,00,000+ per year (7th Pay Commission Level 10 to Level 17 + VIP government bungalow, armed security escort, official car, and authority).',
-    salaryAbroad: 'Indian Foreign Service (IFS) Ambassadors and High Commissioners posted across Europe, Americas, Asia, and United Nations headquarters.',
+    idealTraits: ['courage', 'enterprising'],
+    description: 'You hold supreme executive authority over entire districts. You manage police law and order, direct flood relief, oversee rural hospitals and schools, collect revenue, and convert government budgets into real development for millions.',
+    dailyLife: 'Chairing district development meetings, reviewing police and revenue court disputes, conducting field inspections of schools and hospitals, and advising state ministries.',
+    salaryIndia: '₹9,50,000 to ₹28,00,000+ per year (7th Pay Commission + VIP government bungalow, armed security escort, official car, and immense administrative authority).',
+    salaryAbroad: 'Indian Foreign Service (IFS) Ambassadors and High Commissioners posted across Europe, Americas, Asia, and the United Nations headquarters.',
     highSchoolStream: 'Any stream in 11th & 12th (Arts, Science, or Commerce). Consistent general reading and analytical writing habits are paramount.',
     indianPathways: [
-      'Lal Bahadur Shastri National Academy of Administration (LBSNAA Mussoorie) - post-UPSC training',
-      'Undergraduate degree from any recognized university (Delhi University, IITs, NLUs, etc.)',
-      'National Police Academy (SVPNPA Hyderabad) for IPS Officers'
+      'Lal Bahadur Shastri National Academy of Administration (LBSNAA, Mussoorie) - post-UPSC training',
+      'Undergraduate degree from any recognized university (Delhi University, St. Stephen’s, IITs, NLUs, etc.)',
+      'National Police Academy (SVPNPA, Hyderabad) for IPS Officers'
     ],
     globalPathways: [
       'Harvard Kennedy School of Government (USA) - mid-career fellowships',
       'Blavatnik School of Government, Oxford University (UK) - policy exchanges'
     ],
-    keyEntranceExams: 'UPSC Civil Services Examination (CSE - Prelims, Mains, and Personality Interview), State PCS.',
-    employers: ['Government of India', 'State Secretariats', 'Cabinet Secretariat', 'United Nations Agencies', 'Ministry of External Affairs']
+    keyEntranceExams: 'UPSC Civil Services Examination (CSE - Prelims, Mains, and Interview), State Public Service Commissions (State PCS).',
+    employers: ['Government of India', 'State Government Secretariats', 'Cabinet Secretariat', 'United Nations Agencies', 'Ministry of External Affairs']
   },
 
   'cs_ai_engineer': {
@@ -743,33 +1088,139 @@ const CAREER_DATABASE = {
     title: 'Computer Science, AI & Cyber Defense Architect',
     category: 'Software Systems, Artificial Intelligence & Cloud Security',
     iconName: 'Zap',
-    idealTraits: ['cs_ai', 'logic'],
-    description: 'Build machine learning neural networks, deploy scalable cloud microservices, develop autonomous robotics systems, and defend national banking and defense networks from cyber warfare.',
-    dailyLife: 'Writing and optimizing algorithms, testing machine learning models, deploying distributed microservices, and conducting cyber security penetration testing.',
-    salaryIndia: '₹8,50,000 to ₹48,00,000+ per year (Top tech architects command packages over ₹70 LPA).',
+    idealTraits: ['logic', 'investigative'],
+    description: 'You design intelligent neural networks, build scalable cloud architecture, engineer autonomous robots, and safeguard critical banking and national infrastructure against sophisticated cyber attacks.',
+    dailyLife: 'Writing and optimizing algorithms, testing machine learning models, deploying microservices on cloud infrastructure, and conducting cyber security penetration testing.',
+    salaryIndia: '₹8,50,000 to ₹48,00,000+ per year (₹70,000 to ₹4,00,000 per month; top tech architects command packages over ₹70 LPA).',
     salaryAbroad: '$115,000 to $260,000+ per year (Silicon Valley, Seattle, Munich, London, Singapore, Toronto).',
     highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Mathematics (PCM).',
     indianPathways: [
       'Indian Institutes of Technology (IIT Bombay, IIT Delhi, IIT Madras)',
       'National Institutes of Technology (NIT Trichy, NIT Surathkal)',
-      'BITS Pilani & International Institute of Information Technology (IIIT Hyderabad)'
+      'BITS Pilani & International Institute of Information Technology (IIIT Hyderabad)',
+      'Top State Government Engineering Colleges'
     ],
     globalPathways: [
       'Massachusetts Institute of Technology (MIT) - USA',
       'Stanford University - USA',
-      'National University of Singapore (NUS) - Singapore'
+      'National University of Singapore (NUS) - Singapore',
+      'Technical University of Munich (TUM) - Germany'
     ],
-    keyEntranceExams: 'JEE Main, JEE Advanced, BITSAT; for study abroad: SAT, IELTS/TOEFL, GRE.',
+    keyEntranceExams: 'JEE Main, JEE Advanced, BITSAT, State CETs; for study abroad: SAT, IELTS / TOEFL, GRE.',
     employers: ['Google', 'Microsoft', 'NVIDIA', 'ISRO', 'Amazon', 'Government Cyber Defense Cells']
   },
 
-  'corporate_lawyer': {
-    id: 'corporate_lawyer',
-    title: 'Corporate Legal Counsel & High Court Advocate',
+  'investigative_journalism': {
+    id: 'investigative_journalism',
+    title: 'Investigative Journalist, Documentary Filmmaker & News Anchor',
+    category: 'Mass Media, Investigative Reporting & Documentary Direction',
+    iconName: 'Radio',
+    idealTraits: ['artistic', 'courage'],
+    description: 'You uncover hidden truths, hold powerful corporations and politicians accountable, report from ground zero during crises, and amplify the voices of marginalized communities through print, video, and digital media.',
+    dailyLife: 'Conducting confidential source interviews, verifying leaked records, filing RTI inquiries, filming ground documentaries, writing exposés, and presenting primetime broadcasts.',
+    salaryIndia: '₹5,50,000 to ₹28,00,000+ per year (Senior investigative editors and primetime anchors command substantial packages).',
+    salaryAbroad: '$70,000 to $155,000 per year (Global organizations: BBC News, Reuters, Al Jazeera, Bloomberg, The New York Times).',
+    highSchoolStream: 'Any stream in 11th & 12th (Humanities, English Literature, Political Science, or Commerce).',
+    indianPathways: [
+      'Indian Institute of Mass Communication (IIMC, New Delhi)',
+      'Asian College of Journalism (ACJ, Chennai)',
+      'AJK Mass Communication Research Centre (MCRC, Jamia Millia Islamia)',
+      'Symbiosis Institute of Media and Communication (SIMC, Pune)'
+    ],
+    globalPathways: [
+      'Columbia University Graduate School of Journalism (New York, USA)',
+      'London School of Economics - Media & Communications (UK)',
+      'University of California, Berkeley - Graduate School of Journalism'
+    ],
+    keyEntranceExams: 'IIMC Entrance Exam, ACJ Entrance Exam, CUET-PG (Mass Communication), SAT/GRE & Portfolio Review.',
+    employers: ['BBC News', 'The Hindu / Indian Express', 'Reuters', 'NDTV / Republic Media', 'Independent Documentary Studios', 'Digital Media Outlets']
+  },
+
+  'forensic_criminology': {
+    id: 'forensic_criminology',
+    title: 'Forensic Scientist, Ballistics Expert & Crime Scene Investigator',
+    category: 'Criminology, DNA Forensics & Criminal Investigation',
+    iconName: 'Microscope',
+    idealTraits: ['investigative', 'logic'],
+    description: 'You use modern scientific chemistry, DNA profiling, ballistics analysis, and cyber forensics to solve mysterious murders, cyber frauds, and complex crimes for police and national intelligence bureaus.',
+    dailyLife: 'Examining crime scenes, collecting latent fingerprints and chemical samples, running gas chromatography and DNA sequencers in laboratories, and testifying as an expert witness in High Courts.',
+    salaryIndia: '₹6,00,000 to ₹22,00,000+ per year (Central and State Government Forensic Science Laboratories offer gazetted scientific officer posts).',
+    salaryAbroad: '$80,000 to $145,000 per year (High demand in FBI Laboratories, UK Police Forensics, Interpol, and European Forensic Institutes).',
+    highSchoolStream: '11th & 12th in Science with Chemistry, Biology, and Physics (PCB / PCMB).',
+    indianPathways: [
+      'National Forensic Sciences University (NFSU, Gandhinagar) - World’s premier forensics institution',
+      'Central Forensic Science Laboratories (CFSL Chandigarh, Hyderabad, Kolkata)',
+      'Dr. Harisingh Gour Vishwavidyalaya (Sagar, MP) - Forensic Science Department',
+      'Amity Institute of Forensic Sciences'
+    ],
+    globalPathways: [
+      'King’s College London - Forensic Science & Analytical Toxicology (UK)',
+      'University of Strathclyde - Centre for Forensic Science (Scotland)',
+      'George Washington University - Department of Forensic Sciences (USA)'
+    ],
+    keyEntranceExams: 'NFSU National Entrance Test (NFAT), CUET-UG/PG, GATE in Life Sciences/Chemistry, UPSC CFSL Scientific Officer Exams.',
+    employers: ['Central Bureau of Investigation (CBI)', 'National Investigation Agency (NIA)', 'State Police CID Branches', 'Central Forensic Science Labs', 'Intelligence Bureau (IB)']
+  },
+
+  'chartered_accountant': {
+    id: 'chartered_accountant',
+    title: 'Chartered Accountant (CA) & Forensic Financial Auditor',
+    category: 'Financial Management, Auditing, Capital Markets & Taxation',
+    iconName: 'BarChart3',
+    idealTraits: ['conventional', 'logic'],
+    description: 'You control corporate finances, audit balance sheets to detect fraud, design strategic tax frameworks, and advise enterprise founders and banks on multi-crore investments and acquisitions.',
+    dailyLife: 'Analyzing general ledgers, conducting statutory audits, certifying financial statements, filing corporate tax returns, and advising company boards on capital allocation.',
+    salaryIndia: '₹9,00,000 to ₹45,00,000+ per year (CAs running independent firms or holding corporate CFO seats earn substantial consulting income).',
+    salaryAbroad: '$110,000 to $250,000 per year (Strong global reciprocity across Dubai, London, Singapore, and Sydney).',
+    highSchoolStream: '11th & 12th in Commerce with Mathematics (Science students can also easily transition).',
+    indianPathways: [
+      'The Institute of Chartered Accountants of India (ICAI - registered right after 12th)',
+      'Shri Ram College of Commerce (SRCC, Delhi University)',
+      'Indian Institutes of Management (IIM Indore/Rohtak 5-Year Integrated IPMAT Program)',
+      'St. Xavier’s College (Kolkata & Mumbai)'
+    ],
+    globalPathways: [
+      'London School of Economics (LSE) - United Kingdom',
+      'Wharton School, University of Pennsylvania - USA',
+      'INSEAD - France / Singapore'
+    ],
+    keyEntranceExams: 'CA Foundation (conducted by ICAI right after 12th), IPMAT (for IIMs after school), CFA, ACCA exams.',
+    employers: ['The Big 4 (Deloitte, PwC, EY, KPMG)', 'Goldman Sachs', 'J.P. Morgan', 'HDFC Bank', 'State Bank of India']
+  },
+
+  'sports_physiotherapy': {
+    id: 'sports_physiotherapy',
+    title: 'Sports Scientist, Physical Conditioning Coach & Physiotherapist',
+    category: 'Sports Medicine, Athletic Performance & Kinesiology',
+    iconName: 'Dumbbell',
+    idealTraits: ['tactical', 'social'],
+    description: 'You work alongside national athletes, IPL cricketers, and Olympic competitors. You diagnose muscle tears, rehabilitate injuries, optimize athletic biomechanics, and condition champions to peak physical performance.',
+    dailyLife: 'Conducting flexibility and sprint gait analysis, applying manual therapy and dry needling, designing gym conditioning routines, and traveling with sports teams to tournaments.',
+    salaryIndia: '₹6,00,000 to ₹26,00,000+ per year (BCCI, IPL cricket franchises, and national sports academies offer high compensation).',
+    salaryAbroad: '$85,000 to $170,000 per year (Premier League football clubs, NBA basketball teams, and Australian Sports Institutes).',
+    highSchoolStream: '11th & 12th in Science with Biology (PCB) for Physiotherapy (BPT); or Physical Education for Sports Coaching.',
+    indianPathways: [
+      'Netaji Subhas National Institute of Sports (NSNIS, Patiala) - India’s premier sports coaching institute',
+      'Sports Authority of India (SAI) Training Centres',
+      'Manipal College of Health Professions (MAHE)',
+      'Jamia Hamdard & Government Medical Colleges (Bachelor of Physiotherapy - BPT)'
+    ],
+    globalPathways: [
+      'Loughborough University (UK - Ranked #1 in the World for Sports Science)',
+      'University of Queensland - School of Human Movement (Australia)',
+      'German Sport University Cologne (Germany)'
+    ],
+    keyEntranceExams: 'NEET-UG (for select allied health seats), State Allied Health Entrances, NSNIS Diploma Entrance Exam.',
+    employers: ['BCCI / Indian National Cricket Team', 'Sports Authority of India (SAI)', 'IPL Franchises & ISL Football Clubs', 'Olympic Gold Quest (OGQ)', 'Top Fitness & Orthopedic Hospitals']
+  },
+
+  'corporate_law_judiciary': {
+    id: 'corporate_law_judiciary',
+    title: 'Corporate Legal Counsel & Judicial Magistrate (Civil Judge)',
     category: 'Corporate Advisory, Constitutional Law & Judiciary',
     iconName: 'Scale',
-    idealTraits: ['lawyer', 'logic'],
-    description: 'Negotiate multi-crore business mergers, defend human rights in constitutional courts, file public interest litigations, and progress toward the judicial magistrate bench.',
+    idealTraits: ['enterprising', 'logic'],
+    description: 'You negotiate multi-crore business agreements, defend human rights in constitutional courts, or pass fair legal judgments as a presiding judge in district and high courts.',
     dailyLife: 'Drafting commercial contracts, researching legal precedents, presenting arguments before judges, and mediating settlements between conflicting parties.',
     salaryIndia: '₹8,50,000 to ₹42,00,000+ per year (Senior advocates and partners in tier-1 law firms earn well beyond).',
     salaryAbroad: '$120,000 to $280,000 per year (Elite law firms in London, New York, Dubai, and Singapore).',
@@ -783,35 +1234,11 @@ const CAREER_DATABASE = {
     globalPathways: [
       'Harvard Law School - USA',
       'Oxford University Faculty of Law - United Kingdom',
-      'Cambridge University - United Kingdom'
+      'Cambridge University - United Kingdom',
+      'National University of Singapore (NUS) Faculty of Law'
     ],
     keyEntranceExams: 'CLAT (Common Law Admission Test), AILET; State Judicial Services Examination (PCS-J) for becoming a Civil Judge.',
-    employers: ['Shardul Amarchand Mangaldas', 'Khaitan & Co', 'Supreme Court & High Courts', 'Tata Sons Legal']
-  },
-
-  'chartered_accountant': {
-    id: 'chartered_accountant',
-    title: 'Chartered Accountant (CA) & Forensic Financial Auditor',
-    category: 'Financial Management, Auditing, Capital Markets & Taxation',
-    iconName: 'BarChart3',
-    idealTraits: ['logic', 'conscientious'],
-    description: 'Control corporate balance sheets, audit financial statements to detect multi-crore fraud, design tax frameworks, and advise enterprise founders on investments and acquisitions.',
-    dailyLife: 'Analyzing general ledgers, conducting statutory audits, certifying financial statements, filing corporate taxes, and advising boards on capital allocation.',
-    salaryIndia: '₹9,00,000 to ₹45,00,000+ per year (Independent CA firms and corporate CFO seats earn substantial consulting income).',
-    salaryAbroad: '$110,000 to $250,000 per year (Strong global reciprocity across Dubai, London, Singapore, and Sydney).',
-    highSchoolStream: '11th & 12th in Commerce with Mathematics (Science students can also easily transition).',
-    indianPathways: [
-      'The Institute of Chartered Accountants of India (ICAI - registered right after 12th)',
-      'Shri Ram College of Commerce (SRCC, Delhi University)',
-      'Indian Institutes of Management (IIM Indore/Rohtak 5-Year Integrated IPMAT Program)'
-    ],
-    globalPathways: [
-      'London School of Economics (LSE) - United Kingdom',
-      'Wharton School, University of Pennsylvania - USA',
-      'INSEAD - France / Singapore'
-    ],
-    keyEntranceExams: 'CA Foundation (conducted by ICAI right after 12th), IPMAT (for IIMs after school), CFA, ACCA exams.',
-    employers: ['The Big 4 (Deloitte, PwC, EY, KPMG)', 'Goldman Sachs', 'J.P. Morgan', 'HDFC Bank', 'State Bank of India']
+    employers: ['Shardul Amarchand Mangaldas', 'Khaitan & Co', 'Supreme Court & High Courts', 'Tata Sons Legal', 'State Judicial Services']
   },
 
   'agri_veterinary_tech': {
@@ -819,8 +1246,8 @@ const CAREER_DATABASE = {
     title: 'Veterinary Doctor & Autonomous Agri-Tech Innovator',
     category: 'Veterinary Medicine, Drone Agriculture & Livestock Genetics',
     iconName: 'Feather',
-    idealTraits: ['agri_vet', 'logic'],
-    description: 'Treat livestock, horses, and wildlife as a licensed veterinary surgeon, or modernize farm yields using autonomous agricultural drones, soil biotechnology, and greenhouse automation.',
+    idealTraits: ['realistic', 'investigative'],
+    description: 'You treat livestock, horses, and companion animals as a licensed veterinary surgeon, or modernize farm yields using autonomous agricultural drones, soil biotechnology, and greenhouse automation.',
     dailyLife: 'Performing veterinary surgeries on farm and domestic animals, advising farmers on soil productivity, managing drone crop spraying, and overseeing dairy processing plants.',
     salaryIndia: '₹6,50,000 to ₹25,00,000+ per year (Government Veterinary Officers receive gazetted officer rank and allowances).',
     salaryAbroad: '$85,000 to $175,000 per year (High demand in Australia, New Zealand, Canada, and Netherlands).',
@@ -837,44 +1264,120 @@ const CAREER_DATABASE = {
       'University of Melbourne Veterinary School - Australia'
     ],
     keyEntranceExams: 'NEET-UG (for BVSc & AH seats), ICAR AIEEA (Indian Council of Agricultural Research), State Agri Entrance Tests.',
-    employers: ['State Animal Husbandry Departments', 'Amul / NDDB', 'Bayer CropScience', 'John Deere AgriTech', 'Wildlife Sanctuaries']
+    employers: ['State Animal Husbandry Departments', 'Amul / NDDB', 'Bayer CropScience', 'John Deere AgriTech', 'Animal Welfare Sanctuaries']
   },
 
-  'architect_urban_planner': {
-    id: 'architect_urban_planner',
-    title: 'Architect, Spatial Urban Planner & Sustainable Designer',
-    category: 'Spatial Architecture, Eco-Cities & Structural Aesthetics',
+  'architecture_game_design': {
+    id: 'architecture_game_design',
+    title: 'Architect, Spatial Urban Planner & 3D Game Environment Designer',
+    category: 'Spatial Architecture, 3D Game Worlds & Ergonomic Design',
     iconName: 'Palette',
-    idealTraits: ['architect', 'logic'],
-    description: 'Conceptualize eco-friendly buildings, sustainable smart cities, and iconic public spaces using 3D CAD modeling, structural loads, and environmental airflow principles.',
-    dailyLife: 'Drafting 3D architectural models, testing physical building materials, supervising construction site execution, and presenting plans to urban development authorities.',
-    salaryIndia: '₹6,50,000 to ₹28,00,000+ per year (Principal architects and design firm founders earn substantial fees).',
-    salaryAbroad: '$85,000 to $175,000 per year (Leading architectural design firms across Europe, Singapore, USA, and Japan).',
-    highSchoolStream: '11th & 12th in Science with Mathematics (PCM) is mandatory for B.Arch degrees.',
+    idealTraits: ['artistic', 'realistic'],
+    description: 'You conceptualize eco-friendly buildings, sustainable cities, physical consumer electronics, or virtual 3D gaming environments and cinematic animations that inspire millions.',
+    dailyLife: 'Drafting 3D CAD/Blender models, testing physical building materials, supervising construction sites, and collaborating with digital visual effects teams.',
+    salaryIndia: '₹6,00,000 to ₹26,00,000+ per year (Senior studio architects and game art directors earn high compensation).',
+    salaryAbroad: '$85,000 to $175,000 per year (Global architecture and AAA game studios in USA, Japan, UK, and Canada).',
+    highSchoolStream: '11th & 12th in Science (PCM) for B.Arch; or any stream with Mathematics for Design (NID/UCEED).',
     indianPathways: [
-      'School of Planning and Architecture (SPA New Delhi / Bhopal / Vijayawada)',
+      'School of Planning and Architecture (SPA New Delhi / Bhopal)',
+      'National Institute of Design (NID Ahmedabad)',
       'IIT Roorkee / IIT Kharagpur (Department of Architecture)',
-      'CEPT University (Ahmedabad)',
-      'National Institute of Design (NID Ahmedabad)'
+      'Industrial Design Centre (IDC, IIT Bombay)'
     ],
     globalPathways: [
       'Architectural Association School of Architecture (AA London, UK)',
-      'MIT Department of Architecture (USA)',
+      'Rhode Island School of Design (RISD, USA)',
       'Delft University of Technology (TU Delft, Netherlands)'
     ],
-    keyEntranceExams: 'NATA (National Aptitude Test in Architecture), JEE Main Paper 2 (B.Arch).',
-    employers: ['Hafeez Contractor Architects', 'CP Kukreja Associates', 'L&T Construction', 'Smart Cities Mission', 'Independent Studios']
+    keyEntranceExams: 'NATA (National Aptitude Test in Architecture), JEE Main Paper 2 (B.Arch), UCEED (IITs Design), NID DAT.',
+    employers: ['Hafeez Contractor Architects', 'Ubisoft / Electronic Arts (EA)', 'Tata Motors Design Studio', 'L&T Construction', 'Independent Design Firms']
+  },
+
+  'medicine_surgeon': {
+    id: 'medicine_surgeon',
+    title: 'Specialized Surgeon & Medical Doctor (MBBS / MS / MD)',
+    category: 'Clinical Medicine, Neurosurgery, Cardiology & Critical Care',
+    iconName: 'Activity',
+    idealTraits: ['investigative', 'social'],
+    description: 'You diagnose complex diseases, perform precision surgeries inside operating theatres, manage emergency trauma units, and save human lives every single day.',
+    dailyLife: 'Operating room surgical procedures, morning hospital ward rounds, reviewing MRI/CT scans, prescribing pharmacotherapy, and consulting outpatient patients.',
+    salaryIndia: '₹10,00,000 to ₹50,00,000+ per year (Senior consultant surgeons and specialists in private hospitals can exceed ₹1 Crore annually).',
+    salaryAbroad: '$180,000 to $380,000+ per year (USA - USMLE pathway, UK - PLAB pathway, Canada, Australia).',
+    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Biology (PCB).',
+    indianPathways: [
+      'All India Institute of Medical Sciences (AIIMS New Delhi & Regional AIIMS)',
+      'Christian Medical College (CMC Vellore)',
+      'Armed Forces Medical College (AFMC Pune)',
+      'Maulana Azad Medical College (MAMC New Delhi)'
+    ],
+    globalPathways: [
+      'Johns Hopkins University School of Medicine (USA)',
+      'Oxford University Medical School (UK)',
+      'Karolinska Institute (Sweden)'
+    ],
+    keyEntranceExams: 'NEET-UG, NEET-PG / INI-CET; USMLE (for USA), PLAB/GMC (for UK).',
+    employers: ['AIIMS', 'Apollo Hospitals', 'Fortis Healthcare', 'Armed Forces Medical Services', 'Global Medical Research Centers']
+  },
+
+  'aviation_pilot': {
+    id: 'aviation_pilot',
+    title: 'Commercial Airline Pilot & Aviation Flight Commander',
+    category: 'Commercial Aviation, Aeronautical Navigation & Cockpit Command',
+    iconName: 'Compass',
+    idealTraits: ['tactical', 'conventional'],
+    description: 'You command passenger jets (Boeing 777 / Airbus A350) across global continents. You master cockpit flight computers, navigate stormy weather systems, and ensure the safety of hundreds of passengers.',
+    dailyLife: 'Pre-flight weather briefings, inspecting aircraft exterior fuselage, taxiing and flying across international air routes, and communicating with Air Traffic Control (ATC).',
+    salaryIndia: '₹14,00,000 to ₹55,00,000+ per year (First Officer to Senior Line Captain packages with luxury hotel layovers).',
+    salaryAbroad: '$110,000 to $270,000 per year (Major international airlines: Emirates, Qatar Airways, Singapore Airlines, Delta).',
+    highSchoolStream: '11th & 12th in Science with Physics and Mathematics (PCM) is mandatory as per DGCA regulations.',
+    indianPathways: [
+      'Indira Gandhi Rashtriya Uran Akademi (IGRUA, Amethi) - India’s premier national flying school',
+      'Air India Cadet Pilot Program',
+      'IndiGo Cadet Pilot Program (CAE / Flight Training Adelaide)',
+      'Government Flying Training Schools across states'
+    ],
+    globalPathways: [
+      'CAE Oxford Aviation Academy (United Kingdom)',
+      'Flight Safety International (Florida, USA)',
+      'Singapore Flying College'
+    ],
+    keyEntranceExams: 'IGRUA Entrance Exam, DGCA Theory Exams (Navigation, Meteorology, Air Regulations), Class 1 DGCA Medical Examination.',
+    employers: ['Air India', 'IndiGo', 'Emirates', 'Qatar Airways', 'Singapore Airlines', 'Indian Coast Guard']
   }
 };
 
+/* Default student roster */
 const DEFAULT_STUDENTS = [
   { name: 'Rohan Sharma', email: 'rohan@example.com', password: 'password123', grade: 'Class 11th', registeredOn: '2026-09-28' },
   { name: 'Priya Patel', email: 'priya@example.com', password: 'password123', grade: 'Class 12th', registeredOn: '2026-09-29' },
   { name: 'Aarav Verma', email: 'aarav@example.com', password: 'password123', grade: 'Class 10th', registeredOn: '2026-10-01' }
 ];
 
+/* Helper to render career icons */
+const CareerIcon = ({ name, className = 'w-5 h-5' }) => {
+  switch (name) {
+    case 'Rocket': return <Rocket className={className} />;
+    case 'Shield': return <Shield className={className} />;
+    case 'Heart': return <Heart className={className} />;
+    case 'BookOpen': return <BookOpen className={className} />;
+    case 'Radio': return <Radio className={className} />;
+    case 'Microscope': return <Microscope className={className} />;
+    case 'Landmark': return <Landmark className={className} />;
+    case 'Dumbbell': return <Dumbbell className={className} />;
+    case 'Scale': return <Scale className={className} />;
+    case 'Feather': return <Feather className={className} />;
+    case 'BarChart3': return <BarChart3 className={className} />;
+    case 'Zap': return <Zap className={className} />;
+    case 'Palette': return <Palette className={className} />;
+    case 'Activity': return <Activity className={className} />;
+    default: return <Compass className={className} />;
+  }
+};
+
 export default function App() {
-  const [currentView, setCurrentView] = useState('home');
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'test' | 'evaluating' | 'report' | 'allCareers'
+  
+  // Persistent user session
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('deeppath_user_session');
@@ -884,6 +1387,7 @@ export default function App() {
     }
   });
 
+  // Student roster
   const [studentRoster, setStudentRoster] = useState(() => {
     try {
       const saved = localStorage.getItem('deeppath_student_roster');
@@ -893,6 +1397,7 @@ export default function App() {
     }
   });
 
+  // Google Sheet integration link
   const sheetId = '1Bv16i3BDu7jZ5xq4qz7cLJGfFrfWrsoRGEdOlLO3guc';
   const defaultSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit?usp=sharing`;
   const [sheetUrl, setSheetUrl] = useState(() => {
@@ -901,13 +1406,15 @@ export default function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState('');
 
+  // Founder photo
   const [founderPhoto, setFounderPhoto] = useState(() => {
     return localStorage.getItem('deeppath_founder_photo') || null;
   });
   const fileInputRef = useRef(null);
 
+  // Auth modal
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
   const [authName, setAuthName] = useState('');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
@@ -915,12 +1422,14 @@ export default function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [authErrorMessage, setAuthErrorMessage] = useState('');
 
+  // Roster modal
   const [rosterModalOpen, setRosterModalOpen] = useState(false);
   const [rosterSearch, setRosterSearch] = useState('');
 
+  // Assessment engine state (75 Questions)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [markedForReview, setMarkedForReview] = useState({});
+  const [selectedAnswers, setSelectedAnswers] = useState({}); // { qId: { optionId, scoreType, points } }
+  const [markedForReview, setMarkedForReview] = useState({}); // { qId: true }
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [evaluatingCountdown, setEvaluatingCountdown] = useState(3);
   const [assessmentReport, setAssessmentReport] = useState(null);
@@ -1153,7 +1662,7 @@ export default function App() {
   };
 
   const answeredCount = Object.keys(selectedAnswers).length;
-  const totalQuestions = ASSESSMENT_BATTERY.length;
+  const totalQuestions = ASSESSMENT_BATTERY.length; // 75
   const progressPercent = Math.round((answeredCount / totalQuestions) * 100);
   const currentQ = ASSESSMENT_BATTERY[activeQuestionIndex];
 
@@ -1179,24 +1688,21 @@ export default function App() {
       logic: 0,
       courage: 0,
       empathy: 0,
-      army: 0,
-      airforce: 0,
-      navy: 0,
-      aerospace: 0,
-      civil: 0,
-      surgeon: 0,
-      cardiology: 0,
-      neurology: 0,
-      psychology: 0,
-      civil_services: 0,
-      cs_ai: 0,
-      lawyer: 0,
-      agri_vet: 0,
-      architect: 0,
+      teaching: 0,
+      investigative: 0,
+      artistic: 0,
+      enterprising: 0,
+      realistic: 0,
+      conventional: 0,
+      social: 0,
+      tactical: 0,
       introvert: 0,
       extravert: 0,
+      intuitive: 0,
+      observant: 0,
       conscientious: 0,
       spontaneous: 0,
+      resilient: 0,
       sensitive: 0,
       decided: 0,
       exploring: 0,
@@ -1213,7 +1719,7 @@ export default function App() {
     let mathPoints = 0;
     for (let i = 1; i <= 10; i++) {
       const qAns = selectedAnswers[`q${i}`];
-      if (qAns && qAns.points) {
+      if (qAns && qAns.scoreType === 'logic') {
         mathPoints += qAns.points;
       }
     }
@@ -1224,41 +1730,38 @@ export default function App() {
     let clarityDesc = 'You are actively comparing multiple interesting fields with genuine curiosity. You have natural strengths that will shine once you see the step-by-step roadmap.';
     let clarityColor = 'text-amber-400 bg-amber-400/10 border-amber-400/30';
 
-    if (traitScores.confused >= 10) {
+    if (traitScores.confused >= 15) {
       clarityVerdict = 'Seeking Guidance / Overwhelmed State';
-      clarityDesc = 'You have felt overwhelmed by conflicting advice or fear of making a wrong stream choice. This report provides an exact, structured roadmap to remove all anxiety.';
+      clarityDesc = 'You have felt overwhelmed by too many conflicting options or fear of making a wrong stream choice. This report provides an exact, structured roadmap to remove all anxiety.';
       clarityColor = 'text-rose-400 bg-rose-400/10 border-rose-400/30';
-    } else if (traitScores.pressured >= 10) {
+    } else if (traitScores.pressured >= 15) {
       clarityVerdict = 'Heavy External & Parental Pressure';
       clarityDesc = 'You feel significant pressure from relatives, parents, or peer expectations to pursue traditional degrees. Remember: true success comes when your natural intellect aligns with your daily calling.';
       clarityColor = 'text-orange-400 bg-orange-400/10 border-orange-400/30';
-    } else if (traitScores.decided >= 15) {
+    } else if (traitScores.decided >= 20) {
       clarityVerdict = 'Firmly Focused & Decided';
       clarityDesc = 'You possess crystal-clear intrinsic drive and know what kind of impact you wish to create in life. Use this report to verify college paths, entrance exams, and global opportunities.';
       clarityColor = 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30';
     }
 
     const normalizedTraits = {
-      'Cognitive & Mathematical Logic': Math.min(99, Math.max(45, Math.round((mathPoints / 50) * 100))),
-      'Tactical Armed Forces & Command': Math.min(99, Math.max(40, (traitScores.army + traitScores.airforce + traitScores.navy + traitScores.courage) * 2 + 30)),
-      'Aerospace & Space Technology': Math.min(99, Math.max(40, (traitScores.aerospace + traitScores.logic) * 2 + 30)),
-      'Medical & Surgical Precision': Math.min(99, Math.max(40, (traitScores.surgeon + traitScores.cardiology + traitScores.neurology) * 2 + 30)),
-      'Civil & Structural Engineering': Math.min(99, Math.max(40, (traitScores.civil + traitScores.logic) * 2 + 30)),
-      'Psychological Empathy & Counseling': Math.min(99, Math.max(40, (traitScores.psychology + traitScores.empathy) * 2 + 30)),
-      'Civil Administration & Law': Math.min(99, Math.max(40, (traitScores.civil_services + traitScores.lawyer) * 2 + 30)),
-      'Computer Science & AI Systems': Math.min(99, Math.max(40, (traitScores.cs_ai + traitScores.logic) * 2 + 30))
+      'Cognitive & Mathematical Logic': Math.min(99, Math.max(45, Math.round((traitScores.logic / 45) * 100) + 15)),
+      'Tactical Courage & Defence Mindset': Math.min(99, Math.max(45, Math.round((traitScores.courage / 35) * 100) + 15)),
+      'Empathy, Psychology & Counseling': Math.min(99, Math.max(45, Math.round((traitScores.empathy / 35) * 100) + 15)),
+      'Scientific Investigation & Aerospace': Math.min(99, Math.max(45, Math.round((traitScores.investigative / 45) * 100) + 15)),
+      'Pedagogy & Knowledge Mentorship': Math.min(99, Math.max(45, Math.round((traitScores.teaching / 30) * 100) + 15)),
+      'Enterprise, Law & Strategic Influence': Math.min(99, Math.max(45, Math.round((traitScores.enterprising / 35) * 100) + 15)),
+      'Artistic, Narrative & Media Vision': Math.min(99, Math.max(45, Math.round((traitScores.artistic / 35) * 100) + 15)),
+      'Hands-on Practical & Mechanical Mastery': Math.min(99, Math.max(45, Math.round((traitScores.realistic / 35) * 100) + 15))
     };
 
     const rankedCareers = Object.values(CAREER_DATABASE).map(career => {
       let careerScore = 0;
       career.idealTraits.forEach(trait => {
-        careerScore += (traitScores[trait] || 0) * 4;
+        careerScore += (traitScores[trait] || 0) * 3;
       });
-      if (career.id.includes('airforce') || career.id.includes('aerospace')) {
-        careerScore += traitScores.aerospace * 1.5;
-      }
-      if (career.id.includes('surgeon') || career.id.includes('cardiologist')) {
-        careerScore += traitScores.surgeon * 1.5;
+      if (career.id === 'aerospace_engineer' || career.id === 'cs_ai_engineer') {
+        careerScore += traitScores.logic * 1.6;
       }
       return {
         ...career,
@@ -1330,7 +1833,7 @@ export default function App() {
                 DeepPath<span className="text-amber-400">Careers</span>
               </span>
               <span className="block text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-slate-400">
-                Expanded Defense & Medical Diagnostic • 15 Disciplines
+                75-Question Diagnostic • Aptitude, Psychology & 15 Paths
               </span>
             </div>
           </div>
@@ -1405,7 +1908,7 @@ export default function App() {
               className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:brightness-110 shadow-lg shadow-amber-400/20 transition-all hover:scale-105 active:scale-95"
             >
               <Sparkles className="w-4 h-4 text-slate-950" />
-              <span>Start Assessment</span>
+              <span>Start 75-Q Test</span>
             </button>
           </div>
 
@@ -1425,7 +1928,7 @@ export default function App() {
               <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-400 text-xs font-bold mb-6">
                   <Brain className="w-4 h-4" />
-                  <span>Deep Diagnostic Battery across Defense, Space, Medicine & Engineering</span>
+                  <span>The 75-Question Comprehensive Assessment Engine</span>
                 </div>
 
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.12]">
@@ -1436,8 +1939,9 @@ export default function App() {
                 </h1>
 
                 <p className="mt-8 text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-                  An untimed, thorough diagnostic designed to uncover your true cognitive and psychological strengths.
-                  Deep specialization across the **Indian Army, Air Force, Navy**, **Aerospace & Space Technology**, **Specialized Surgery**, **Cardiology**, **Neurology**, **Civil Infrastructure**, and **Public Governance**.
+                  An untimed, comprehensive diagnostic battery of 75 questions designed to uncover your full cognitive and psychological makeup:
+                  10 Math & Spatial Logic Puzzles, Big-5 Personality Traits, Career Confusion Index, RIASEC Vocational Domains, 
+                  and Team Dynamics across 15 diverse professions.
                 </p>
 
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -1445,7 +1949,7 @@ export default function App() {
                     onClick={handleInitiateTestClick}
                     className="w-full sm:w-auto px-8 py-4 rounded-2xl font-black text-base text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:brightness-110 shadow-xl shadow-amber-400/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
                   >
-                    <span>Begin Assessment</span>
+                    <span>Begin 75-Question Assessment</span>
                     <ArrowRight className="w-5 h-5 text-slate-950" />
                   </button>
 
@@ -1454,41 +1958,41 @@ export default function App() {
                     className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm text-slate-300 hover:text-white border border-slate-800 bg-slate-900/60 hover:bg-slate-900 transition-all flex items-center justify-center gap-2"
                   >
                     <BookOpen className="w-4 h-4 text-amber-400" />
-                    <span>Explore All 15 Disciplines</span>
+                    <span>Explore All 15 Professions</span>
                   </button>
                 </div>
 
                 <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
                   <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
                     <div className="flex items-center gap-2 text-amber-400 font-bold text-sm mb-1">
-                      <Shield className="w-4 h-4" />
-                      <span>Deep Defense Branches</span>
+                      <Brain className="w-4 h-4" />
+                      <span>10 Logic & Math Puzzles</span>
                     </div>
-                    <p className="text-xs text-slate-400">Army combat command, IAF fighter aviation & Naval destroyers.</p>
+                    <p className="text-xs text-slate-400">Pattern sequences, speeds, ratios, spatial cubes & deductions.</p>
                   </div>
 
                   <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
                     <div className="flex items-center gap-2 text-rose-400 font-bold text-sm mb-1">
-                      <Activity className="w-4 h-4" />
-                      <span>Advanced Medical Wings</span>
+                      <Sliders className="w-4 h-4" />
+                      <span>Career Clarity Index</span>
                     </div>
-                    <p className="text-xs text-slate-400">Trauma surgery, cardiology cath-labs & clinical neurology.</p>
+                    <p className="text-xs text-slate-400">Pinpoints parental pressure, exploring curiosity, or confusion.</p>
                   </div>
 
                   <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
                     <div className="flex items-center gap-2 text-sky-400 font-bold text-sm mb-1">
                       <Rocket className="w-4 h-4" />
-                      <span>Space & Aerospace</span>
+                      <span>15 Diverse Professions</span>
                     </div>
-                    <p className="text-xs text-slate-400">ISRO rocketry, satellite telemetry & supersonic propulsion.</p>
+                    <p className="text-xs text-slate-400">Aerospace, Army, Psychology, Civil Services, Pilot, Surgeon & Law.</p>
                   </div>
 
                   <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
                     <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm mb-1">
-                      <Building className="w-4 h-4" />
-                      <span>Civil Mega Infrastructure</span>
+                      <Globe className="w-4 h-4" />
+                      <span>India & Abroad Routes</span>
                     </div>
-                    <p className="text-xs text-slate-400">High-speed rail tunnels, suspension bridges & structural loads.</p>
+                    <p className="text-xs text-slate-400">IIST, NDA, AIIMS, NIMHANS, TISS, Oxford, Sandhurst & MIT.</p>
                   </div>
                 </div>
 
@@ -1598,13 +2102,14 @@ export default function App() {
 
                     <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
                       <p>
-                        A fulfilled career isn't limited to a generic desk job. When I looked around, 
-                        the real heroes were army commanders defending our high-altitude glaciers, IAF fighter pilots navigating supersonic skies, 
-                        surgeons standing for 6 hours straight inside trauma rooms, and aerospace engineers crafting rockets for the cosmos.
+                        A fulfilled life isn’t limited to only doctor or software engineer. When I looked around, 
+                        the real heroes were aerospace scientists launching rockets to the moon, army officers standing vigil on icy borders, psychologists listening patiently 
+                        to wounded minds, passionate school teachers awakening curious brains, and investigative reporters 
+                        uncovering the truth.
                       </p>
                       <p>
-                        We designed this enhanced diagnostic with targeted logic puzzles and realistic scenarios so that whether you belong to a quiet village 
-                        or a busy city, you find your exact calling with step-by-step clarity.
+                        We built this expanded 75-question diagnostic with real math puzzles, pattern thinking, and lifelike scenarios so every young student—whether 
+                        from a quiet village or a bustling city—can discover their true calling with clarity and confidence.
                       </p>
                     </div>
 
@@ -1741,7 +2246,7 @@ export default function App() {
                       onClick={triggerAssessmentEvaluation}
                       className="px-7 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-emerald-400/20"
                     >
-                      <span>Analyze Answers</span>
+                      <span>Analyze All 75 Answers</span>
                       <Sparkles className="w-4 h-4" />
                     </button>
                   )}
@@ -1756,7 +2261,7 @@ export default function App() {
                   
                   <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                     <div>
-                      <h3 className="text-lg font-bold text-white">Assessment Question Palette ({totalQuestions})</h3>
+                      <h3 className="text-lg font-bold text-white">Assessment Question Palette (75)</h3>
                       <p className="text-xs text-slate-400">Click any number to jump directly to that question.</p>
                     </div>
                     <button 
@@ -1846,23 +2351,23 @@ export default function App() {
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-white">Synthesizing Profile Dimensions</h3>
+                <h3 className="text-2xl font-black text-white">Synthesizing 75 Dimensions</h3>
                 <p className="text-xs text-slate-400 mt-2">
-                  Calculating Cognitive Aptitude IQ, Defense Instincts, Medical Branching, and matching across 15 full career paths...
+                  Calculating Cognitive Aptitude IQ, Decidedness vs Confusion Index, Big-5 traits, and matching across 15 full career paths...
                 </p>
               </div>
 
               <div className="space-y-2 text-left bg-slate-950 p-4 rounded-xl border border-slate-800/80 text-xs">
                 <div className="flex items-center justify-between text-slate-400">
-                  <span>Math & Logic Aptitude</span>
+                  <span>10 Math & Spatial Logic Puzzles</span>
                   <span className="text-emerald-400 font-bold">Percentile Solved</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-400">
-                  <span>Defense & Medical Scenarios</span>
+                  <span>Career Clarity & Parental Pressure</span>
                   <span className="text-emerald-400 font-bold">Evaluated</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-400">
-                  <span>Colleges (NDA, AIIMS, IIST, IITs, Oxford)</span>
+                  <span>Colleges (IIST, NDA, AIIMS, NIMHANS, TISS, Oxford)</span>
                   <span className="text-amber-400 font-bold">Synthesizing...</span>
                 </div>
               </div>
@@ -1883,13 +2388,13 @@ export default function App() {
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Specialized Diagnostic Dossier</span>
+                    <span>Comprehensive 75-Question Diagnostic Dossier</span>
                   </div>
                   <h1 className="text-2xl sm:text-4xl font-black text-white">
                     Congratulations, {currentUser?.name || 'Student'}!
                   </h1>
                   <p className="text-sm text-slate-300 mt-1">
-                    Calculated on {assessmentReport.dateFormatted}. Here is your full cognitive and vocational breakdown.
+                    Calculated on {assessmentReport.dateFormatted} from all 75 questions. Here is your full cognitive and vocational breakdown.
                   </p>
                 </div>
 
@@ -1914,6 +2419,7 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
               <div className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/60 space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pillar 1: Cognitive Logic & Math</span>
@@ -1928,8 +2434,8 @@ export default function App() {
                 </div>
 
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Evaluated from the numerical sequences, spatial cubes, structural ratios, and aerodynamic reasoning questions. 
-                  Demonstrates sharp analytical precision and strong technical problem-solving capacity.
+                  Evaluated from the 10 numerical sequences, speed-time, ratio logic, 3D painted cubes, and deductive syllogisms. 
+                  Demonstrates sharp analytical precision and strong problem-solving capacity.
                 </p>
               </div>
 
@@ -1949,12 +2455,13 @@ export default function App() {
                   {assessmentReport.clarityDesc}
                 </p>
               </div>
+
             </div>
 
             <div className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/50 space-y-6">
               <div>
-                <h3 className="text-xl font-bold text-white">Psychological & Domain Trait Spectrum</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Scored from your choices across tactical dilemmas, engineering decisions, and vocational callings.</p>
+                <h3 className="text-xl font-bold text-white">Psychological & Vocational Trait Spectrum</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Scored from your choices across the 75 dilemmas, teamwork responses, and vocational callings.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
@@ -1975,7 +2482,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Primary Matched Career Card */}
             <div className="p-8 sm:p-10 rounded-3xl border-2 border-amber-400/60 bg-slate-900/80 relative space-y-8 shadow-2xl shadow-amber-400/5">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
                 <div className="flex items-start gap-4">
@@ -2138,10 +2644,10 @@ export default function App() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
             <div className="text-center max-w-3xl mx-auto space-y-3">
               <h1 className="text-3xl sm:text-5xl font-black text-white">
-                Directory of All 15 Diverse Disciplines
+                Directory of All 15 Diverse Professions
               </h1>
               <p className="text-sm sm:text-base text-slate-400">
-                Explore every career path—from Army Officers and IAF Fighter Pilots to Aerospace Engineers, Specialized Surgeons, and Civil Builders.
+                Explore every career path beyond ordinary stereotypes—from Aerospace Rocket Engineers and Army Officers to Commercial Airline Pilots and Surgeons.
               </p>
             </div>
 
@@ -2176,7 +2682,7 @@ export default function App() {
                       onClick={handleInitiateTestClick}
                       className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 transition-colors"
                     >
-                      Take Assessment to Check Fit
+                      Take 75-Q Assessment to Check Fit
                     </button>
                   </div>
                 </div>
@@ -2229,6 +2735,7 @@ export default function App() {
 
             {authErrorMessage && (
               <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
                 <span className="leading-relaxed">{authErrorMessage}</span>
               </div>
             )}
@@ -2453,7 +2960,7 @@ export default function App() {
             <span className="font-bold text-slate-400">DeepPath Careers Platform</span>
           </div>
           <div>
-            Built with dedicated branches for Defense (Army, Navy, Air Force), Aerospace & Civil Engineering, and Specialized Medicine.
+            Built with 75 holistic diagnostic questions and 15 diverse professions for all students.
           </div>
           <div className="text-slate-600">
             Connected with Google Spreadsheet ID: {sheetId.slice(0, 8)}...
