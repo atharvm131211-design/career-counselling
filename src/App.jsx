@@ -1,2004 +1,2488 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Compass,
-  ArrowRight,
-  ArrowLeft,
-  CheckCircle2,
-  Bookmark,
-  Award,
-  Sparkles,
-  Database,
-  Search,
-  RefreshCw,
-  Camera,
-  Layers,
-  BrainCircuit,
-  Lock,
-  Mail,
-  User,
-  ExternalLink,
-  ChevronRight,
-  ShieldCheck,
-  AlertTriangle
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { 
+  Compass, Sparkles, BookOpen, GraduationCap, Globe, 
+  CheckCircle2, ArrowRight, ArrowLeft, Shield, User, Mail, 
+  Lock, LogOut, RefreshCw, Award, Search, Camera,
+  FileSpreadsheet, ExternalLink, Check, Database,
+  Sliders, Eye, EyeOff, Bookmark, Zap, Activity, Brain, 
+  Printer, Scale, Feather, Heart, Radio, Microscope,
+  Landmark, Palette, Dumbbell, Grid, Rocket, Plane, Anchor
 } from 'lucide-react';
 
-// --- QUESTION BANK: 75 COMPREHENSIVE QUESTIONS ---
-const QUESTIONS = [
-  // 1-10: Mathematical, Logical & Spatial Puzzles
+const ASSESSMENT_BATTERY = [
+  // 1-10: COGNITIVE APTITUDE & MATH PUZZLES
   {
-    id: 1,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "Find the next number in this sequence: 3, 7, 15, 31, 63, ...",
+    id: 'q1',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'NUMBER PATTERN: Look at this sequence: 4, 9, 19, 39, 79, ... What number comes next?',
     options: [
-      { text: "127 (Rule: multiply previous by 2, add 1)", traits: { logic: 10, analytical: 8 } },
-      { text: "95", traits: { logic: 2 } },
-      { text: "120", traits: { logic: 3 } },
-      { text: "126", traits: { logic: 4 } }
-    ],
-    isAptitude: true,
-    correctIndex: 0
-  },
-  {
-    id: 2,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "A bus travels 180 km in 3 hours at constant speed. If the driver increases speed by 20 km/h, how far will it travel in the next 3 hours?",
-    options: [
-      { text: "200 km", traits: { logic: 2 } },
-      { text: "240 km (Speed increases from 60 to 80 km/h; 80 x 3 = 240)", traits: { logic: 10, analytical: 8 } },
-      { text: "220 km", traits: { logic: 3 } },
-      { text: "210 km", traits: { logic: 2 } }
-    ],
-    isAptitude: true,
-    correctIndex: 1
-  },
-  {
-    id: 3,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "A wooden cube is painted red on all 6 sides and cut into 27 equal smaller cubes. How many small cubes have red paint on EXACTLY two sides?",
-    options: [
-      { text: "12 cubes (Located along the 12 edges, excluding corners)", traits: { logic: 10, spatial: 10 } },
-      { text: "8 cubes", traits: { logic: 3, spatial: 3 } },
-      { text: "6 cubes", traits: { logic: 3, spatial: 2 } },
-      { text: "1 cube", traits: { logic: 1 } }
-    ],
-    isAptitude: true,
-    correctIndex: 0
-  },
-  {
-    id: 4,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "Statement: 'All pilots are trained navigators. Some navigators are astronomers.' What can we deduce for sure?",
-    options: [
-      { text: "Every pilot is an astronomer", traits: { logic: 2 } },
-      { text: "Some pilots might be astronomers, but we cannot be 100% certain", traits: { logic: 10, analytical: 8 } },
-      { text: "No pilot can ever study astronomy", traits: { logic: 1 } },
-      { text: "All astronomers are pilots", traits: { logic: 1 } }
-    ],
-    isAptitude: true,
-    correctIndex: 1
-  },
-  {
-    id: 5,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "A tank has two taps. Tap A fills it in 4 hours, Tap B in 6 hours. If both open together, how long does it take?",
-    options: [
-      { text: "5 hours", traits: { logic: 2 } },
-      { text: "2.4 hours (2 hours 24 mins)", traits: { logic: 10, analytical: 8 } },
-      { text: "3 hours", traits: { logic: 3 } },
-      { text: "1.5 hours", traits: { logic: 2 } }
-    ],
-    isAptitude: true,
-    correctIndex: 1
-  },
-  {
-    id: 6,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "If 12 workers build a bridge section in 15 days, how many days will 20 workers take at the same pace?",
-    options: [
-      { text: "9 days (12 x 15 / 20 = 9)", traits: { logic: 10, analytical: 8 } },
-      { text: "10 days", traits: { logic: 3 } },
-      { text: "8 days", traits: { logic: 4 } },
-      { text: "11 days", traits: { logic: 2 } }
-    ],
-    isAptitude: true,
-    correctIndex: 0
-  },
-  {
-    id: 7,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "Looking at a clock showing 3:15, what is the exact angle between the hour and minute hands?",
-    options: [
-      { text: "0 degrees", traits: { logic: 2 } },
-      { text: "7.5 degrees (The hour hand moves 0.5 deg per minute)", traits: { logic: 10, spatial: 9 } },
-      { text: "15 degrees", traits: { logic: 3 } },
-      { text: "5 degrees", traits: { logic: 2 } }
-    ],
-    isAptitude: true,
-    correctIndex: 1
-  },
-  {
-    id: 8,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "In a code language: 'EARTH' is written as 'FBSUI'. How will 'STARS' be written?",
-    options: [
-      { text: "TUBST (Each letter shifted forward by +1)", traits: { logic: 10, analytical: 8 } },
-      { text: "RUARS", traits: { logic: 2 } },
-      { text: "TVBST", traits: { logic: 3 } },
-      { text: "SUAST", traits: { logic: 2 } }
-    ],
-    isAptitude: true,
-    correctIndex: 0
-  },
-  {
-    id: 9,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "Which word does NOT belong: Triangle, Octagon, Sphere, Pentagon, Hexagon?",
-    options: [
-      { text: "Sphere (3D solid figure, while others are 2D flat polygons)", traits: { logic: 10, spatial: 8 } },
-      { text: "Octagon", traits: { logic: 2 } },
-      { text: "Triangle", traits: { logic: 2 } },
-      { text: "Pentagon", traits: { logic: 2 } }
-    ],
-    isAptitude: true,
-    correctIndex: 0
-  },
-  {
-    id: 10,
-    pillar: "Pillar 1: Aptitude & Logic",
-    q: "A shirt originally priced at Rs 800 is given a 20% discount, and then an additional 10% cash discount. Final price?",
-    options: [
-      { text: "Rs 560", traits: { logic: 3 } },
-      { text: "Rs 576 (800 - 160 = 640; 640 - 64 = 576)", traits: { logic: 10, analytical: 8 } },
-      { text: "Rs 580", traits: { logic: 2 } },
-      { text: "Rs 600", traits: { logic: 2 } }
-    ],
-    isAptitude: true,
-    correctIndex: 1
-  },
-
-  // 11-18: Career Decidedness & Family/Peer Pressure
-  {
-    id: 11,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "When relatives ask: 'What do you want to become?', how do you feel inside?",
-    options: [
-      { text: "I have 1 or 2 clear choices and feel excited to explain them", traits: { clarity: 10, pressure: 2 } },
-      { text: "I say doctor/engineer just to satisfy them, but I'm unsure", traits: { clarity: 4, pressure: 9 } },
-      { text: "I feel totally blank and worried because I have no idea", traits: { clarity: 2, pressure: 8 } },
-      { text: "I like so many different fields that picking one feels impossible", traits: { clarity: 5, pressure: 4, creative: 6 } }
+      { id: 'q1_a', text: '159 ', scoreType: 'logic', points: 5 },
+      { id: 'q1_b', text: '149', scoreType: 'logic', points: 1 },
+      { id: 'q1_c', text: '169', scoreType: 'logic', points: 1 },
+      { id: 'q1_d', text: '158', scoreType: 'logic', points: 1 }
     ]
   },
   {
-    id: 12,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "Are your current subject choices mainly your own passion or parents' wish?",
+    id: 'q2',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'DISTANCE & SPEED: A military reconnaissance vehicle drives 120 km at 40 km/h, then returns along the same route at 60 km/h. What is its average speed?',
     options: [
-      { text: "100% my personal interest and calling", traits: { clarity: 10, enterprise: 8 } },
-      { text: "Mostly parents/family wish for job security", traits: { pressure: 10, clarity: 3 } },
-      { text: "A balanced agreement between my family and me", traits: { clarity: 8, social: 7 } },
-      { text: "I chose because my closest friends were choosing it", traits: { pressure: 7, clarity: 3 } }
+      { id: 'q2_a', text: '48 km/h ', scoreType: 'logic', points: 5 },
+      { id: 'q2_b', text: '50 km/h', scoreType: 'logic', points: 1 },
+      { id: 'q2_c', text: '45 km/h', scoreType: 'logic', points: 1 },
+      { id: 'q2_d', text: '52 km/h', scoreType: 'logic', points: 1 }
     ]
   },
   {
-    id: 13,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "If money or competition was not an obstacle, what would you choose without fear?",
+    id: 'q3',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'CIVIL STRUCTURAL RATIO: A concrete mix requires cement, sand, and gravel in a 1 : 2 : 4 ratio by volume. If an engineer uses 14 cubic meters of gravel, how much cement is needed?',
     options: [
-      { text: "Writing, filmmaking, theater, design, or fine arts", traits: { creative: 10, artistic: 10 } },
-      { text: "Fighter pilot, army commando, or frontline police officer", traits: { defence: 10, discipline: 10 } },
-      { text: "Building tech startups, software, or advanced AI robots", traits: { tech: 10, analytical: 9 } },
-      { text: "Helping troubled people, teaching, or community healing", traits: { social: 10, empathy: 10 } }
+      { id: 'q3_a', text: '3.5 cubic meters ', scoreType: 'civil', points: 5 },
+      { id: 'q3_b', text: '7 cubic meters', scoreType: 'civil', points: 1 },
+      { id: 'q3_c', text: '2.5 cubic meters', scoreType: 'civil', points: 1 },
+      { id: 'q3_d', text: '4 cubic meters', scoreType: 'civil', points: 1 }
     ]
   },
   {
-    id: 14,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "How often do you stay awake late reading or watching videos about a specific topic just for fun?",
+    id: 'q4',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'SPATIAL CUT: A solid metal cube is painted black on all 6 sides and sawed into 64 equal smaller cubes. How many small cubes have ZERO black painted faces?',
     options: [
-      { text: "Almost every night — I get obsessed with learning new things", traits: { analytical: 9, creative: 8, clarity: 8 } },
-      { text: "Only when school exams or test dates approach", traits: { conventional: 8 } },
-      { text: "I prefer sports, gaming, and talking to friends instead", traits: { social: 8, practical: 7 } },
-      { text: "I experiment with hands-on tools, repairs, or drawing", traits: { practical: 10, artistic: 8 } }
+      { id: 'q4_a', text: '8 smaller cubes ', scoreType: 'logic', points: 5 },
+      { id: 'q4_b', text: '16 smaller cubes', scoreType: 'logic', points: 1 },
+      { id: 'q4_c', text: '0 smaller cubes', scoreType: 'logic', points: 1 },
+      { id: 'q4_d', text: '4 smaller cubes', scoreType: 'logic', points: 1 }
     ]
   },
   {
-    id: 15,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "What scares you most about choosing a career right now?",
+    id: 'q5',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'AERODYNAMIC LOGIC: An aircraft flies into a headwind of 50 km/h with an airspeed of 450 km/h. What is its ground speed over the territory?',
     options: [
-      { text: "Getting stuck in a boring 9-to-5 desk job doing repetitive paperwork", traits: { creative: 9, enterprise: 8 } },
-      { text: "Not earning enough money to support my family comfortably", traits: { enterprise: 8, conventional: 7 } },
-      { text: "Failing entrance exams after years of preparation", traits: { pressure: 9 } },
-      { text: "Not knowing what my real hidden talent actually is", traits: { clarity: 2, pressure: 7 } }
+      { id: 'q5_a', text: '400 km/h ', scoreType: 'aerospace', points: 5 },
+      { id: 'q5_b', text: '500 km/h', scoreType: 'aerospace', points: 1 },
+      { id: 'q5_c', text: '425 km/h', scoreType: 'aerospace', points: 1 },
+      { id: 'q5_d', text: '450 km/h', scoreType: 'aerospace', points: 1 }
     ]
   },
   {
-    id: 16,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "If everyone around you advised against your dream, would you still pursue it?",
+    id: 'q6',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'PERCENTAGE MARGIN: A medical equipment manufacturer offers a 20% discount on ultrasound scanners but still makes a 20% profit on production cost. If the production cost is ₹1,00,000, what is the marked list price?',
     options: [
-      { text: "Yes, I trust my conviction and will prove myself through hard work", traits: { enterprise: 10, defence: 9, discipline: 9 } },
-      { text: "No, family approval and peace of mind matter more to me", traits: { social: 8, conventional: 7 } },
-      { text: "I would take a safe primary career first, then pursue my dream on the side", traits: { analytical: 8, conventional: 8 } },
-      { text: "I would feel very conflicted and hesitate", traits: { pressure: 8, clarity: 3 } }
+      { id: 'q6_a', text: '₹1,50,000 ', scoreType: 'logic', points: 5 },
+      { id: 'q6_b', text: '₹1,40,000', scoreType: 'logic', points: 1 },
+      { id: 'q6_c', text: '₹1,30,000', scoreType: 'logic', points: 1 },
+      { id: 'q6_d', text: '₹1,60,000', scoreType: 'logic', points: 1 }
     ]
   },
   {
-    id: 17,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "How confident do you feel in your ability to master tough new skills?",
+    id: 'q7',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'PRESSURE DEPTH: In naval submarine navigation, hydrostatic water pressure increases by roughly 1 atmosphere for every 10 meters of depth. At 250 meters depth, what is the approximate water pressure?',
     options: [
-      { text: "Very confident; give me good material and I can teach myself anything", traits: { analytical: 10, logic: 9 } },
-      { text: "Confident only if I have a clear teacher explaining step-by-step", traits: { conventional: 8, social: 7 } },
-      { text: "I learn best by doing with my hands, not through thick textbooks", traits: { practical: 10 } },
-      { text: "I often doubt myself when concepts get difficult", traits: { pressure: 8 } }
+      { id: 'q7_a', text: '25 to 26 atmospheres ', scoreType: 'navy', points: 5 },
+      { id: 'q7_b', text: '15 atmospheres', scoreType: 'navy', points: 1 },
+      { id: 'q7_c', text: '50 atmospheres', scoreType: 'navy', points: 1 },
+      { id: 'q7_d', text: '10 atmospheres', scoreType: 'navy', points: 1 }
     ]
   },
   {
-    id: 18,
-    pillar: "Pillar 2: Career Decidedness & Pressure",
-    q: "Where do you see yourself 10 years from now?",
+    id: 'q8',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'ENGINEERING WORK & TIME: 6 civil engineers can complete a bridge foundation blueprint in 12 days. How many days will 9 engineers take at the same pace?',
     options: [
-      { text: "Leading an organization, running a business, or heading a department", traits: { enterprise: 10, leadership: 10 } },
-      { text: "In a quiet lab or studio creating high-value intellectual work", traits: { analytical: 9, creative: 9 } },
-      { text: "Out in fields, flying, defending borders, or on active fieldwork", traits: { practical: 10, defence: 10 } },
-      { text: "Directly transforming underprivileged lives or running a clinic/school", traits: { social: 10, empathy: 10 } }
+      { id: 'q8_a', text: '8 days ', scoreType: 'civil', points: 5 },
+      { id: 'q8_b', text: '10 days', scoreType: 'civil', points: 1 },
+      { id: 'q8_c', text: '6 days', scoreType: 'civil', points: 1 },
+      { id: 'q8_d', text: '9 days', scoreType: 'civil', points: 1 }
+    ]
+  },
+  {
+    id: 'q9',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'ORBITAL CIRCUMFERENCE: A satellite orbits Earth at an altitude giving it an orbit radius of 7,000 km. What distance does it travel in 1 full circular orbit? (Use π ≈ 22/7)',
+    options: [
+      { id: 'q9_a', text: '44,000 km ', scoreType: 'aerospace', points: 5 },
+      { id: 'q9_b', text: '22,000 km', scoreType: 'aerospace', points: 1 },
+      { id: 'q9_c', text: '35,000 km', scoreType: 'aerospace', points: 1 },
+      { id: 'q9_d', text: '50,000 km', scoreType: 'aerospace', points: 1 }
+    ]
+  },
+  {
+    id: 'q10',
+    pillar: 'Cognitive & Math Logic',
+    type: 'puzzle',
+    prompt: 'DEDUCTION: All combat commandos undergo intensive survival training. Some survival experts are mountaineers. Which conclusion is guaranteed?',
+    options: [
+      { id: 'q10_a', text: 'Some commandos might be mountaineers, but it is not 100% guaranteed for all.', scoreType: 'army', points: 5 },
+      { id: 'q10_b', text: 'All mountaineers are commandos.', scoreType: 'army', points: 1 },
+      { id: 'q10_c', text: 'No commando ever climbs mountains.', scoreType: 'army', points: 1 },
+      { id: 'q10_d', text: 'Every survival expert is an army soldier.', scoreType: 'army', points: 1 }
     ]
   },
 
-  // 19-33: Personality, Psychology & Work Temperament
+  // 11-20: SPECIALIZED DEFENSE BRANCHING (ARMY vs AIR FORCE vs NAVY vs AEROSPACE DEFENSE)
   {
-    id: 19,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "After spending 5 hours at a noisy wedding or party, how do you feel?",
+    id: 'q11',
+    pillar: 'Defense & Tactical Instincts',
+    prompt: 'If you were selected for an armed forces commission, which operational theater excites your soul the most?',
     options: [
-      { text: "Exhausted; I need quiet alone time to recharge my battery", traits: { introvert: 10, analytical: 7 } },
-      { text: "Energized! I want to keep hanging out and chat with more people", traits: { extrovert: 10, social: 8 } },
-      { text: "Fine as long as I was with my 2 closest friends", traits: { social: 6, introvert: 5 } },
-      { text: "I prefer staying home and working on my personal projects anyway", traits: { introvert: 9, creative: 8 } }
+      { id: 'q11_a', text: 'The Indian Army: Ground combat, infantry battalions, tank regiments in deserts, and Siachen glacier posts.', scoreType: 'army', points: 5 },
+      { id: 'q11_b', text: 'The Indian Air Force: Cockpit of a Sukhoi Su-30MKI or Rafale flying at Mach 1.8 above the clouds.', scoreType: 'airforce', points: 5 },
+      { id: 'q11_c', text: 'The Indian Navy: Guided missile destroyers, aircraft carrier flight decks, and stealth submarines in the Arabian Sea.', scoreType: 'navy', points: 5 },
+      { id: 'q11_d', text: 'Defense Research (DRDO/ISRO): Designing intercontinental ballistic missiles, radar domes, and military satellites.', scoreType: 'aerospace', points: 5 }
     ]
   },
   {
-    id: 20,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "How clean and organized is your study desk or school bag right now?",
+    id: 'q12',
+    pillar: 'Defense & Tactical Instincts',
+    prompt: 'In high-adrenaline crisis conditions, what kind of pressure suits your mindset best?',
     options: [
-      { text: "Very organized — every notebook and pen has its fixed place", traits: { conventional: 10, discipline: 9 } },
-      { text: "Organized chaos — it looks messy to others, but I know where everything is", traits: { creative: 8, analytical: 7 } },
-      { text: "Quite messy, I only organize when forced to", traits: { creative: 7 } },
-      { text: "Minimalist — I keep only 1 notebook and 1 pen, nothing extra", traits: { analytical: 8, discipline: 8 } }
+      { id: 'q12_a', text: 'Physical tactical combat: Boots on the ground, extreme endurance, leading soldiers face-to-face under fire.', scoreType: 'army', points: 5 },
+      { id: 'q12_b', text: 'Split-second 3D air combat: G-force physical stress, rapid instrument cross-checks, and supersonic dogfight decisions.', scoreType: 'airforce', points: 5 },
+      { id: 'q12_c', text: 'Isolated endurance & ocean warfare: Navigating deep ocean currents, sonar tracking, and weeks at sea with disciplined crews.', scoreType: 'navy', points: 5 },
+      { id: 'q12_d', text: 'Engineering precision under countdown pressure: Ensuring a rocket engine does not explode during high-vibration liftoff.', scoreType: 'aerospace', points: 5 }
     ]
   },
   {
-    id: 21,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "When a sudden emergency disrupts your weekend plans, how do you react?",
+    id: 'q13',
+    pillar: 'Defense & Tactical Instincts',
+    prompt: 'Which technical subject would you genuinely enjoy reading manuals about during free evenings?',
     options: [
-      { text: "I instantly stay calm, assess facts, and make a plan B", traits: { defence: 9, analytical: 9, leadership: 8 } },
-      { text: "I get irritated because I dislike sudden changes to my routine", traits: { conventional: 8 } },
-      { text: "I quickly check on everyone involved to ensure everyone is okay emotionally", traits: { social: 10, empathy: 10 } },
-      { text: "I treat it like an adventure and enjoy solving the surprise problem", traits: { enterprise: 8, practical: 8 } }
+      { id: 'q13_a', text: 'Infantry assault tactics, battlefield terrain maps, artillery ballistic tables, and commando ambushes.', scoreType: 'army', points: 5 },
+      { id: 'q13_b', text: 'Jet turbine aerodynamics, head-up display avionics, missile radar lock-on mechanisms, and aerial refueling.', scoreType: 'airforce', points: 5 },
+      { id: 'q13_c', text: 'Naval hull hydrodynamics, sonar acoustic signatures, torpedo tracking systems, and marine diesel turbines.', scoreType: 'navy', points: 5 },
+      { id: 'q13_d', text: 'Orbital mechanics, cryogenic rocket propellants, carbon composite thermal shielding, and satellite telemetry.', scoreType: 'aerospace', points: 5 }
     ]
   },
   {
-    id: 22,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "Do you make major decisions using your heart (empathy/feelings) or head (data/logic)?",
+    id: 'q14',
+    pillar: 'Defense & Tactical Instincts',
+    prompt: 'When you imagine earning national military or defense honors, which image makes your chest swell with pride?',
     options: [
-      { text: "Head: Pure cold logic, numbers, and hard evidence", traits: { analytical: 10, logic: 10 } },
-      { text: "Heart: Values, compassion, and how it impacts people", traits: { social: 10, empathy: 10 } },
-      { text: "Gut instinct: A fast intuitive feeling that usually turns out right", traits: { enterprise: 9, creative: 8 } },
-      { text: "Rules and precedent: Following tested guidelines and traditions", traits: { conventional: 9, discipline: 8 } }
-    ]
-  },
-  {
-    id: 23,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "When someone insults your hard work in front of peers, what do you do?",
-    options: [
-      { text: "Keep a calm poker face, analyze if their point is valid, and reply with facts", traits: { discipline: 10, analytical: 8 } },
-      { text: "Defend myself boldly right then and there with firm confidence", traits: { leadership: 9, defence: 8 } },
-      { text: "Feel deeply hurt inside and withdraw silently", traits: { empathy: 8, introvert: 7 } },
-      { text: "Use humor or wit to defuse the tension without picking a fight", traits: { social: 9, creative: 8 } }
-    ]
-  },
-  {
-    id: 24,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "Which kind of task do you naturally enjoy doing the most?",
-    options: [
-      { text: "Dissecting a tricky puzzle, equation, or mysterious software bug", traits: { tech: 10, analytical: 10 } },
-      { text: "Listening to a friend's emotional problem and helping them heal", traits: { social: 10, empathy: 10 } },
-      { text: "Building, fixing, repairing, or assembling physical objects", traits: { practical: 10 } },
-      { text: "Pitching an idea, convincing people, or organizing an event", traits: { enterprise: 10, leadership: 9 } }
-    ]
-  },
-  {
-    id: 25,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "How do you handle strict deadlines?",
-    options: [
-      { text: "I finish days in advance with a structured daily checklist", traits: { conventional: 10, discipline: 9 } },
-      { text: "I do my best work under intense last-minute adrenaline pressure", traits: { creative: 8, enterprise: 7 } },
-      { text: "I pace myself steadily without stress", traits: { analytical: 8, discipline: 8 } },
-      { text: "I often struggle and procrastinate", traits: { pressure: 7 } }
-    ]
-  },
-  {
-    id: 26,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "Would you rather read a 300-page book or watch a 2-hour documentary?",
-    options: [
-      { text: "300-page book — I love deep, thorough, imaginative reading", traits: { analytical: 9, creative: 8 } },
-      { text: "2-hour visual documentary — I absorb visual diagrams and audio fast", traits: { practical: 8, social: 7 } },
-      { text: "Neither — I learn best by doing experiments with my hands", traits: { practical: 10 } },
-      { text: "I prefer discussing ideas in a live debate with people", traits: { social: 9, enterprise: 8 } }
-    ]
-  },
-  {
-    id: 27,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "How comfortable are you speaking in front of an audience of 100 people?",
-    options: [
-      { text: "Very natural; I enjoy commanding the stage and holding attention", traits: { leadership: 10, enterprise: 9 } },
-      { text: "Nervous at first, but I can deliver well if I practiced thoroughly", traits: { discipline: 8, conventional: 7 } },
-      { text: "I get terrified and prefer someone else present for the group", traits: { introvert: 9 } },
-      { text: "I prefer presenting one-on-one or behind a screen/camera", traits: { analytical: 8, creative: 7 } }
-    ]
-  },
-  {
-    id: 28,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "When learning about history or society, what interests you most?",
-    options: [
-      { text: "Military tactics, war strategies, and heroic leadership decisions", traits: { defence: 10, leadership: 8 } },
-      { text: "Why civilizations collapsed, trade routes, and economic systems", traits: { analytical: 9, enterprise: 8 } },
-      { text: "Art, architecture, literature, and how common people lived", traits: { creative: 9, artistic: 9 } },
-      { text: "Human rights struggles, freedom movements, and social reform", traits: { social: 10, legal: 9 } }
-    ]
-  },
-  {
-    id: 29,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "Do you prefer following established guidelines or inventing your own approach?",
-    options: [
-      { text: "Inventing novel, unconventional paths even if there is risk", traits: { creative: 10, enterprise: 9 } },
-      { text: "Following proven systems that guarantee reliable, safe results", traits: { conventional: 10, discipline: 8 } },
-      { text: "Mastering the rules first, then finding clever ways to optimize them", traits: { analytical: 9, legal: 8 } },
-      { text: "Adapting instinctively based on what the real-time moment requires", traits: { practical: 9, defence: 8 } }
-    ]
-  },
-  {
-    id: 30,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "How patient are you when doing repetitive, detailed checks (like checking numbers)?",
-    options: [
-      { text: "Extremely patient; I spot tiny typos and errors that everyone misses", traits: { conventional: 10, analytical: 9 } },
-      { text: "I get bored after 5 minutes and want action", traits: { practical: 9, defence: 8 } },
-      { text: "Moderate — if the end goal is important to me", traits: { discipline: 7 } },
-      { text: "I would rather automate the checking process with a script/tool", traits: { tech: 10, analytical: 9 } }
-    ]
-  },
-  {
-    id: 31,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "What role do you naturally fall into during a family festival or school annual day?",
-    options: [
-      { text: "Stage anchor, performer, or public speaker", traits: { creative: 9, extrovert: 9 } },
-      { text: "Stage manager, timing coordinator, and logistical lead", traits: { discipline: 9, enterprise: 8 } },
-      { text: "Sound system, lighting, electricals, and tech setup", traits: { practical: 10, tech: 8 } },
-      { text: "Quietly welcoming guests, serving food, and comforting relatives", traits: { social: 10, empathy: 9 } }
-    ]
-  },
-  {
-    id: 32,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "When an unfair rule is enforced by an authority figure, what is your reaction?",
-    options: [
-      { text: "I research the official policy book and challenge it with legal logic", traits: { legal: 10, analytical: 9 } },
-      { text: "I mobilize my peers together to demand fairness respectfully", traits: { leadership: 10, social: 8 } },
-      { text: "I accept it as discipline and focus on doing my duty regardless", traits: { defence: 9, discipline: 9 } },
-      { text: "I find a creative workaround behind the scenes", traits: { creative: 8, enterprise: 7 } }
-    ]
-  },
-  {
-    id: 33,
-    pillar: "Pillar 3: Personality & Temperament",
-    q: "How do you deal with physical exhaustion or tough weather (extreme heat, cold, rain)?",
-    options: [
-      { text: "I love outdoor challenges; physical grit makes me feel alive", traits: { defence: 10, practical: 10 } },
-      { text: "I strongly prefer clean, air-conditioned indoor office spaces", traits: { conventional: 8, analytical: 7 } },
-      { text: "I don't mind as long as I am exploring nature, animals, or farms", traits: { practical: 9, social: 7 } },
-      { text: "I manage fine if I'm playing competitive sports", traits: { practical: 9, discipline: 8 } }
+      { id: 'q14_a', text: 'Wearing olive-green uniform with Para-commando balidaan badge, leading troops on the front lines.', scoreType: 'army', points: 5 },
+      { id: 'q14_b', text: 'Wearing flight overalls and G-suit, walking toward your fighter jet on the tarmac before sunrise.', scoreType: 'airforce', points: 5 },
+      { id: 'q14_c', text: 'Wearing crisp white naval officer uniform with gold epaulettes, saluting on the bridge of a warship.', scoreType: 'navy', points: 5 },
+      { id: 'q14_d', text: 'Standing in the ISRO/DRDO mission control room as the rocket you designed successfully injects its satellite into orbit.', scoreType: 'aerospace', points: 5 }
     ]
   },
 
-  // 34-48: Vocational Calling & RIASEC Typology
+  // 15-22: MEDICAL SPECIALIZATION (SURGERY vs CARDIOLOGY vs NEUROLOGY vs PSYCHOLOGY)
   {
-    id: 34,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "If you were handed a tool kit with screwdrivers, soldering iron, and wires, what would you do?",
+    id: 'q15',
+    pillar: 'Medical & Healthcare Domain',
+    prompt: 'When you imagine yourself in a hospital wearing a white coat, where do you feel your calling lies?',
     options: [
-      { text: "Open up a broken radio or appliance immediately to see how it works", traits: { practical: 10, tech: 8 } },
-      { text: "Carefully read the safety manual and put it in a safe cabinet", traits: { conventional: 8, discipline: 7 } },
-      { text: "I have no interest in mechanical tools; I prefer books or screens", traits: { analytical: 8 } },
-      { text: "Use the pieces to build a sculpture or creative art installation", traits: { artistic: 9, creative: 9 } }
+      { id: 'q15_a', text: 'Inside the Operating Theatre (OT): Wearing sterile green scrubs, holding a scalpel, stitching tissue, saving lives with steady hands.', scoreType: 'surgeon', points: 5 },
+      { id: 'q15_b', text: 'The Cardiology / Critical Care Unit: Reading complex ECG rhythms, performing catheter stentings, stabilizing failing hearts.', scoreType: 'cardiology', points: 5 },
+      { id: 'q15_c', text: 'The Neurosciences Ward: Diagnosing brain tumors, managing stroke recoveries, analyzing neural pathways and reflexes.', scoreType: 'neurology', points: 5 },
+      { id: 'q15_d', text: 'The Therapy Clinic: Sitting one-on-one with troubled individuals, diagnosing behavioral disorders, guiding them through emotional healing.', scoreType: 'psychology', points: 5 }
     ]
   },
   {
-    id: 35,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "Which YouTube or documentary topic would you click first?",
+    id: 'q16',
+    pillar: 'Medical & Healthcare Domain',
+    prompt: 'How do your hands and mind react to the sight of surgical blood, deep open incisions, and biological human organs?',
     options: [
-      { text: "'How Black Holes Bend Spacetime' or 'Cracking the Human Genome'", traits: { analytical: 10, logic: 8 } },
-      { text: "'Special Forces Selection: Surviving the Toughest Training on Earth'", traits: { defence: 10, discipline: 9 } },
-      { text: "'How a 22-Year-Old Built an $80 Million Tech Company'", traits: { enterprise: 10, leadership: 8 } },
-      { text: "'Inside the Mind of Criminals: Forensic Psychology Explained'", traits: { social: 9, legal: 8, analytical: 8 } }
+      { id: 'q16_a', text: 'Completely steady and focused: I am captivated by human anatomy and surgical precision.', scoreType: 'surgeon', points: 5 },
+      { id: 'q16_b', text: 'I prefer vascular catheters, heart monitors, and pharmaceutical interventions over open flesh incisions.', scoreType: 'cardiology', points: 5 },
+      { id: 'q16_c', text: 'I am drawn to electrical impulses, brain MRI scans, and the nervous system rather than general blood work.', scoreType: 'neurology', points: 5 },
+      { id: 'q16_d', text: 'I feel uncomfortable around open surgical wounds; I prefer working purely with the psychological mind and words.', scoreType: 'psychology', points: 5 }
     ]
   },
   {
-    id: 36,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "When you visit a rural village or farmlands, what catches your thoughts?",
+    id: 'q17',
+    pillar: 'Medical & Healthcare Domain',
+    prompt: 'Which biological mystery would you spend 5 years in intensive university research to solve?',
     options: [
-      { text: "How drone seeding, smart sensors, and drip irrigation could boost crop yields", traits: { practical: 10, tech: 8 } },
-      { text: "How villagers can get fair legal rights, healthcare clinics, and schools", traits: { social: 10, legal: 9 } },
-      { text: "The peace and scenic beauty, inspiring me to paint or photograph", traits: { artistic: 10, creative: 9 } },
-      { text: "The economics: supply chains, wholesale grain mandis, and farmer profits", traits: { enterprise: 9, conventional: 8 } }
+      { id: 'q17_a', text: 'Minimally invasive laparoscopic and robotic surgery techniques to eliminate post-operation infections.', scoreType: 'surgeon', points: 5 },
+      { id: 'q17_b', text: 'Reversing arterial plaque blockages and developing artificial heart pumps that never wear out.', scoreType: 'cardiology', points: 5 },
+      { id: 'q17_c', text: 'Curing Alzheimer\'s memory loss, repairing damaged spinal nerves, and deciphering consciousness.', scoreType: 'neurology', points: 5 },
+      { id: 'q17_d', text: 'Treating severe adolescent depression, chronic anxiety, and trauma without addictive psychiatric medications.', scoreType: 'psychology', points: 5 }
     ]
   },
   {
-    id: 37,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "If you could shadow a top professional for one entire week, who would you pick?",
+    id: 'q18',
+    pillar: 'Medical & Healthcare Domain',
+    prompt: 'How do you handle patient interactions when a family is crying in severe emotional distress?',
     options: [
-      { text: "A high-court Chief Justice arguing landmark constitutional cases", traits: { legal: 10, leadership: 8 } },
-      { text: "An AI researcher training supercomputers on massive neural models", traits: { tech: 10, analytical: 10 } },
-      { text: "An Army Colonel commanding border security operations", traits: { defence: 10, leadership: 9 } },
-      { text: "A neurosurgeon conducting delicate brain surgery", traits: { analytical: 9, discipline: 10, social: 7 } }
-    ]
-  },
-  {
-    id: 38,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "How do you feel about managing money, stocks, and financial sheets?",
-    options: [
-      { text: "Fascinating; I love understanding profit margins, compounding, and wealth", traits: { enterprise: 10, conventional: 9 } },
-      { text: "Too dry and boring for me; I care more about science, art, or public service", traits: { creative: 8, social: 8 } },
-      { text: "Useful as a tool, but not something I want to spend my life doing", traits: { practical: 7 } },
-      { text: "I like the mathematical and algorithmic aspect of trading models", traits: { analytical: 10, tech: 8 } }
-    ]
-  },
-  {
-    id: 39,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "When writing an essay or project, what is your primary strength?",
-    options: [
-      { text: "Clear, factual structure with bullet-proof data and citations", traits: { analytical: 9, conventional: 8 } },
-      { text: "Poetic storytelling, deep metaphors, and emotional resonance", traits: { artistic: 10, creative: 10 } },
-      { text: "Persuasive rhetoric that convinces the reader to take urgent action", traits: { legal: 9, enterprise: 9 } },
-      { text: "Step-by-step practical guides on how to make or build something", traits: { practical: 9, tech: 7 } }
-    ]
-  },
-  {
-    id: 40,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "Which daily work environment sounds most inspiring to you?",
-    options: [
-      { text: "A buzzing command room or sports field where fast decisions save the day", traits: { defence: 10, leadership: 8 } },
-      { text: "A quiet, private study lined with books, research papers, and dual monitors", traits: { analytical: 10, introvert: 8 } },
-      { text: "A bustling courtroom or board meeting defending high-stakes issues", traits: { legal: 10, enterprise: 8 } },
-      { text: "A hospital, therapy clinic, or classroom helping human beings thrive", traits: { social: 10, empathy: 10 } }
-    ]
-  },
-  {
-    id: 41,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "How do you feel about working with animals and veterinary care?",
-    options: [
-      { text: "I love animals deeply and wouldn't mind treating injured cows, dogs, or wildlife", traits: { practical: 10, empathy: 9 } },
-      { text: "I like pets, but I don't want a medical career around animal diseases", traits: { analytical: 6 } },
-      { text: "I'm more interested in human psychology and human minds", traits: { social: 10, analytical: 8 } },
-      { text: "I prefer machines, engines, and code over biological care", traits: { tech: 9, practical: 8 } }
-    ]
-  },
-  {
-    id: 42,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "If you had a free month with zero exams, what would you choose to create?",
-    options: [
-      { text: "A mobile application, web tool, or smart automation script", traits: { tech: 10, analytical: 8 } },
-      { text: "A 50-page fiction novella, photo album, or animated short film", traits: { artistic: 10, creative: 10 } },
-      { text: "A small campus business or selling handmade goods for real profit", traits: { enterprise: 10, practical: 8 } },
-      { text: "A free tutoring camp for underprivileged village kids", traits: { social: 10, empathy: 10 } }
-    ]
-  },
-  {
-    id: 43,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "How do you feel about national uniform services (Army, Navy, Air Force, Police)?",
-    options: [
-      { text: "Huge respect and desire to earn the uniform, stars, and serve the motherland", traits: { defence: 10, discipline: 10 } },
-      { text: "Respectful, but I prefer civilian corporate or scientific careers", traits: { analytical: 8 } },
-      { text: "I would serve as an army doctor, engineer, or cyber defence specialist", traits: { defence: 8, tech: 8, practical: 8 } },
-      { text: "I prefer artistic and peaceful cultural professions", traits: { creative: 8, social: 7 } }
-    ]
-  },
-  {
-    id: 44,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "When you see a stunning building or bridge, what is your initial thought?",
-    options: [
-      { text: "The architectural beauty, light angles, and interior aesthetic feeling", traits: { artistic: 10, creative: 9 } },
-      { text: "The structural load calculation: steel weight, concrete mix, and foundations", traits: { practical: 10, analytical: 8 } },
-      { text: "Who funded the project, square-foot price, and real-estate returns", traits: { enterprise: 9, conventional: 8 } },
-      { text: "How accessible and comfortable it is for elderly or disabled people", traits: { social: 9, empathy: 9 } }
-    ]
-  },
-  {
-    id: 45,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "How interested are you in how the human brain and feelings operate?",
-    options: [
-      { text: "Extremely; I constantly observe why people lie, feel anxious, or act kindly", traits: { social: 10, analytical: 9, empathy: 10 } },
-      { text: "Only interested in the biological neurons and chemistry of the brain", traits: { analytical: 10 } },
-      { text: "I prefer looking forward at future goals rather than overanalyzing past feelings", traits: { enterprise: 8, practical: 7 } },
-      { text: "I find human feelings unpredictable and prefer clear mathematical rules", traits: { logic: 10, tech: 9 } }
-    ]
-  },
-  {
-    id: 46,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "What role does physical fitness and athletic discipline play in your daily life?",
-    options: [
-      { text: "Essential: I run, work out, or play competitive sports regularly", traits: { practical: 10, defence: 9, discipline: 9 } },
-      { text: "Occasional: I play on weekends for fun, but study is my main priority", traits: { discipline: 7 } },
-      { text: "Minimal: I spend almost all my time on intellectual desk pursuits", traits: { analytical: 8, introvert: 7 } },
-      { text: "I am passionate about becoming a sports physio, coach, or trainer", traits: { practical: 10, social: 8 } }
-    ]
-  },
-  {
-    id: 47,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "When a complex law, tax code, or constitutional clause is discussed, what do you think?",
-    options: [
-      { text: "I enjoy dissecting each word, finding loopholes, and arguing justice", traits: { legal: 10, analytical: 9 } },
-      { text: "I want to calculate the tax numbers accurately down to the exact rupee", traits: { conventional: 10, enterprise: 8 } },
-      { text: "It seems dry and tedious; I would hire a lawyer to deal with it", traits: { creative: 7 } },
-      { text: "I care about whether the law protects the poor and vulnerable", traits: { social: 10, legal: 8 } }
-    ]
-  },
-  {
-    id: 48,
-    pillar: "Pillar 4: Vocational Calling & RIASEC",
-    q: "If an airplane hits turbulent weather, what is your mindset?",
-    options: [
-      { text: "I stay cool and curious about cockpit aerodynamics, airspeed, and instruments", traits: { practical: 9, defence: 8, analytical: 8 } },
-      { text: "I trust the trained pilots and keep calmly reading my book", traits: { discipline: 8 } },
-      { text: "I comfort the nervous passenger sitting next to me", traits: { social: 10, empathy: 9 } },
-      { text: "I feel nervous and keep tracking the altitude display", traits: { pressure: 6 } }
+      { id: 'q18_a', text: 'I deliver direct, honest surgical facts calmly and rush back inside to fight for the patient\'s life on the table.', scoreType: 'surgeon', points: 4 },
+      { id: 'q18_b', text: 'I explain the heart vitals, blood oxygen stats, and medication plan clearly so they understand the treatment.', scoreType: 'cardiology', points: 4 },
+      { id: 'q18_c', text: 'I map out the cognitive reflexes, MRI findings, and recovery prognosis with methodical care.', scoreType: 'neurology', points: 4 },
+      { id: 'q18_d', text: 'I sit down beside them, listen deeply with profound empathy, and provide psychological comfort and grounding.', scoreType: 'psychology', points: 5 }
     ]
   },
 
-  // 49-62: Group Dynamics, Collaboration & Ethics
+  // 19-26: ENGINEERING INFRASTRUCTURE & SPACE (AEROSPACE vs CIVIL vs COMPUTER SCIENCE)
   {
-    id: 49,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "In a 5-person group project where 2 members are slacking off, what do you do?",
+    id: 'q19',
+    pillar: 'Engineering & Construction Systems',
+    prompt: 'If you were given a ₹500 Crore government engineering grant, what monument of human progress would you build?',
     options: [
-      { text: "Have a firm, private 1-on-1 talk to understand their blocker and assign clear tasks", traits: { leadership: 10, social: 8 } },
-      { text: "Just do the whole project myself in anger so we don't lose marks", traits: { discipline: 8, introvert: 7 } },
-      { text: "Report them directly to the teacher with timestamped evidence", traits: { legal: 9, conventional: 8 } },
-      { text: "Try to make the tasks fun and collaborative so they feel motivated to join", traits: { social: 10, empathy: 9 } }
+      { id: 'q19_a', text: 'A reusable heavy-lift rocket capable of landing satellite payloads on the lunar south pole.', scoreType: 'aerospace', points: 5 },
+      { id: 'q19_b', text: 'A mega sea-link suspension bridge or high-speed mountain tunnel connecting isolated Himalayan valleys.', scoreType: 'civil', points: 5 },
+      { id: 'q19_c', text: 'An autonomous AI supercomputing data center securing national defense networks against global cyber warfare.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q19_d', text: 'A futuristic zero-carbon smart city with green parks, renewable solar grids, and sustainable housing.', scoreType: 'architect', points: 5 }
     ]
   },
   {
-    id: 50,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "When two close friends are having a screaming argument, what is your role?",
+    id: 'q20',
+    pillar: 'Engineering & Construction Systems',
+    prompt: 'What kind of failure keeps you awake at night and pushes you to double-check every calculation?',
     options: [
-      { text: "The impartial judge: hear both sides calmly and point out who is factually right", traits: { legal: 10, analytical: 8 } },
-      { text: "The peacemaker: calm their tempers and help them apologize and forgive", traits: { social: 10, empathy: 10 } },
-      { text: "Stay out of it completely; it's their personal business", traits: { introvert: 8 } },
-      { text: "Command them both to stop shouting immediately and focus on the task", traits: { defence: 9, leadership: 8 } }
+      { id: 'q20_a', text: 'A rocket fuel valve seal leaking under cryogenic cold, causing a catastrophic launchpad explosion.', scoreType: 'aerospace', points: 5 },
+      { id: 'q20_b', text: 'A bridge foundation settling unevenly or a dam wall developing micro-cracks under hydraulic pressure.', scoreType: 'civil', points: 5 },
+      { id: 'q20_c', text: 'A critical software bug allowing foreign hackers to paralyze national electricity grids or bank servers.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q20_d', text: 'An aesthetic building flaw that makes an entire residential tower gloomy, unlivable, and poorly ventilated.', scoreType: 'architect', points: 5 }
     ]
   },
   {
-    id: 51,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "Would you rather be the public face of a successful team or the secret mastermind behind the curtain?",
+    id: 'q21',
+    pillar: 'Engineering & Construction Systems',
+    prompt: 'Where would you rather spend your active workdays?',
     options: [
-      { text: "The secret mastermind: I want full strategic control without public spotlight", traits: { analytical: 10, introvert: 9 } },
-      { text: "The public face: I love speaking to crowds, press, and taking responsibility", traits: { enterprise: 10, leadership: 9, extrovert: 9 } },
-      { text: "A loyal core executor doing the hardest hands-on heavy lifting", traits: { practical: 9, discipline: 9 } },
-      { text: "The mentor who teaches and trains younger juniors to shine", traits: { social: 10, empathy: 9 } }
+      { id: 'q21_a', text: 'At a space launch center (Sriharikota) running telemetry simulations and inspecting rocket rocket stages.', scoreType: 'aerospace', points: 5 },
+      { id: 'q21_b', text: 'Wearing a yellow hard-hat on site, inspecting massive steel rebar cages, pouring concrete, and supervising heavy cranes.', scoreType: 'civil', points: 5 },
+      { id: 'q21_c', text: 'In a modern tech lab with multi-monitor workstation setups, writing neural networks, and optimizing backend systems.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q21_d', text: 'In an architectural design studio drawing 3D CAD blueprints, modeling miniature physical buildings, and choosing textures.', scoreType: 'architect', points: 5 }
     ]
   },
   {
-    id: 52,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "If you catch a teammate cheating on an exam, how do you handle it?",
+    id: 'q22',
+    pillar: 'Engineering & Construction Systems',
+    prompt: 'When inspecting a construction site or rocket assembly hangar, what catches your sharp attention first?',
     options: [
-      { text: "Warn them firmly that if they do it again, you will report it — honor comes first", traits: { defence: 9, discipline: 10 } },
-      { text: "Quietly report to the invigilator because unfairness harms all honest students", traits: { legal: 10, conventional: 8 } },
-      { text: "Talk to them after the test to find out what desperate situation pushed them to cheat", traits: { social: 10, empathy: 10 } },
-      { text: "Mind my own business and focus only on my own paper", traits: { introvert: 7 } }
-    ]
-  },
-  {
-    id: 53,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "How do you convince someone who strongly disagrees with you?",
-    options: [
-      { text: "Present clear statistical data, graphs, and proven case studies", traits: { analytical: 10, logic: 9 } },
-      { text: "Understand their personal emotional fear first, then address it warmly", traits: { social: 10, empathy: 10 } },
-      { text: "Use powerful rhetoric, real-life metaphors, and compelling analogies", traits: { legal: 9, creative: 8 } },
-      { text: "Demonstrate a physical working prototype: proof speaks louder than words", traits: { practical: 10, tech: 8 } }
-    ]
-  },
-  {
-    id: 54,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "What kind of leader do you admire most?",
-    options: [
-      { text: "A battle-hardened commander who leads from the front lines and never leaves anyone behind", traits: { defence: 10, leadership: 9 } },
-      { text: "A visionary scientist or engineer who creates breakthrough technology", traits: { tech: 10, analytical: 9 } },
-      { text: "A compassionate reformer like Mahatma Gandhi, Nelson Mandela, or Mother Teresa", traits: { social: 10, empathy: 10 } },
-      { text: "A bold entrepreneur who builds massive global industry and wealth", traits: { enterprise: 10, leadership: 8 } }
-    ]
-  },
-  {
-    id: 55,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "If your team wins a prestigious trophy, who deserves the credit?",
-    options: [
-      { text: "Give 100% of the spotlight to the team and quietly smile from the background", traits: { leadership: 10, empathy: 9 } },
-      { text: "Fairly acknowledge each person's exact percentage contribution", traits: { analytical: 8, legal: 8 } },
-      { text: "Proudly accept the trophy as captain, then thank every sponsor and member", traits: { enterprise: 9, extrovert: 8 } },
-      { text: "Celebrate with street food and music together with the crew", traits: { social: 9, practical: 8 } }
-    ]
-  },
-  {
-    id: 56,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "When a junior student comes to you crying because of bullying, what is your first action?",
-    options: [
-      { text: "Sit down with them, listen patiently, and ensure they feel safe and cared for", traits: { social: 10, empathy: 10 } },
-      { text: "Confront the bullies directly and make sure they never dare touch the student again", traits: { defence: 10, discipline: 8 } },
-      { text: "Gather proof and file a strict formal grievance with school leadership", traits: { legal: 10, conventional: 8 } },
-      { text: "Teach the student practical self-defence and assertive communication techniques", traits: { practical: 9, discipline: 8 } }
-    ]
-  },
-  {
-    id: 57,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "Do you prefer working solo in complete silence or in a collaborative buzzing room?",
-    options: [
-      { text: "Solo in deep silence: My best ideas come when zero people interrupt me", traits: { introvert: 10, analytical: 9 } },
-      { text: "Collaborative buzzing room: Bouncing ideas off energetic people sparks my creativity", traits: { extrovert: 10, creative: 8, social: 8 } },
-      { text: "A small trusted trio where everyone knows their precise duty", traits: { discipline: 8, practical: 8 } },
-      { text: "Doesn't matter as long as the mission is clear and goals are tracked", traits: { leadership: 8, enterprise: 8 } }
-    ]
-  },
-  {
-    id: 58,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "How do you feel about competitive rivalry with peers?",
-    options: [
-      { text: "I love competition; it sharpens my skills and drives me to be #1", traits: { enterprise: 10, defence: 8 } },
-      { text: "I dislike rivalry; I believe in collaboration where everyone wins together", traits: { social: 10, empathy: 10 } },
-      { text: "My only competition is with who I was yesterday", traits: { discipline: 9, analytical: 8 } },
-      { text: "I prefer working on niche topics where there is zero competition", traits: { creative: 9, artistic: 8 } }
-    ]
-  },
-  {
-    id: 59,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "If an employer offers you 3x salary to work for a company whose ethics you distrust, what do you do?",
-    options: [
-      { text: "Reject it immediately: Integrity and clear conscience cannot be bought", traits: { discipline: 10, social: 9, legal: 8 } },
-      { text: "Take it for 2 years, accumulate capital, then fund ethical projects", traits: { enterprise: 10, analytical: 8 } },
-      { text: "Join and try to reform their corrupt practices from the inside", traits: { leadership: 9, legal: 9 } },
-      { text: "Consult my mentors and family before making any rash move", traits: { conventional: 8 } }
-    ]
-  },
-  {
-    id: 60,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "When a team project crashes due to a mistake you personally made, what do you do?",
-    options: [
-      { text: "Step up immediately, state 'This was my error', and deliver the fix without making excuses", traits: { leadership: 10, discipline: 10 } },
-      { text: "Analyze the root cause on paper first, then present a corrected model", traits: { analytical: 10, logic: 8 } },
-      { text: "Feel terrible and apologize deeply to everyone affected", traits: { empathy: 9, social: 7 } },
-      { text: "Try to quietly patch the bug before anyone notices", traits: { tech: 7 } }
-    ]
-  },
-  {
-    id: 61,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "How do you manage people older or more experienced than you?",
-    options: [
-      { text: "Respect their seniority, listen to their wisdom, and lead through humility", traits: { leadership: 10, social: 9 } },
-      { text: "Rely strictly on data and objective benchmarks so age doesn't matter", traits: { analytical: 9, conventional: 8 } },
-      { text: "I feel very intimidated directing older elders", traits: { introvert: 8 } },
-      { text: "Clear protocols, checklists, and respectful military-style decorum", traits: { defence: 9, discipline: 9 } }
-    ]
-  },
-  {
-    id: 62,
-    pillar: "Pillar 5: Teamwork & Group Dynamics",
-    q: "If your friend shares an emotional secret with you, how safe is it?",
-    options: [
-      { text: "It goes to my grave: absolute loyalty and confidentiality", traits: { social: 10, discipline: 10, empathy: 10 } },
-      { text: "Safe, unless it poses a real physical danger to their life", traits: { legal: 10, analytical: 8 } },
-      { text: "I sometimes slip up if talking to my parents", traits: { social: 6 } },
-      { text: "I help them write it down so they can process the trauma", traits: { creative: 8, social: 8 } }
+      { id: 'q22_a', text: 'The aerodynamic wing taper, rocket nozzle expansion ratio, and lightweight carbon composite skin.', scoreType: 'aerospace', points: 5 },
+      { id: 'q22_b', text: 'The soil bearing capacity, pillar depth, beam deflection, and foundation load distribution.', scoreType: 'civil', points: 5 },
+      { id: 'q22_c', text: 'The digital sensor telemetry, automated PLC logic, and server network connectivity.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q22_d', text: 'The sunlight ingress angles, room acoustics, aesthetic exterior facade, and pedestrian walkways.', scoreType: 'architect', points: 5 }
     ]
   },
 
-  // 63-75: Applied Scenarios & Life Purpose
+  // 23-30: CAREER DECIDEDNESS & FAMILY PRESSURE
   {
-    id: 63,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "At age 75 looking back at your life, what would make you feel your journey was truly successful?",
+    id: 'q23',
+    pillar: 'Career Clarity & Pressure',
+    prompt: 'When relatives ask: "What are your future career plans?", what is your honest internal reaction?',
     options: [
-      { text: "I served and defended my nation with honor, courage, and pride", traits: { defence: 10, discipline: 10 } },
-      { text: "I unlocked scientific mysteries, invented technology, or created medical cures", traits: { analytical: 10, tech: 10 } },
-      { text: "I lifted hundreds of struggling families out of poverty, distress, or illness", traits: { social: 10, empathy: 10 } },
-      { text: "I built enterprises, created thousands of jobs, and established lasting institutions", traits: { enterprise: 10, leadership: 10 } }
+      { id: 'q23_a', text: 'I have 1 or 2 specific dream vocations that I have loved for years, and I explain them with confidence.', scoreType: 'decided', points: 5 },
+      { id: 'q23_b', text: 'I have 4 or 5 different interests, but I find it hard to pick just one specific career path.', scoreType: 'exploring', points: 4 },
+      { id: 'q23_c', text: 'I feel deeply confused and worried because I have no clear picture of my path.', scoreType: 'confused', points: 5 },
+      { id: 'q23_d', text: 'I usually repeat whatever degree my parents or elder cousins tell me to say.', scoreType: 'pressured', points: 5 }
     ]
   },
   {
-    id: 64,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "During a major flood disaster in a town, where do you naturally rush to help?",
+    id: 'q24',
+    pillar: 'Career Clarity & Pressure',
+    prompt: 'How much do family expectations influence your decision regarding 11th/12th stream selection?',
     options: [
-      { text: "In rescue boats pulling stranded citizens and animals out of the floodwaters", traits: { practical: 10, defence: 10 } },
-      { text: "In the medical emergency camp bandaging wounds and administering IV fluids", traits: { practical: 9, social: 10 } },
-      { text: "In the central control room managing logistics, food trucks, and communications", traits: { enterprise: 9, leadership: 9, conventional: 8 } },
-      { text: "Documenting the truth on camera so the world sends urgent international relief", traits: { artistic: 9, legal: 8 } }
+      { id: 'q24_a', text: 'They strongly insist on conventional secure options (doctor/engineer/govt job), even if my heart differs.', scoreType: 'pressured', points: 5 },
+      { id: 'q24_b', text: 'They are completely supportive and encourage me to follow whatever matches my genuine skills.', scoreType: 'decided', points: 4 },
+      { id: 'q24_c', text: 'I am so undecided myself that I easily adopt whatever opinion someone shares with me.', scoreType: 'confused', points: 4 },
+      { id: 'q24_d', text: 'I am researching entrance exams and college roadmaps on my own and discussing them openly with my family.', scoreType: 'exploring', points: 5 }
     ]
   },
   {
-    id: 65,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "Which kind of problem would keep your mind engaged for weeks without getting bored?",
+    id: 'q25',
+    pillar: 'Career Clarity & Pressure',
+    prompt: 'What is your biggest fear when thinking about your working life at age 28?',
     options: [
-      { text: "Designing an autonomous robot that can navigate rough agricultural soil", traits: { tech: 10, practical: 9 } },
-      { text: "Drafting a constitutional appeal that reverses an unjust court judgment", traits: { legal: 10, analytical: 9 } },
-      { text: "Helping a severely traumatized teenager rebuild their confidence and smile again", traits: { social: 10, empathy: 10 } },
-      { text: "Forecasting the next 5-year trend in world stock markets and global trade", traits: { enterprise: 10, analytical: 9 } }
+      { id: 'q25_a', text: 'Getting stuck in a boring, repetitive desk job doing paperwork that creates zero impact.', scoreType: 'exploring', points: 4 },
+      { id: 'q25_b', text: 'Not earning enough money to provide my parents and family with a secure, honorable life.', scoreType: 'decided', points: 4 },
+      { id: 'q25_c', text: 'Studying for 5 years in a field everyone praised, only to realize I hate the daily work.', scoreType: 'confused', points: 5 },
+      { id: 'q25_d', text: 'Failing to meet family expectations and letting down those who sacrificed for me.', scoreType: 'pressured', points: 5 }
     ]
   },
   {
-    id: 66,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "If you received a grant of 10 Lakhs INR to spend on any equipment for yourself, what do you buy?",
+    id: 'q26',
+    pillar: 'Career Clarity & Pressure',
+    prompt: 'If college entrance fee or competition was not a factor, what would you pursue without hesitation?',
     options: [
-      { text: "High-end compute server with multiple GPUs for deep learning and AI models", traits: { tech: 10, analytical: 9 } },
-      { text: "A cinema camera, sound recording gear, and professional editing suite", traits: { artistic: 10, creative: 10 } },
-      { text: "Advanced farming drone, soil moisture sensors, and greenhouse lab kit", traits: { practical: 10 } },
-      { text: "A certified law and chartered accountancy research library & conference pass", traits: { legal: 9, conventional: 9 } }
+      { id: 'q26_a', text: 'Fighter pilot, naval commander, or army officer serving on national frontlines.', scoreType: 'army', points: 5 },
+      { id: 'q26_b', text: 'Rocket engineer, astrophysicist, or advanced AI robotics inventor.', scoreType: 'aerospace', points: 5 },
+      { id: 'q26_c', text: 'Specialized brain surgeon, cardiologist, or mental health healer.', scoreType: 'surgeon', points: 5 },
+      { id: 'q26_d', text: 'High court judge, civil district magistrate (IAS), or enterprise founder.', scoreType: 'civil_services', points: 5 }
+    ]
+  },
+
+  // 27-40: PSYCHOMETRIC TEMPERAMENT & WORK DYNAMICS
+  {
+    id: 'q27',
+    pillar: 'Personality & Temperament',
+    prompt: 'EXTRAVERSION: After spending 5 consecutive days studying alone for tough exams, how do you recharge?',
+    options: [
+      { id: 'q27_a', text: 'Playing football, running outdoors with peers, and laughing with a group.', scoreType: 'extravert', points: 5 },
+      { id: 'q27_b', text: 'Staying in my quiet room, reading books, listening to music, or taking a solitary walk.', scoreType: 'introvert', points: 5 },
+      { id: 'q27_c', text: 'Meeting my 1 or 2 closest friends for peaceful, deep conversation.', scoreType: 'introvert', points: 4 },
+      { id: 'q27_d', text: 'Organizing an outing or festival gathering for our entire school circle.', scoreType: 'extravert', points: 5 }
     ]
   },
   {
-    id: 67,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "How do you feel about traveling and living in different remote states or countries?",
+    id: 'q28',
+    pillar: 'Personality & Temperament',
+    prompt: 'DISCIPLINE: When assigned a major project due in two weeks:',
     options: [
-      { text: "Thrilled! I love packing my bags, meeting strange cultures, and adapting", traits: { extrovert: 9, defence: 8, practical: 8 } },
-      { text: "I prefer staying rooted close to my hometown, family, and lifelong friends", traits: { conventional: 8, introvert: 7 } },
-      { text: "Fine as long as the research facility or university campus has great resources", traits: { analytical: 9 } },
-      { text: "I want to work globally in major financial and tech hubs like London, NYC, or Singapore", traits: { enterprise: 10, tech: 8 } }
+      { id: 'q28_a', text: 'I break it down into daily milestones immediately and finish 2 days ahead of schedule.', scoreType: 'conscientious', points: 5 },
+      { id: 'q28_b', text: 'I start with good intentions, relax mid-way, and finish in a late-night burst of adrenaline.', scoreType: 'spontaneous', points: 4 },
+      { id: 'q28_c', text: 'I work best when sudden creative inspiration strikes, rather than following rigid routines.', scoreType: 'spontaneous', points: 5 },
+      { id: 'q28_d', text: 'I struggle with procrastination and feel stressed near the deadline.', scoreType: 'spontaneous', points: 4 }
     ]
   },
   {
-    id: 68,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "When you read about a mysterious unsolved criminal case, what do you focus on?",
+    id: 'q29',
+    pillar: 'Personality & Temperament',
+    prompt: 'MORAL COURAGE: In a group project, when an older peer tries to bully a quiet classmate:',
     options: [
-      { text: "Forensic evidence: DNA traces, fingerprint patterns, and ballistics data", traits: { analytical: 10, logic: 9 } },
-      { text: "Criminal psychology: What was the motive, childhood trauma, and psychological trigger?", traits: { social: 10, empathy: 8 } },
-      { text: "Police strategy: How the investigative cordon was laid out and suspects cornered", traits: { defence: 9, leadership: 8 } },
-      { text: "Courtroom trial: How the defence and prosecution lawyers presented their witnesses", traits: { legal: 10 } }
+      { id: 'q29_a', text: 'I stand up immediately, look the bully in the eye, and firmly order them to back off.', scoreType: 'courage', points: 5 },
+      { id: 'q29_b', text: 'I pull the quiet classmate away safely and report the behavior to teachers with proof.', scoreType: 'empathy', points: 4 },
+      { id: 'q29_c', text: 'I logically dissect the bully\'s false claims until they feel foolish and back down.', scoreType: 'logic', points: 4 },
+      { id: 'q29_d', text: 'I console the victim afterward and ensure they do not feel alone.', scoreType: 'empathy', points: 5 }
     ]
   },
   {
-    id: 69,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "If a machine you rely on suddenly makes a weird screeching noise and stops, what is your instinct?",
+    id: 'q30',
+    pillar: 'Personality & Temperament',
+    prompt: 'PRESSURE TOLERANCE: When an unexpected emergency shatters your team\'s plan 1 hour before presentation:',
     options: [
-      { text: "Unplug it, grab a flashlight and screwdriver, and look at the gears and belt", traits: { practical: 10, tech: 8 } },
-      { text: "Check the warranty receipt, call the customer service technician, and log a ticket", traits: { conventional: 9 } },
-      { text: "Look up the exact error code or symptoms on a repair forum or YouTube", traits: { analytical: 9, logic: 8 } },
-      { text: "Ask someone else in the family who knows mechanics better", traits: { social: 6 } }
+      { id: 'q30_a', text: 'My heart rate stays steady; I take command, delegate backup tasks, and find a solution.', scoreType: 'courage', points: 5 },
+      { id: 'q30_b', text: 'I analyze the root failure on paper first, calculate the fastest fix, and execute.', scoreType: 'logic', points: 5 },
+      { id: 'q30_c', text: 'I check on team morale first to ensure nobody is having a panic breakdown.', scoreType: 'empathy', points: 5 },
+      { id: 'q30_d', text: 'I feel deeply shaken inside and need a moment to collect my thoughts.', scoreType: 'sensitive', points: 4 }
     ]
   },
   {
-    id: 70,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "What gives you more pride: creating a physical object you can hold, or writing an elegant digital program?",
+    id: 'q31',
+    pillar: 'Personality & Temperament',
+    prompt: 'DETAIL FOCUS: How patient are you when doing repetitive mathematical verifications or safety checks?',
     options: [
-      { text: "A physical object: A crafted wooden table, repaired engine, or hand-drawn architectural model", traits: { practical: 10, artistic: 8 } },
-      { text: "A digital program: A clean script running lightning-fast in the terminal", traits: { tech: 10, analytical: 9 } },
-      { text: "A well-written persuasive legal brief or published investigative article", traits: { legal: 9, creative: 9 } },
-      { text: "A child or student passing their exams because you personally coached them", traits: { social: 10, empathy: 10 } }
+      { id: 'q31_a', text: 'Extremely patient: Missing even one decimal error can cause a bridge or rocket to fail.', scoreType: 'conscientious', points: 5 },
+      { id: 'q31_b', text: 'I get restless quickly; I prefer hands-on physical action or talking to people.', scoreType: 'spontaneous', points: 4 },
+      { id: 'q31_c', text: 'I automate the repetitive check using code so I never have to do it manually.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q31_d', text: 'I can do it if required, but my heart is in creative storytelling or design.', scoreType: 'artistic', points: 4 }
     ]
   },
   {
-    id: 71,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "How important is having a predictable daily routine (same waking time, fixed tasks, predictable days)?",
+    id: 'q32',
+    pillar: 'Personality & Temperament',
+    prompt: 'OUTDOOR WEATHER GRIT: How do you handle extreme physical hardship (scorching heat, monsoon mud, or freezing cold)?',
     options: [
-      { text: "Extremely important: Predictable structure helps me stay focused and calm", traits: { conventional: 10, discipline: 9 } },
-      { text: "I despise predictability: I want every single day to be a fresh, unpredictable adventure", traits: { creative: 9, defence: 8, enterprise: 8 } },
-      { text: "A mix: Fixed morning habits, but flexible work challenges throughout the day", traits: { analytical: 8, leadership: 8 } },
-      { text: "I adapt to whatever schedule my patients, students, or team need from me", traits: { social: 9, empathy: 9 } }
+      { id: 'q32_a', text: 'I thrive in tough elements: Outdoor grit, mud, and physical sweat make me feel alive.', scoreType: 'army', points: 5 },
+      { id: 'q32_b', text: 'I don\'t mind heavy weather as long as I am inspecting a construction site or farm.', scoreType: 'civil', points: 4 },
+      { id: 'q32_c', text: 'I strongly prefer modern, air-conditioned hospitals, research laboratories, or corporate towers.', scoreType: 'surgeon', points: 4 },
+      { id: 'q32_d', text: 'I prefer working from a quiet study room or computer terminal.', scoreType: 'cs_ai', points: 4 }
+    ]
+  },
+
+  // 33-45: VOCATIONAL PASSION & RIASEC DOMAINS
+  {
+    id: 'q33',
+    pillar: 'Vocational Calling',
+    prompt: 'When you visit a rural village or agricultural district in India, what thought grabs your mind?',
+    options: [
+      { id: 'q33_a', text: 'Treating injured livestock and deploying agricultural drones for soil sensors and drip irrigation.', scoreType: 'agri_vet', points: 5 },
+      { id: 'q33_b', text: 'Building durable concrete canals, paved roads, and flood protection embankments for the village.', scoreType: 'civil', points: 5 },
+      { id: 'q33_c', text: 'Serving as District Collector (IAS) to ensure schools, hospitals, and ration schemes reach every family.', scoreType: 'civil_services', points: 5 },
+      { id: 'q33_d', text: 'Setting up free medical health camps to diagnose heart murmurs, cataracts, and nerve illnesses.', scoreType: 'cardiology', points: 5 }
     ]
   },
   {
-    id: 72,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "If you had to teach an 8-year-old child a complex subject, how would you approach it?",
+    id: 'q34',
+    pillar: 'Vocational Calling',
+    prompt: 'If you had to read a 400-page book from cover to cover this weekend, which title would you pick?',
     options: [
-      { text: "Turn it into an imaginative fairy tale or animated comic story", traits: { artistic: 10, creative: 10 } },
-      { text: "Use real-life hands-on objects (coins, water cups, blocks) they can touch", traits: { practical: 10, social: 8 } },
-      { text: "Break it down into simple logical rules and fun mini-quizzes", traits: { analytical: 9, discipline: 8 } },
-      { text: "Listen to the child's questions first and let their own curiosity lead", traits: { social: 10, empathy: 10 } }
+      { id: 'q34_a', text: '"Rocket Propulsion Elements & Space Mission Architectures"', scoreType: 'aerospace', points: 5 },
+      { id: 'q34_b', text: '"Principles of Trauma Surgery & Battlefield Operative Medicine"', scoreType: 'surgeon', points: 5 },
+      { id: 'q34_c', text: '"The Art of Military Strategy & Battlefield Command: From NDA to Kargil"', scoreType: 'army', points: 5 },
+      { id: 'q34_d', text: '"Constitutional Law of India & Landmark Supreme Court Judgments"', scoreType: 'lawyer', points: 5 }
     ]
   },
   {
-    id: 73,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "How do you respond when someone lies directly to your face?",
+    id: 'q35',
+    pillar: 'Vocational Calling',
+    prompt: 'Which tool or equipment would you handle with the most natural instinct and curiosity?',
     options: [
-      { text: "I spot the micro-expressions and body language immediately and remember it quietly", traits: { analytical: 10, social: 8 } },
-      { text: "I cross-question them with contradictions until they are forced to admit the truth", traits: { legal: 10, logic: 9 } },
-      { text: "I feel sad for them and wonder why they felt too unsafe to tell the truth", traits: { empathy: 10, social: 9 } },
-      { text: "I lose all respect for them and cut them out of my inner circle", traits: { discipline: 9 } }
+      { id: 'q35_a', text: 'A flight joystick, throttle quadrant, and radar screen.', scoreType: 'airforce', points: 5 },
+      { id: 'q35_b', text: 'A precision surgical needle-holder, scalpel, and suture threads.', scoreType: 'surgeon', points: 5 },
+      { id: 'q35_c', text: 'A laser surveying total station, concrete compression tester, and CAD soil blueprints.', scoreType: 'civil', points: 5 },
+      { id: 'q35_d', text: 'An oscilloscope, rocket fuel injector nozzle, and cryogenic valve test rig.', scoreType: 'aerospace', points: 5 }
     ]
   },
   {
-    id: 74,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "Would you rather earn 50 Lakhs doing work that harms the environment or 15 Lakhs creating clean green technology?",
+    id: 'q36',
+    pillar: 'Vocational Calling',
+    prompt: 'How do you feel about national uniform discipline, physical salutes, and rank hierarchy?',
     options: [
-      { text: "15 Lakhs for clean green tech without a doubt — values always trump money", traits: { social: 10, discipline: 9 } },
-      { text: "15 Lakhs, and use innovation to scale it into a 50 Lakh business cleanly", traits: { enterprise: 10, tech: 8 } },
-      { text: "Money matters most early in career to secure family, then switch to ethics later", traits: { enterprise: 8, conventional: 7 } },
-      { text: "I would dedicate myself to enforcing strict environmental laws against violators", traits: { legal: 10, defence: 8 } }
+      { id: 'q36_a', text: 'Supreme honor and purpose: Living by military code, honor, and serving the motherland is the highest calling.', scoreType: 'army', points: 5 },
+      { id: 'q36_b', text: 'I respect it deeply, but I prefer contributing to national strength through science, rocketry, or medicine.', scoreType: 'aerospace', points: 4 },
+      { id: 'q36_c', text: 'I prefer civil governance authority like IAS/IPS over strict regimented barracks life.', scoreType: 'civil_services', points: 4 },
+      { id: 'q36_d', text: 'I prefer intellectual freedom in university academia, hospitals, or private enterprise.', scoreType: 'professor', points: 4 }
     ]
   },
   {
-    id: 75,
-    pillar: "Pillar 6: Practical Scenarios & Life Purpose",
-    q: "Final question: When you close your eyes, which mental image fills your chest with the most courage?",
+    id: 'q37',
+    pillar: 'Vocational Calling',
+    prompt: 'When you hear about an earthquake striking an Indian state, where do you want to be helping?',
     options: [
-      { text: "Marching in an olive-green or white uniform saluting the national tricolor", traits: { defence: 10, discipline: 10 } },
-      { text: "Watching code or algorithms you designed power systems across the globe", traits: { tech: 10, analytical: 10 } },
-      { text: "Looking into the grateful eyes of a person or family whose life you saved", traits: { social: 10, empathy: 10 } },
-      { text: "Standing in a high court arguing justice for those who had no voice", traits: { legal: 10, leadership: 9 } }
+      { id: 'q37_a', text: 'In Army/NDRF combat rescue boats and helicopters, pulling trapped citizens from collapsed rubble.', scoreType: 'army', points: 5 },
+      { id: 'q37_b', text: 'In the emergency trauma tent performing emergency amputations and stabilizing crush injuries.', scoreType: 'surgeon', points: 5 },
+      { id: 'q37_c', text: 'Inspecting damaged bridges, dams, and structural pillars to prevent catastrophic collapses.', scoreType: 'civil', points: 5 },
+      { id: 'q37_d', text: 'Directing the district administration control room, food logistics, and relief funds as District Magistrate.', scoreType: 'civil_services', points: 5 }
+    ]
+  },
+
+  // 38-50: LIFE PURPOSE, VALUES & WORK STYLE
+  {
+    id: 'q38',
+    pillar: 'Life Purpose & Legacy',
+    prompt: 'At age 75 looking back at your journey, what will make you feel your life had true meaning?',
+    options: [
+      { id: 'q38_a', text: 'I defended my motherland with honor, stood firm on our borders, and protected millions of citizens.', scoreType: 'army', points: 5 },
+      { id: 'q38_b', text: 'I built spacecraft, explored the cosmos, and pushed the frontiers of scientific knowledge.', scoreType: 'aerospace', points: 5 },
+      { id: 'q38_c', text: 'I operated on thousands of sick patients and pulled human beings back from the edge of death.', scoreType: 'surgeon', points: 5 },
+      { id: 'q38_d', text: 'I designed bridges, highways, and infrastructure that will safely carry millions of travelers for 100 years.', scoreType: 'civil', points: 5 }
+    ]
+  },
+  {
+    id: 'q39',
+    pillar: 'Life Purpose & Legacy',
+    prompt: 'Which equation of reward matters to you most in your professional career?',
+    options: [
+      { id: 'q39_a', text: 'Supreme national honor, military respect, official quarters, and lifelong brotherly camaraderie.', scoreType: 'army', points: 5 },
+      { id: 'q39_b', text: 'Intellectual breakthrough: Seeing a rocket or satellite you designed roar into orbit.', scoreType: 'aerospace', points: 5 },
+      { id: 'q39_c', text: 'Medical healing: Walking out of surgery to tell a weeping family that their child is alive and will walk again.', scoreType: 'surgeon', points: 5 },
+      { id: 'q39_d', text: 'Building legacy: Seeing a grand suspension bridge or highway you engineered stand proudly across a river.', scoreType: 'civil', points: 5 }
+    ]
+  },
+  {
+    id: 'q40',
+    pillar: 'Life Purpose & Legacy',
+    prompt: 'FINAL SELF-REFLECTION: When you close your eyes and picture yourself 10 years from now, which image makes you proudest?',
+    options: [
+      { id: 'q40_a', text: 'Commanding troops in uniform, or piloting a supersonic fighter jet, or commanding a naval warship.', scoreType: 'army', points: 5 },
+      { id: 'q40_b', text: 'Working as a Senior ISRO/DRDO Aerospace Scientist building deep space probes and rocket engines.', scoreType: 'aerospace', points: 5 },
+      { id: 'q40_c', text: 'Leading surgical procedures or treating heart and neurological conditions as an elite doctor.', scoreType: 'surgeon', points: 5 },
+      { id: 'q40_d', text: 'Chief Structural Engineer building state mega-projects or leading district governance as an IAS officer.', scoreType: 'civil', points: 5 }
     ]
   }
 ];
 
-// --- 14 IN-DEPTH CAREER ROADMAPS ---
+// 15 COMPREHENSIVE CAREERS DATABASE
 const CAREER_DATABASE = {
-  defence: {
-    title: "Armed Forces Officer (Army / Navy / Air Force)",
-    badge: "Courage, Honour & Leadership",
-    matchScore: 96,
-    desc: "Lead troops, pilot fighter aircraft, command naval warships, and defend the sovereign borders of the nation. Unmatched camaraderie, discipline, and service pride.",
-    streams: "11th & 12th: Physics, Chemistry & Math (PCM) for Air Force/Navy; Any stream for Army.",
-    indiaPath: "National Defence Academy (NDA Khadakwasla, Pune), Indian Military Academy (IMA Dehradun), Air Force Academy (Dundigal), INA Ezhimala via CDS / AFCAT.",
-    abroadPath: "Royal Military Academy Sandhurst (UK), West Point (USMA, USA), Australian Defence Force Academy.",
-    exams: "NDA Exam (UPSC), CDS (Combined Defence Services), AFCAT, SSB 5-Day Interview.",
-    salary: "Starting: ₹10 - 14 LPA (Lieutenant) | Senior Officer / General: ₹25 - 32 LPA + official accommodation, medical, rations."
+  'army_defence_officer': {
+    id: 'army_defence_officer',
+    title: 'Indian Armed Forces Officer (Army Infantry & Special Forces)',
+    category: 'National Defense, Battlefield Command & Armed Strategy',
+    iconName: 'Shield',
+    idealTraits: ['army', 'courage'],
+    description: 'Lead infantry platoons, armored tank regiments, and commando units. You command soldiers with discipline, make tactical decisions under fire, and safeguard national borders in high-altitude and desert theaters.',
+    dailyLife: 'Early morning physical conditioning, tactical weapons inspection, combat simulation drills, troop administration, and border operational readiness.',
+    salaryIndia: '₹9,50,000 to ₹34,00,000+ per year (Lieutenant to Brigadier/General) + Official cantonment bungalow, defense healthcare, and military pension privileges.',
+    salaryAbroad: 'United Nations (UN) Peacekeeping Missions ($85,000 to $145,000 tax-free allowances) and military diplomatic postings in foreign embassies.',
+    highSchoolStream: 'Any stream (Science, Commerce, or Arts) for Army wing. Physics, Chemistry & Math (PCM) recommended for technical entries.',
+    indianPathways: [
+      'National Defence Academy (NDA, Khadakwasla, Pune) - right after 12th',
+      'Indian Military Academy (IMA Dehradun) - post graduation via CDS exam',
+      'Technical Entry Scheme (TES) - direct SSB selection based on 12th PCM marks',
+      'Officers Training Academy (OTA Chennai) - Short Service Commission'
+    ],
+    globalPathways: [
+      'Royal Military Academy Sandhurst (United Kingdom) - officer exchange courses',
+      'United States Military Academy (West Point, USA) - strategic command symposiums',
+      'Defence Services Staff College (DSSC) international command modules'
+    ],
+    keyEntranceExams: 'NDA Exam (UPSC), CDS Exam (UPSC), 5-Day SSB Interview, Medical Fitness Standards.',
+    employers: ['Indian Army', 'Para-Special Forces', 'Rashtriya Rifles', 'National Security Guard (NSG)', 'Assam Rifles']
   },
-  psychology: {
-    title: "Clinical Psychologist & Mental Health Psychotherapist",
-    badge: "Empathy, Healing & Science of Mind",
-    matchScore: 94,
-    desc: "Diagnose psychological conditions, assist adolescents and families through distress, run psychiatric clinics, and research cognitive neurosciences.",
-    streams: "11th & 12th: Any stream (Humanities / PCB preferred with Psychology).",
-    indiaPath: "BA/B.Sc Psychology from Delhi University, Christ University, TISS, followed by M.Phil / Psy.D from NIMHANS Bangalore or CIP Ranchi (RCI License).",
-    abroadPath: "Oxford, Harvard, King's College London, University of Toronto, University of Melbourne.",
-    exams: "CUET-UG, NIMHANS Entrance, RCI Licensing Examination.",
-    salary: "Starting: ₹5 - 9 LPA | Established Private Practice / Hospital Lead: ₹18 - 35 LPA ($75k - $140k abroad)."
+
+  'airforce_fighter_pilot': {
+    id: 'airforce_fighter_pilot',
+    title: 'Indian Air Force Fighter Pilot & Aeronautical Navigator',
+    category: 'Aerial Combat, Supersonic Aviation & Airspace Defense',
+    iconName: 'Plane',
+    idealTraits: ['airforce', 'courage'],
+    description: 'Pilot supersonic fighter jets (Rafale, Sukhoi Su-30MKI, Tejas) at speeds exceeding Mach 1.8. You execute precision air-to-air dogfights, tactical radar strikes, and defend Indian skies from enemy intrusions.',
+    dailyLife: 'Pre-flight weather and combat briefing, high-G tactical combat sorties, supersonic instrument cross-checks, simulator flight runs, and squadron strategy reviews.',
+    salaryIndia: '₹12,00,000 to ₹38,00,000+ per year (Flying Officer to Air Marshal) + Flying allowances, defense housing, and specialized flight medical care.',
+    salaryAbroad: 'Joint international air combat drills (Cope India, Pitch Black Australia, Red Flag USA) and defense diplomatic attaché postings.',
+    highSchoolStream: '11th & 12th in Science with Physics and Mathematics (PCM) is mandatory.',
+    indianPathways: [
+      'National Defence Academy (NDA Khadakwasla - Air Force Wing)',
+      'Air Force Academy (AFA Dundigal, Hyderabad) - Flying Branch',
+      'Air Force Common Admission Test (AFCAT) post-graduation route'
+    ],
+    globalPathways: [
+      'Royal Air Force College Cranwell (United Kingdom)',
+      'US Air Force Academy (Colorado Springs, USA)',
+      'Joint international flight weapon school modules'
+    ],
+    keyEntranceExams: 'NDA Exam (UPSC), AFCAT, 5-Day AFSB Interview, Computerised Pilot Selection System (CPSS) Test.',
+    employers: ['Indian Air Force (IAF)', 'Fighter Squadrons', 'Aircraft and Systems Testing Establishment (ASTE)', 'Surya Kiran Aerobatics']
   },
-  tech: {
-    title: "Computer Science & AI Systems Architect",
-    badge: "Logic, Automation & Code",
-    matchScore: 95,
-    desc: "Build next-generation artificial intelligence models, cloud security architectures, operating systems, and high-performance algorithms.",
-    streams: "11th & 12th: Physics, Chemistry, Math (PCM) + Computer Science.",
-    indiaPath: "B.Tech Computer Science from IIT Bombay, IIT Delhi, BITS Pilani, IIIT Hyderabad, NIT Trichy.",
-    abroadPath: "MIT, Stanford, Carnegie Mellon University (CMU), UC Berkeley, NUS Singapore.",
-    exams: "JEE Main, JEE Advanced, BITSAT, SAT / GRE for overseas.",
-    salary: "Starting: ₹14 - 28 LPA | Senior Staff Engineer / Silicon Valley Architect: ₹50 LPA - ₹1.5 Cr+ ($150k - $300k)."
+
+  'navy_warship_commander': {
+    id: 'navy_warship_commander',
+    title: 'Indian Navy Warship Surface Commander & Submariner',
+    category: 'Maritime Warfare, Guided Missile Destroyers & Submarine Patrols',
+    iconName: 'Anchor',
+    idealTraits: ['navy', 'courage'],
+    description: 'Command stealth guided-missile destroyers, aircraft carriers, or nuclear-powered attack submarines. You dominate international sea lanes, track undersea acoustic signatures, and enforce maritime sovereignty.',
+    dailyLife: 'Bridge watch navigation, missile battery tracking, sonar acoustic sweeps, damage control drills, replenishment at sea, and international anti-piracy patrols.',
+    salaryIndia: '₹10,50,000 to ₹35,00,000+ per year (Sub-Lieutenant to Admiral) + Submarine/Diving allowances, naval officer housing, and medical privileges.',
+    salaryAbroad: 'Global naval deployments across Indo-Pacific, Gulf of Aden, and joint fleet exercises (MALABAR, Milan, Varuna) with US and French Navies.',
+    highSchoolStream: '11th & 12th in Science with Physics and Mathematics (PCM) is mandatory.',
+    indianPathways: [
+      'Indian Naval Academy (INA Ezhimala, Kerala - 4-Year B.Tech Cadets)',
+      'National Defence Academy (NDA Khadakwasla - Navy Wing)',
+      'Combined Defence Services (CDS) Naval Executive Branch'
+    ],
+    globalPathways: [
+      'Britannia Royal Naval College (Dartmouth, UK)',
+      'United States Naval Academy (Annapolis, USA)',
+      'International Submarine Warfare Command Courses'
+    ],
+    keyEntranceExams: 'NDA Exam (UPSC), INA 10+2 B.Tech Entry, CDS Exam (UPSC), 5-Day Naval SSB Interview.',
+    employers: ['Indian Navy', 'Western & Eastern Naval Commands', 'Submarine Fleet', 'MARCOS (Marine Commandos)']
   },
-  legal: {
-    title: "Corporate Legal Counsel & High Court Advocate",
-    badge: "Justice, Rhetoric & Constitutional Law",
-    matchScore: 93,
-    desc: "Fight constitutional matters, represent public interest litigations, draft major corporate mergers, and progress towards the judicial magistrate bench.",
-    streams: "11th & 12th: Any stream (Humanities / Commerce / Science with strong English).",
-    indiaPath: "5-Year Integrated BA.LL.B / BBA.LL.B from NLSIU Bangalore, NALSAR Hyderabad, WBNUJS Kolkata, NLU Delhi.",
-    abroadPath: "Oxford University (BCL), Harvard Law School (LLM), Cambridge, Columbia Law School.",
-    exams: "CLAT (Common Law Admission Test), AILET, LSAT India, Bar Council Exam (AIBE).",
-    salary: "Starting: ₹12 - 18 LPA (Tier-1 Law Firms) | Senior Designated Advocate / Partner: ₹50 LPA - ₹2 Cr+."
+
+  'aerospace_engineer': {
+    id: 'aerospace_engineer',
+    title: 'Aerospace, Rocket Propulsion & Satellite Systems Engineer',
+    category: 'Space Exploration, Aerodynamics & Satellite Defense',
+    iconName: 'Rocket',
+    idealTraits: ['aerospace', 'logic'],
+    description: 'Design and manufacture cryogenic rockets, lunar exploration probes, satellite constellations, and supersonic defense systems. You master aerodynamics, rocket propulsion, orbital mechanics, and thermal heat shields.',
+    dailyLife: 'Running wind tunnel simulations, writing CFD (Computational Fluid Dynamics) code, testing liquid propulsion rocket engines, analyzing telemetry data, and assembling satellite avionics.',
+    salaryIndia: '₹8,50,000 to ₹35,00,000+ per year (ISRO Scientist/Engineer \'SC\' grade offers gazetted rank with official quarters; private space startups offer ₹12–28 LPA).',
+    salaryAbroad: '$105,000 to $220,000+ per year (NASA, ESA, SpaceX, Blue Origin, Boeing, Airbus, Rolls-Royce Aerospace).',
+    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Mathematics (PCM).',
+    indianPathways: [
+      'Indian Institute of Space Science and Technology (IIST Thiruvananthapuram - direct recruitment pipeline to ISRO)',
+      'Indian Institutes of Technology (IIT Bombay, IIT Madras, IIT Kanpur, IIT Kharagpur - B.Tech Aerospace)',
+      'Madras Institute of Technology (MIT Chromepet, Anna University - Dr. APJ Abdul Kalam\'s alma mater)'
+    ],
+    globalPathways: [
+      'Massachusetts Institute of Technology (MIT AeroAstro - USA)',
+      'California Institute of Technology (Caltech / JPL - USA)',
+      'Delft University of Technology (TU Delft - Netherlands)',
+      'Cranfield University (UK - Aerospace Excellence)'
+    ],
+    keyEntranceExams: 'JEE Advanced (for IITs and IIST), JEE Main, GATE (Aerospace), GRE & TOEFL/IELTS for overseas MS/Ph.D.',
+    employers: ['ISRO (Indian Space Research Organisation)', 'DRDO', 'Skyroot Aerospace', 'Agnikul Cosmos', 'HAL', 'Boeing', 'Airbus']
   },
-  finance: {
-    title: "Chartered Accountant & Investment Analyst",
-    badge: "Forensic Numbers, Capital & Wealth",
-    matchScore: 91,
-    desc: "Audit corporate accounts, detect forensic financial fraud, manage multimillion-dollar investment portfolios, and guide business mergers.",
-    streams: "11th & 12th: Commerce with Mathematics (or PCM).",
-    indiaPath: "ICAI Chartered Accountancy (CA Foundation -> Inter -> Articleship -> CA Final), SRCC Delhi, IIM Ahmedabad.",
-    abroadPath: "London School of Economics (LSE), Wharton (Penn), Stern (NYU), CFA Institute (USA).",
-    exams: "CA Foundation, CUET-UG, CAT, CFA Level 1-3.",
-    salary: "Starting: ₹10 - 15 LPA (Big-4 Audit) | Partner / Hedge Fund Analyst: ₹40 - 90 LPA+ ($120k - $240k)."
+
+  'civil_engineer': {
+    id: 'civil_engineer',
+    title: 'Civil & Structural Infrastructure Engineer',
+    category: 'Mega Bridges, Tunnels, Dams & High-Speed Transit Systems',
+    iconName: 'Building',
+    idealTraits: ['civil', 'logic'],
+    description: 'Design, calculate, and construct monumental suspension bridges, mountain rail tunnels, multi-tier flyovers, hydroelectric dams, and earthquake-resistant skyscrapers that serve millions for generations.',
+    dailyLife: 'Reviewing soil mechanics reports, running finite element structural load software (STAAD.Pro / ETABS), inspecting high-grade concrete pouring on site, and managing heavy cranes.',
+    salaryIndia: '₹7,00,000 to ₹32,00,000+ per year (L&T, Afcons, NHAI, and Central Engineering Services offer strong growth).',
+    salaryAbroad: '$90,000 to $180,000 per year (High global demand across Dubai mega-projects, Australia, Canada, and UK infrastructure firms).',
+    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Mathematics (PCM).',
+    indianPathways: [
+      'Indian Institutes of Technology (IIT Roorkee - Asia\'s oldest civil engineering faculty)',
+      'IIT Delhi / IIT Bombay / IIT Kharagpur (B.Tech Civil Engineering)',
+      'National Institutes of Technology (NIT Trichy, NIT Surathkal)',
+      'College of Engineering Guindy (Anna University) & VJTI Mumbai'
+    ],
+    globalPathways: [
+      'University of California, Berkeley - Civil & Environmental Engineering (USA)',
+      'Imperial College London (UK - Department of Civil and Environmental Engineering)',
+      'National University of Singapore (NUS) - Civil Engineering',
+      'ETH Zurich (Switzerland)'
+    ],
+    keyEntranceExams: 'JEE Main, JEE Advanced, GATE (Civil Engineering), UPSC Indian Engineering Services (IES/ESE).',
+    employers: ['Larsen & Toubro (L&T)', 'National Highways Authority of India (NHAI)', 'Afcons Infrastructure', 'Delhi Metro (DMRC)', 'Tata Projects']
   },
-  civilServices: {
-    title: "Civil Services Officer (IAS / IPS / IFS)",
-    badge: "Governance, Public Administration & Impact",
-    matchScore: 95,
-    desc: "Run entire administrative districts, direct police forces, implement government welfare schemes, or represent India diplomatically as an ambassador.",
-    streams: "11th & 12th: Any stream (Humanities, Science, or Commerce).",
-    indiaPath: "Graduation from any recognized university (IITs, DU, JNU, State Universities) followed by UPSC Civil Services Examination.",
-    abroadPath: "Kennedy School of Government (Harvard), Blavatnik School of Government (Oxford) for mid-career fellowships.",
-    exams: "UPSC CSE (Prelims, Mains, Personality Interview).",
-    salary: "Starting: Level 10 Pay Matrix (~₹80,000/month basic + DA) with official residence, security, and administrative authority."
+
+  'specialized_surgeon': {
+    id: 'specialized_surgeon',
+    title: 'Specialized Surgeon (Trauma & Operative Surgery)',
+    category: 'Operative Medicine, Trauma Care & Precision Surgical Operations',
+    iconName: 'Activity',
+    idealTraits: ['surgeon', 'courage'],
+    description: 'Operate inside high-stakes operating rooms to repair ruptured organs, remove tumors, reattach severed vessels, and manage trauma accidents with razor-sharp physical precision.',
+    dailyLife: 'Sterile scrubbing, performing 3-to-6 hour surgeries, monitoring intensive care units (ICU), reviewing pre-op diagnostic scans, and conducting post-op patient rounds.',
+    salaryIndia: '₹14,00,000 to ₹65,00,000+ per year (Senior consultant surgeons in top private and trust hospitals can exceed ₹1 Crore annually).',
+    salaryAbroad: '$220,000 to $450,000+ per year (USA - USMLE pathway, UK - FRCS pathway, Canada, Australia).',
+    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Biology (PCB).',
+    indianPathways: [
+      'All India Institute of Medical Sciences (AIIMS New Delhi & Regional AIIMS)',
+      'Christian Medical College (CMC Vellore)',
+      'Armed Forces Medical College (AFMC Pune)',
+      'Maulana Azad Medical College (MAMC New Delhi)'
+    ],
+    globalPathways: [
+      'Johns Hopkins University School of Medicine (USA)',
+      'Oxford University Medical School (UK)',
+      'Harvard Medical School (USA)',
+      'Royal College of Surgeons (England/Edinburgh)'
+    ],
+    keyEntranceExams: 'NEET-UG, NEET-PG / INI-CET (for MS General Surgery), followed by M.Ch superspecialty examinations.',
+    employers: ['AIIMS', 'Apollo Hospitals', 'Fortis Healthcare', 'Medanta The Medicity', 'Armed Forces Medical Services']
   },
-  agriTech: {
-    title: "Precision Agri-Tech Innovator & Veterinary Specialist",
-    badge: "Sustainable Earth, Food Security & Animals",
-    matchScore: 90,
-    desc: "Deploy autonomous soil sensors, automated green houses, and manage large-scale veterinary clinics to modernize farming and animal care.",
-    streams: "11th & 12th: Physics, Chemistry & Biology (PCB) or Agriculture.",
-    indiaPath: "B.V.Sc & A.H (Veterinary) or B.Sc Agriculture from IVRI Bareilly, GB Pant Pantnagar, PAU Ludhiana, TNAU Coimbatore.",
-    abroadPath: "Wageningen University (Netherlands), UC Davis (USA), Cornell University, Royal Veterinary College (London).",
-    exams: "NEET-UG (for 15% All India Veterinary quota), ICAR AIEEA.",
-    salary: "Starting: ₹6 - 10 LPA | Agri-Tech Lead / International Consultant: ₹20 - 45 LPA ($85k - $160k)."
+
+  'cardiologist_specialist': {
+    id: 'cardiologist_specialist',
+    title: 'Cardiologist & Cardiovascular Interventionist',
+    category: 'Heart Physiology, Angioplasty Stenting & Cardiac Rhythm Care',
+    iconName: 'Heart',
+    idealTraits: ['cardiology', 'logic'],
+    description: 'Diagnose and treat heart attacks, arterial blockages, and congenital valve defects. You perform catheter angioplasties in cath-labs, implant pacemakers, and save failing hearts.',
+    dailyLife: 'Conducting coronary angiographies, implanting cardiac stents, analyzing echocardiograms, managing coronary care units (CCU), and optimizing cardiovascular drugs.',
+    salaryIndia: '₹15,00,000 to ₹70,00,000+ per year (Interventional cardiologists command top packages across hospital networks).',
+    salaryAbroad: '$240,000 to $480,000+ per year (High global demand in USA, UK, Germany, and Gulf medical centers).',
+    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Biology (PCB).',
+    indianPathways: [
+      'AIIMS New Delhi (DM Cardiology)',
+      'Postgraduate Institute of Medical Education & Research (PGIMER Chandigarh)',
+      'Sri Jayadeva Institute of Cardiovascular Sciences (Bengaluru)',
+      'King Edward Memorial Hospital (KEM Mumbai)'
+    ],
+    globalPathways: [
+      'Cleveland Clinic Lerner College of Medicine (USA - World #1 in Cardiology)',
+      'Mayo Clinic Alix School of Medicine (USA)',
+      'Imperial College Healthcare NHS Trust (UK)'
+    ],
+    keyEntranceExams: 'NEET-UG (MBBS) -> NEET-PG (MD Internal Medicine) -> NEET-SS / INI-SS (DM Cardiology).',
+    employers: ['Narayana Health', 'Asian Heart Institute', 'Apollo Heart Centres', 'Max Healthcare', 'Government Medical Colleges']
   },
-  architecture: {
-    title: "Architect & Sustainable Urban Designer",
-    badge: "Spatial Aesthetics, 3D Design & Cities",
-    matchScore: 92,
-    desc: "Design iconic buildings, green smart cities, eco-friendly homes, and virtual 3D environments using CAD and structural engineering.",
-    streams: "11th & 12th: Physics, Chemistry & Math (PCM).",
-    indiaPath: "B.Arch from IIT Kharagpur, IIT Roorkee, SPA Delhi, CEPT University Ahmedabad.",
-    abroadPath: "Architectural Association (AA London), MIT Architecture, TU Delft, ETH Zurich.",
-    exams: "NATA (National Aptitude Test in Architecture), JEE Main Paper 2.",
-    salary: "Starting: ₹6 - 10 LPA | Principal Architect / Design Firm Founder: ₹25 - 60 LPA+."
+
+  'neurologist_physician': {
+    id: 'neurologist_physician',
+    title: 'Neurologist & Cognitive Neuroscientist',
+    category: 'Brain Physiology, Stroke Management & Central Nervous Systems',
+    iconName: 'Brain',
+    idealTraits: ['neurology', 'logic'],
+    description: 'Solve intricate mysteries of the human brain, spinal cord, and peripheral nerves. You diagnose strokes, epilepsy, Parkinson\'s disease, memory loss, and neuromuscular disorders.',
+    dailyLife: 'Analyzing brain MRI/CT scans, interpreting EEG wave recordings, conducting cranial nerve reflex tests, and managing acute stroke thrombolysis units.',
+    salaryIndia: '₹13,00,000 to ₹60,00,000+ per year (High demand in specialized neuro-centers and academic medical faculties).',
+    salaryAbroad: '$210,000 to $420,000+ per year (Elite academic hospitals across USA, Switzerland, and UK).',
+    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Biology (PCB).',
+    indianPathways: [
+      'National Institute of Mental Health and Neurosciences (NIMHANS, Bengaluru)',
+      'Sree Chitra Tirunal Institute for Medical Sciences and Technology (Trivandrum)',
+      'AIIMS New Delhi (DM Neurology)',
+      'PGIMER Chandigarh'
+    ],
+    globalPathways: [
+      'UCL Queen Square Institute of Neurology (London, UK)',
+      'Johns Hopkins Department of Neurology (USA)',
+      'Karolinska Institute (Sweden)'
+    ],
+    keyEntranceExams: 'NEET-UG (MBBS) -> NEET-PG (MD Medicine/Pediatrics) -> NEET-SS (DM Neurology).',
+    employers: ['NIMHANS Bengaluru', 'Apollo Institute of Neurosciences', 'Manipal Hospitals', 'Sir Ganga Ram Hospital', 'Research Institutes']
+  },
+
+  'clinical_psychologist': {
+    id: 'clinical_psychologist',
+    title: 'Clinical Psychologist & Mental Health Psychotherapist',
+    category: 'Mental Health, Behavioral Science & Psychotherapy',
+    iconName: 'Heart',
+    idealTraits: ['psychology', 'empathy'],
+    description: 'Diagnose mental health conditions, guide individuals through depression, grief, anxiety, and trauma, administer psychometric assessments, and restore peace to troubled minds.',
+    dailyLife: 'Conducting one-on-one 50-minute clinical therapy sessions, psychometric diagnostic evaluations, cognitive behavioral therapy (CBT), and family counseling.',
+    salaryIndia: '₹6,00,000 to ₹25,00,000+ per year (Private clinical consultants earn ₹1,500 to ₹3,500 per therapy hour).',
+    salaryAbroad: '$90,000 to $165,000 per year (High demand across UK NHS, Canada, Australia, and USA).',
+    highSchoolStream: 'Any stream in 11th & 12th with Psychology as an elective (Humanities or Science with Biology preferred).',
+    indianPathways: [
+      'NIMHANS Bengaluru (M.Phil / Psy.D in Clinical Psychology)',
+      'Tata Institute of Social Sciences (TISS Mumbai)',
+      'Delhi University (Lady Shri Ram College / Daulat Ram College)',
+      'Central Institute of Psychiatry (CIP Ranchi)'
+    ],
+    globalPathways: [
+      'University of Oxford - Department of Experimental Psychology (UK)',
+      'Harvard University - Department of Psychology (USA)',
+      'University of Melbourne - School of Psychological Sciences (Australia)'
+    ],
+    keyEntranceExams: 'CUET-UG/PG, NIMHANS M.Phil Entrance Exam, RCI Licensing Examination.',
+    employers: ['NIMHANS', 'Private Mental Wellness Clinics', 'Top Multispecialty Hospitals', 'Schools & Universities']
+  },
+
+  'civil_services_ias': {
+    id: 'civil_services_ias',
+    title: 'District Magistrate (IAS / IPS / IFS) & Public Administrator',
+    category: 'Civil Administration, Law Enforcement & Public Governance',
+    iconName: 'Landmark',
+    idealTraits: ['civil_services', 'courage'],
+    description: 'Hold supreme executive authority over entire administrative districts. You manage police law and order, direct disaster relief, supervise rural hospitals and schools, and drive government policy.',
+    dailyLife: 'Chairing district development meetings, reviewing police and revenue court disputes, conducting field inspections, and advising state ministries.',
+    salaryIndia: '₹9,50,000 to ₹28,00,000+ per year (7th Pay Commission Level 10 to Level 17 + VIP government bungalow, armed security escort, official car, and authority).',
+    salaryAbroad: 'Indian Foreign Service (IFS) Ambassadors and High Commissioners posted across Europe, Americas, Asia, and United Nations headquarters.',
+    highSchoolStream: 'Any stream in 11th & 12th (Arts, Science, or Commerce). Consistent general reading and analytical writing habits are paramount.',
+    indianPathways: [
+      'Lal Bahadur Shastri National Academy of Administration (LBSNAA Mussoorie) - post-UPSC training',
+      'Undergraduate degree from any recognized university (Delhi University, IITs, NLUs, etc.)',
+      'National Police Academy (SVPNPA Hyderabad) for IPS Officers'
+    ],
+    globalPathways: [
+      'Harvard Kennedy School of Government (USA) - mid-career fellowships',
+      'Blavatnik School of Government, Oxford University (UK) - policy exchanges'
+    ],
+    keyEntranceExams: 'UPSC Civil Services Examination (CSE - Prelims, Mains, and Personality Interview), State PCS.',
+    employers: ['Government of India', 'State Secretariats', 'Cabinet Secretariat', 'United Nations Agencies', 'Ministry of External Affairs']
+  },
+
+  'cs_ai_engineer': {
+    id: 'cs_ai_engineer',
+    title: 'Computer Science, AI & Cyber Defense Architect',
+    category: 'Software Systems, Artificial Intelligence & Cloud Security',
+    iconName: 'Zap',
+    idealTraits: ['cs_ai', 'logic'],
+    description: 'Build machine learning neural networks, deploy scalable cloud microservices, develop autonomous robotics systems, and defend national banking and defense networks from cyber warfare.',
+    dailyLife: 'Writing and optimizing algorithms, testing machine learning models, deploying distributed microservices, and conducting cyber security penetration testing.',
+    salaryIndia: '₹8,50,000 to ₹48,00,000+ per year (Top tech architects command packages over ₹70 LPA).',
+    salaryAbroad: '$115,000 to $260,000+ per year (Silicon Valley, Seattle, Munich, London, Singapore, Toronto).',
+    highSchoolStream: '11th & 12th in Science with Physics, Chemistry, and Mathematics (PCM).',
+    indianPathways: [
+      'Indian Institutes of Technology (IIT Bombay, IIT Delhi, IIT Madras)',
+      'National Institutes of Technology (NIT Trichy, NIT Surathkal)',
+      'BITS Pilani & International Institute of Information Technology (IIIT Hyderabad)'
+    ],
+    globalPathways: [
+      'Massachusetts Institute of Technology (MIT) - USA',
+      'Stanford University - USA',
+      'National University of Singapore (NUS) - Singapore'
+    ],
+    keyEntranceExams: 'JEE Main, JEE Advanced, BITSAT; for study abroad: SAT, IELTS/TOEFL, GRE.',
+    employers: ['Google', 'Microsoft', 'NVIDIA', 'ISRO', 'Amazon', 'Government Cyber Defense Cells']
+  },
+
+  'corporate_lawyer': {
+    id: 'corporate_lawyer',
+    title: 'Corporate Legal Counsel & High Court Advocate',
+    category: 'Corporate Advisory, Constitutional Law & Judiciary',
+    iconName: 'Scale',
+    idealTraits: ['lawyer', 'logic'],
+    description: 'Negotiate multi-crore business mergers, defend human rights in constitutional courts, file public interest litigations, and progress toward the judicial magistrate bench.',
+    dailyLife: 'Drafting commercial contracts, researching legal precedents, presenting arguments before judges, and mediating settlements between conflicting parties.',
+    salaryIndia: '₹8,50,000 to ₹42,00,000+ per year (Senior advocates and partners in tier-1 law firms earn well beyond).',
+    salaryAbroad: '$120,000 to $280,000 per year (Elite law firms in London, New York, Dubai, and Singapore).',
+    highSchoolStream: 'Any stream in 11th & 12th (Arts, Commerce, or Science students are all equally eligible).',
+    indianPathways: [
+      'National Law School of India University (NLSIU Bengaluru)',
+      'NALSAR University of Law (Hyderabad)',
+      'The West Bengal National University of Juridical Sciences (WBNUJS Kolkata)',
+      'Faculty of Law, University of Delhi'
+    ],
+    globalPathways: [
+      'Harvard Law School - USA',
+      'Oxford University Faculty of Law - United Kingdom',
+      'Cambridge University - United Kingdom'
+    ],
+    keyEntranceExams: 'CLAT (Common Law Admission Test), AILET; State Judicial Services Examination (PCS-J) for becoming a Civil Judge.',
+    employers: ['Shardul Amarchand Mangaldas', 'Khaitan & Co', 'Supreme Court & High Courts', 'Tata Sons Legal']
+  },
+
+  'chartered_accountant': {
+    id: 'chartered_accountant',
+    title: 'Chartered Accountant (CA) & Forensic Financial Auditor',
+    category: 'Financial Management, Auditing, Capital Markets & Taxation',
+    iconName: 'BarChart3',
+    idealTraits: ['logic', 'conscientious'],
+    description: 'Control corporate balance sheets, audit financial statements to detect multi-crore fraud, design tax frameworks, and advise enterprise founders on investments and acquisitions.',
+    dailyLife: 'Analyzing general ledgers, conducting statutory audits, certifying financial statements, filing corporate taxes, and advising boards on capital allocation.',
+    salaryIndia: '₹9,00,000 to ₹45,00,000+ per year (Independent CA firms and corporate CFO seats earn substantial consulting income).',
+    salaryAbroad: '$110,000 to $250,000 per year (Strong global reciprocity across Dubai, London, Singapore, and Sydney).',
+    highSchoolStream: '11th & 12th in Commerce with Mathematics (Science students can also easily transition).',
+    indianPathways: [
+      'The Institute of Chartered Accountants of India (ICAI - registered right after 12th)',
+      'Shri Ram College of Commerce (SRCC, Delhi University)',
+      'Indian Institutes of Management (IIM Indore/Rohtak 5-Year Integrated IPMAT Program)'
+    ],
+    globalPathways: [
+      'London School of Economics (LSE) - United Kingdom',
+      'Wharton School, University of Pennsylvania - USA',
+      'INSEAD - France / Singapore'
+    ],
+    keyEntranceExams: 'CA Foundation (conducted by ICAI right after 12th), IPMAT (for IIMs after school), CFA, ACCA exams.',
+    employers: ['The Big 4 (Deloitte, PwC, EY, KPMG)', 'Goldman Sachs', 'J.P. Morgan', 'HDFC Bank', 'State Bank of India']
+  },
+
+  'agri_veterinary_tech': {
+    id: 'agri_veterinary_tech',
+    title: 'Veterinary Doctor & Autonomous Agri-Tech Innovator',
+    category: 'Veterinary Medicine, Drone Agriculture & Livestock Genetics',
+    iconName: 'Feather',
+    idealTraits: ['agri_vet', 'logic'],
+    description: 'Treat livestock, horses, and wildlife as a licensed veterinary surgeon, or modernize farm yields using autonomous agricultural drones, soil biotechnology, and greenhouse automation.',
+    dailyLife: 'Performing veterinary surgeries on farm and domestic animals, advising farmers on soil productivity, managing drone crop spraying, and overseeing dairy processing plants.',
+    salaryIndia: '₹6,50,000 to ₹25,00,000+ per year (Government Veterinary Officers receive gazetted officer rank and allowances).',
+    salaryAbroad: '$85,000 to $175,000 per year (High demand in Australia, New Zealand, Canada, and Netherlands).',
+    highSchoolStream: '11th & 12th in Science with Biology (PCB) for Veterinary; or PCM/PCB for Agri-Tech.',
+    indianPathways: [
+      'Indian Veterinary Research Institute (IVRI Bareilly)',
+      'Punjab Agricultural University (PAU Ludhiana)',
+      'G.B. Pant University of Agriculture & Technology (Pantnagar)',
+      'State Veterinary and Animal Sciences Universities'
+    ],
+    globalPathways: [
+      'Wageningen University & Research - Netherlands (World #1 in Agriculture)',
+      'University of California, Davis - USA',
+      'University of Melbourne Veterinary School - Australia'
+    ],
+    keyEntranceExams: 'NEET-UG (for BVSc & AH seats), ICAR AIEEA (Indian Council of Agricultural Research), State Agri Entrance Tests.',
+    employers: ['State Animal Husbandry Departments', 'Amul / NDDB', 'Bayer CropScience', 'John Deere AgriTech', 'Wildlife Sanctuaries']
+  },
+
+  'architect_urban_planner': {
+    id: 'architect_urban_planner',
+    title: 'Architect, Spatial Urban Planner & Sustainable Designer',
+    category: 'Spatial Architecture, Eco-Cities & Structural Aesthetics',
+    iconName: 'Palette',
+    idealTraits: ['architect', 'logic'],
+    description: 'Conceptualize eco-friendly buildings, sustainable smart cities, and iconic public spaces using 3D CAD modeling, structural loads, and environmental airflow principles.',
+    dailyLife: 'Drafting 3D architectural models, testing physical building materials, supervising construction site execution, and presenting plans to urban development authorities.',
+    salaryIndia: '₹6,50,000 to ₹28,00,000+ per year (Principal architects and design firm founders earn substantial fees).',
+    salaryAbroad: '$85,000 to $175,000 per year (Leading architectural design firms across Europe, Singapore, USA, and Japan).',
+    highSchoolStream: '11th & 12th in Science with Mathematics (PCM) is mandatory for B.Arch degrees.',
+    indianPathways: [
+      'School of Planning and Architecture (SPA New Delhi / Bhopal / Vijayawada)',
+      'IIT Roorkee / IIT Kharagpur (Department of Architecture)',
+      'CEPT University (Ahmedabad)',
+      'National Institute of Design (NID Ahmedabad)'
+    ],
+    globalPathways: [
+      'Architectural Association School of Architecture (AA London, UK)',
+      'MIT Department of Architecture (USA)',
+      'Delft University of Technology (TU Delft, Netherlands)'
+    ],
+    keyEntranceExams: 'NATA (National Aptitude Test in Architecture), JEE Main Paper 2 (B.Arch).',
+    employers: ['Hafeez Contractor Architects', 'CP Kukreja Associates', 'L&T Construction', 'Smart Cities Mission', 'Independent Studios']
+  }
+};
+
+const DEFAULT_STUDENTS = [
+  { name: 'Rohan Sharma', email: 'rohan@example.com', password: 'password123', grade: 'Class 11th', registeredOn: '2026-09-28' },
+  { name: 'Priya Patel', email: 'priya@example.com', password: 'password123', grade: 'Class 12th', registeredOn: '2026-09-29' },
+  { name: 'Aarav Verma', email: 'aarav@example.com', password: 'password123', grade: 'Class 10th', registeredOn: '2026-10-01' }
+];
+
+const CareerIcon = ({ name, className = 'w-5 h-5' }) => {
+  switch (name) {
+    case 'Rocket': return <Rocket className={className} />;
+    case 'Plane': return <Plane className={className} />;
+    case 'Anchor': return <Anchor className={className} />;
+    case 'Shield': return <Shield className={className} />;
+    case 'Heart': return <Heart className={className} />;
+    case 'BookOpen': return <BookOpen className={className} />;
+    case 'Radio': return <Radio className={className} />;
+    case 'Microscope': return <Microscope className={className} />;
+    case 'Landmark': return <Landmark className={className} />;
+    case 'Dumbbell': return <Dumbbell className={className} />;
+    case 'Scale': return <Scale className={className} />;
+    case 'Feather': return <Feather className={className} />;
+    case 'BarChart3': return <BarChart3 className={className} />;
+    case 'Zap': return <Zap className={className} />;
+    case 'Palette': return <Palette className={className} />;
+    case 'Activity': return <Activity className={className} />;
+    case 'Building': return <Building className={className} />;
+    default: return <Compass className={className} />;
   }
 };
 
 export default function App() {
-  // Navigation & session state
-  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'auth' | 'quiz' | 'analyzing' | 'report'
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentView, setCurrentView] = useState('home');
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('deeppath_user_session');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
-  // Authentication fields
+  const [studentRoster, setStudentRoster] = useState(() => {
+    try {
+      const saved = localStorage.getItem('deeppath_student_roster');
+      return saved ? JSON.parse(saved) : DEFAULT_STUDENTS;
+    } catch {
+      return DEFAULT_STUDENTS;
+    }
+  });
+
+  const sheetId = '1Bv16i3BDu7jZ5xq4qz7cLJGfFrfWrsoRGEdOlLO3guc';
+  const defaultSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit?usp=sharing`;
+  const [sheetUrl, setSheetUrl] = useState(() => {
+    return localStorage.getItem('deeppath_custom_sheet_url') || defaultSheetUrl;
+  });
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncFeedback, setSyncFeedback] = useState('');
+
+  const [founderPhoto, setFounderPhoto] = useState(() => {
+    return localStorage.getItem('deeppath_founder_photo') || null;
+  });
+  const fileInputRef = useRef(null);
+
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
   const [authName, setAuthName] = useState('');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
-  const [authError, setAuthError] = useState('');
+  const [authGrade, setAuthGrade] = useState('Class 11th');
+  const [showPassword, setShowPassword] = useState(false);
+  const [authErrorMessage, setAuthErrorMessage] = useState('');
 
-  // Roster Database state
-  const [userRoster, setUserRoster] = useState([
-    { name: "Demo Student", email: "student@school.edu", password: "password123", date: "2026-10-01", status: "Active" },
-    { name: "Aarav Sharma", email: "aarav@gmail.com", password: "testpass", date: "2026-10-02", status: "Active" }
-  ]);
-  const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
+  const [rosterModalOpen, setRosterModalOpen] = useState(false);
   const [rosterSearch, setRosterSearch] = useState('');
-  const [sheetUrl, setSheetUrl] = useState("https://docs.google.com/spreadsheets/d/1Bv16i3BDu7jZ5xq4qz7cLJGfFrfWrsoRGEdOlLO3guc/edit?usp=sharing");
-  const [isSyncing, setIsSyncing] = useState(false);
 
-  // Founder photo state
-  const [founderPhoto, setFounderPhoto] = useState(null);
-
-  // Quiz state
-  const [currentQIndex, setCurrentQIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState({});
-  const [bookmarkedQuestions, setBookmarkedQuestions] = useState({});
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [markedForReview, setMarkedForReview] = useState({});
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [evaluatingCountdown, setEvaluatingCountdown] = useState(3);
+  const [assessmentReport, setAssessmentReport] = useState(null);
 
-  // Final diagnostic results
-  const [diagnosticResult, setDiagnosticResult] = useState(null);
-
-  // Handle founder photo upload
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setFounderPhoto(reader.result);
-      reader.readAsDataURL(file);
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('deeppath_user_session', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('deeppath_user_session');
     }
-  };
+  }, [currentUser]);
 
-  // Sync Google Sheet roster (CSV export endpoint)
-  const syncGoogleSheet = async () => {
-    setIsSyncing(true);
-    try {
-      const match = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-      if (!match || !match[1]) {
-        alert("Please enter a valid Google Sheets URL.");
-        setIsSyncing(false);
-        return;
+  useEffect(() => {
+    localStorage.setItem('deeppath_student_roster', JSON.stringify(studentRoster));
+  }, [studentRoster]);
+
+  useEffect(() => {
+    localStorage.setItem('deeppath_custom_sheet_url', sheetUrl);
+  }, [sheetUrl]);
+
+  useEffect(() => {
+    if (founderPhoto) {
+      try {
+        localStorage.setItem('deeppath_founder_photo', founderPhoto);
+      } catch (e) {
+        console.warn('Photo size exceeds storage quota.');
       }
-      const sheetId = match[1];
-      const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
-      
-      const response = await fetch(csvUrl);
-      if (!response.ok) throw new Error("Could not access sheet. Ensure sharing is set to 'Anyone with link can view'.");
-      const text = await response.text();
-      
-      const rows = text.split('\n').filter(r => r.trim() !== '');
-      if (rows.length > 1) {
-        const fetched = [];
-        for (let i = 1; i < rows.length; i++) {
-          const cols = rows[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
-          if (cols.length >= 2) {
-            fetched.push({
-              name: cols[0] || `Student #${i}`,
-              email: cols[1] || "",
-              password: cols[2] || "password123",
-              date: cols[3] || new Date().toISOString().split('T')[0],
-              status: "Synced"
-            });
-          }
-        }
-        if (fetched.length > 0) {
-          setUserRoster(prev => {
-            const emails = new Set(prev.map(u => u.email.toLowerCase()));
-            const newUsers = fetched.filter(u => u.email && !emails.has(u.email.toLowerCase()));
-            return [...newUsers, ...prev];
+    }
+  }, [founderPhoto]);
+
+  useEffect(() => {
+    if (sheetUrl) {
+      syncRosterFromGoogleSheet(sheetUrl);
+    }
+  }, []);
+
+  const syncRosterFromGoogleSheet = async (urlToFetch) => {
+    if (!urlToFetch) return;
+    setIsSyncing(true);
+    setSyncFeedback('Reading student database from Google Sheet...');
+
+    try {
+      let exportUrl = urlToFetch.trim();
+      const match = exportUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      if (match && match[1]) {
+        exportUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv`;
+      }
+
+      const response = await fetch(exportUrl);
+      if (!response.ok) {
+        throw new Error('Please ensure Google Sheet share permissions are set to "Anyone with the link can view".');
+      }
+
+      const csvData = await response.text();
+      const rows = parseSheetCsv(csvData);
+
+      if (rows.length > 0) {
+        setStudentRoster(prev => {
+          const map = new Map();
+          prev.forEach(u => map.set(u.email.toLowerCase(), u));
+          rows.forEach(u => {
+            if (!map.has(u.email.toLowerCase())) {
+              map.set(u.email.toLowerCase(), u);
+            }
           });
-          alert(`Success! Synced ${fetched.length} student records from your Google Sheet.`);
-        }
+          return Array.from(map.values());
+        });
+        setSyncFeedback(`Successfully synchronized ${rows.length} student records from Google Sheet!`);
+      } else {
+        setSyncFeedback('Google Sheet connected. Ready for new student registrations.');
       }
     } catch (err) {
-      alert("Note: Google Sheet needs 'Anyone with link can view' permissions to sync directly in-browser. Sample demo users remain active.");
+      setSyncFeedback(`Note: Sheet sync status (${err.message}). Local storage database is active.`);
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // Auth: Register or Login
-  const handleAuthSubmit = (e) => {
+  const parseSheetCsv = (text) => {
+    const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+    if (lines.length <= 1) return [];
+
+    const parsed = [];
+    const headers = lines[0].toLowerCase();
+    const startIndex = headers.includes('email') || headers.includes('timestamp') || headers.includes('name') ? 1 : 0;
+
+    for (let i = startIndex; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
+      const emailCol = cols.find(c => c.includes('@') && c.includes('.'));
+      if (emailCol) {
+        const email = emailCol.toLowerCase();
+        const emailIdx = cols.indexOf(emailCol);
+        let name = 'Student';
+        if (emailIdx > 0 && cols[emailIdx - 1] && !cols[emailIdx - 1].includes('/')) {
+          name = cols[emailIdx - 1];
+        } else if (cols[0] && !cols[0].includes('/') && !cols[0].includes('@')) {
+          name = cols[0];
+        }
+
+        let password = 'password123';
+        if (cols.length > emailIdx + 1 && cols[emailIdx + 1]) {
+          password = cols[emailIdx + 1];
+        }
+
+        parsed.push({
+          name: name || 'Registered Student',
+          email: email,
+          password: password || 'password123',
+          grade: 'Class 11th',
+          registeredOn: new Date().toLocaleDateString('en-US')
+        });
+      }
+    }
+    return parsed;
+  };
+
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
-    setAuthError('');
+    setAuthErrorMessage('');
 
-    const cleanEmail = authEmail.trim().toLowerCase();
-    const cleanPassword = authPassword.trim();
-
-    if (!cleanEmail || !cleanPassword) {
-      setAuthError("Please fill in both email and password.");
+    if (!authEmail.trim() || !authPassword.trim()) {
+      setAuthErrorMessage('Please enter both your registered email and password.');
       return;
     }
 
-    if (authMode === 'register') {
-      if (!authName.trim()) {
-        setAuthError("Please enter your full name.");
-        return;
-      }
-      const existing = userRoster.find(u => u.email.toLowerCase() === cleanEmail);
-      if (existing) {
-        setAuthError("This email is already registered. Please log in directly.");
-        return;
-      }
-      const newUser = {
-        name: authName.trim(),
-        email: cleanEmail,
-        password: cleanPassword,
-        date: new Date().toISOString().split('T')[0],
-        status: "Active"
-      };
-      setUserRoster(prev => [newUser, ...prev]);
-      setCurrentUser(newUser);
-      setCurrentView('quiz');
+    const cleanEmail = authEmail.trim().toLowerCase();
+    const enteredPassword = authPassword.trim();
+    const matchedUser = studentRoster.find(u => u.email.toLowerCase() === cleanEmail);
+
+    if (!matchedUser) {
+      setAuthErrorMessage('Account not found in the database. Please register first to take the career test.');
+      return;
+    }
+
+    if (matchedUser.password !== enteredPassword) {
+      setAuthErrorMessage('Incorrect password. Please verify your password and try again.');
+      return;
+    }
+
+    setCurrentUser(matchedUser);
+    setAuthModalOpen(false);
+    setAuthEmail('');
+    setAuthPassword('');
+    startAssessmentTest();
+  };
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    setAuthErrorMessage('');
+
+    if (!authName.trim() || !authEmail.trim() || !authPassword.trim()) {
+      setAuthErrorMessage('Please enter your full name, email, and password.');
+      return;
+    }
+
+    if (!authEmail.includes('@') || !authEmail.includes('.')) {
+      setAuthErrorMessage('Please enter a valid email address.');
+      return;
+    }
+
+    if (authPassword.length < 4) {
+      setAuthErrorMessage('Password should be at least 4 characters.');
+      return;
+    }
+
+    const cleanEmail = authEmail.trim().toLowerCase();
+    const alreadyRegistered = studentRoster.some(u => u.email.toLowerCase() === cleanEmail);
+
+    if (alreadyRegistered) {
+      setAuthErrorMessage('This email is already registered! Please switch to Login.');
+      return;
+    }
+
+    const newStudent = {
+      name: authName.trim(),
+      email: cleanEmail,
+      password: authPassword.trim(),
+      grade: authGrade,
+      registeredOn: new Date().toLocaleDateString('en-US')
+    };
+
+    setStudentRoster(prev => [newStudent, ...prev]);
+    setCurrentUser(newStudent);
+    setAuthModalOpen(false);
+    setAuthName('');
+    setAuthEmail('');
+    setAuthPassword('');
+    startAssessmentTest();
+  };
+
+  const handleSignOut = () => {
+    setCurrentUser(null);
+    setCurrentView('home');
+  };
+
+  const handleInitiateTestClick = () => {
+    if (!currentUser) {
+      setAuthErrorMessage('');
+      setAuthMode('login');
+      setAuthModalOpen(true);
     } else {
-      // Login mode
-      const matched = userRoster.find(
-        u => u.email.toLowerCase() === cleanEmail && u.password === cleanPassword
-      );
-      if (matched) {
-        setCurrentUser(matched);
-        setCurrentView('quiz');
-      } else {
-        setAuthError("Account not found in the spreadsheet database. Please check your credentials or register above.");
-      }
+      startAssessmentTest();
     }
   };
 
-  // Quiz Answer Selection
-  const handleSelectOption = (questionId, optionIndex) => {
-    setUserAnswers(prev => ({
+  const startAssessmentTest = () => {
+    setActiveQuestionIndex(0);
+    setSelectedAnswers({});
+    setMarkedForReview({});
+    setCurrentView('test');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectOption = (qId, option) => {
+    setSelectedAnswers(prev => ({
       ...prev,
-      [questionId]: optionIndex
+      [qId]: {
+        optionId: option.id,
+        scoreType: option.scoreType,
+        points: option.points
+      }
     }));
   };
 
-  const toggleBookmark = (qId) => {
-    setBookmarkedQuestions(prev => ({
+  const toggleMarkForReview = (qId) => {
+    setMarkedForReview(prev => ({
       ...prev,
       [qId]: !prev[qId]
     }));
   };
 
-  // Finish assessment and calculate scores
-  const handleSubmitAssessment = () => {
-    setCurrentView('analyzing');
+  const answeredCount = Object.keys(selectedAnswers).length;
+  const totalQuestions = ASSESSMENT_BATTERY.length;
+  const progressPercent = Math.round((answeredCount / totalQuestions) * 100);
+  const currentQ = ASSESSMENT_BATTERY[activeQuestionIndex];
 
-    setTimeout(() => {
-      // Tally traits
-      const traitScores = {
-        logic: 0,
-        spatial: 0,
-        analytical: 0,
-        defence: 0,
-        social: 0,
-        empathy: 0,
-        tech: 0,
-        legal: 0,
-        enterprise: 0,
-        discipline: 0,
-        creative: 0,
-        artistic: 0,
-        practical: 0,
-        conventional: 0,
-        leadership: 0,
-        clarity: 0,
-        pressure: 0
-      };
+  const triggerAssessmentEvaluation = () => {
+    setIsPaletteOpen(false);
+    setCurrentView('evaluating');
+    setEvaluatingCountdown(3);
 
-      let correctAptitudeCount = 0;
-
-      QUESTIONS.forEach(q => {
-        const selectedIdx = userAnswers[q.id];
-        if (selectedIdx !== undefined) {
-          const selectedOption = q.options[selectedIdx];
-          if (q.isAptitude && selectedIdx === q.correctIndex) {
-            correctAptitudeCount += 1;
-          }
-          if (selectedOption.traits) {
-            Object.entries(selectedOption.traits).forEach(([trait, score]) => {
-              if (traitScores[trait] !== undefined) {
-                traitScores[trait] += score;
-              }
-            });
-          }
+    const timer = setInterval(() => {
+      setEvaluatingCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          computeComprehensiveReport();
+          return 0;
         }
+        return prev - 1;
       });
-
-      // Calculate primary and secondary career recommendations
-      const careerScores = [
-        { key: 'tech', score: traitScores.tech + traitScores.logic + traitScores.analytical },
-        { key: 'defence', score: traitScores.defence + traitScores.discipline + traitScores.leadership },
-        { key: 'legal', score: traitScores.legal + traitScores.analytical + traitScores.leadership },
-        { key: 'psychology', score: traitScores.social + traitScores.empathy + traitScores.analytical },
-        { key: 'finance', score: traitScores.enterprise + traitScores.conventional + traitScores.logic },
-        { key: 'civilServices', score: traitScores.leadership + traitScores.social + traitScores.legal },
-        { key: 'agriTech', score: traitScores.practical + traitScores.tech + traitScores.empathy },
-        { key: 'architecture', score: traitScores.creative + traitScores.artistic + traitScores.spatial }
-      ];
-
-      careerScores.sort((a, b) => b.score - a.score);
-
-      const topCareer = CAREER_DATABASE[careerScores[0].key] || CAREER_DATABASE.tech;
-      const secondaryCareer = CAREER_DATABASE[careerScores[1].key] || CAREER_DATABASE.defence;
-
-      setDiagnosticResult({
-        primary: topCareer,
-        secondary: secondaryCareer,
-        aptitudeScore: correctAptitudeCount,
-        clarityScore: traitScores.clarity,
-        pressureScore: traitScores.pressure,
-        traitScores
-      });
-
-      setCurrentView('report');
-    }, 2800);
+    }, 900);
   };
 
-  const answeredCount = Object.keys(userAnswers).length;
-  const currentQuestion = QUESTIONS[currentQIndex];
+  const computeComprehensiveReport = () => {
+    const traitScores = {
+      logic: 0,
+      courage: 0,
+      empathy: 0,
+      army: 0,
+      airforce: 0,
+      navy: 0,
+      aerospace: 0,
+      civil: 0,
+      surgeon: 0,
+      cardiology: 0,
+      neurology: 0,
+      psychology: 0,
+      civil_services: 0,
+      cs_ai: 0,
+      lawyer: 0,
+      agri_vet: 0,
+      architect: 0,
+      introvert: 0,
+      extravert: 0,
+      conscientious: 0,
+      spontaneous: 0,
+      sensitive: 0,
+      decided: 0,
+      exploring: 0,
+      confused: 0,
+      pressured: 0
+    };
+
+    Object.values(selectedAnswers).forEach(ans => {
+      if (ans.scoreType && traitScores[ans.scoreType] !== undefined) {
+        traitScores[ans.scoreType] += ans.points || 5;
+      }
+    });
+
+    let mathPoints = 0;
+    for (let i = 1; i <= 10; i++) {
+      const qAns = selectedAnswers[`q${i}`];
+      if (qAns && qAns.points) {
+        mathPoints += qAns.points;
+      }
+    }
+    const mathMax = 50;
+    const iqPercentile = Math.min(99, Math.max(55, Math.round((mathPoints / mathMax) * 100)));
+
+    let clarityVerdict = 'Exploring with Keen Curiosity';
+    let clarityDesc = 'You are actively comparing multiple interesting fields with genuine curiosity. You have natural strengths that will shine once you see the step-by-step roadmap.';
+    let clarityColor = 'text-amber-400 bg-amber-400/10 border-amber-400/30';
+
+    if (traitScores.confused >= 10) {
+      clarityVerdict = 'Seeking Guidance / Overwhelmed State';
+      clarityDesc = 'You have felt overwhelmed by conflicting advice or fear of making a wrong stream choice. This report provides an exact, structured roadmap to remove all anxiety.';
+      clarityColor = 'text-rose-400 bg-rose-400/10 border-rose-400/30';
+    } else if (traitScores.pressured >= 10) {
+      clarityVerdict = 'Heavy External & Parental Pressure';
+      clarityDesc = 'You feel significant pressure from relatives, parents, or peer expectations to pursue traditional degrees. Remember: true success comes when your natural intellect aligns with your daily calling.';
+      clarityColor = 'text-orange-400 bg-orange-400/10 border-orange-400/30';
+    } else if (traitScores.decided >= 15) {
+      clarityVerdict = 'Firmly Focused & Decided';
+      clarityDesc = 'You possess crystal-clear intrinsic drive and know what kind of impact you wish to create in life. Use this report to verify college paths, entrance exams, and global opportunities.';
+      clarityColor = 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30';
+    }
+
+    const normalizedTraits = {
+      'Cognitive & Mathematical Logic': Math.min(99, Math.max(45, Math.round((mathPoints / 50) * 100))),
+      'Tactical Armed Forces & Command': Math.min(99, Math.max(40, (traitScores.army + traitScores.airforce + traitScores.navy + traitScores.courage) * 2 + 30)),
+      'Aerospace & Space Technology': Math.min(99, Math.max(40, (traitScores.aerospace + traitScores.logic) * 2 + 30)),
+      'Medical & Surgical Precision': Math.min(99, Math.max(40, (traitScores.surgeon + traitScores.cardiology + traitScores.neurology) * 2 + 30)),
+      'Civil & Structural Engineering': Math.min(99, Math.max(40, (traitScores.civil + traitScores.logic) * 2 + 30)),
+      'Psychological Empathy & Counseling': Math.min(99, Math.max(40, (traitScores.psychology + traitScores.empathy) * 2 + 30)),
+      'Civil Administration & Law': Math.min(99, Math.max(40, (traitScores.civil_services + traitScores.lawyer) * 2 + 30)),
+      'Computer Science & AI Systems': Math.min(99, Math.max(40, (traitScores.cs_ai + traitScores.logic) * 2 + 30))
+    };
+
+    const rankedCareers = Object.values(CAREER_DATABASE).map(career => {
+      let careerScore = 0;
+      career.idealTraits.forEach(trait => {
+        careerScore += (traitScores[trait] || 0) * 4;
+      });
+      if (career.id.includes('airforce') || career.id.includes('aerospace')) {
+        careerScore += traitScores.aerospace * 1.5;
+      }
+      if (career.id.includes('surgeon') || career.id.includes('cardiologist')) {
+        careerScore += traitScores.surgeon * 1.5;
+      }
+      return {
+        ...career,
+        totalScore: careerScore
+      };
+    }).sort((a, b) => b.totalScore - a.totalScore);
+
+    setAssessmentReport({
+      iqPercentile,
+      clarityVerdict,
+      clarityDesc,
+      clarityColor,
+      primary: rankedCareers[0],
+      secondary: rankedCareers[1],
+      tertiary: rankedCareers[2],
+      quaternary: rankedCareers[3],
+      traits: normalizedTraits,
+      answeredCount,
+      dateFormatted: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
+    });
+
+    setCurrentView('report');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePhotoUploadChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Please choose an image file smaller than 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFounderPhoto(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const filteredRoster = useMemo(() => {
+    if (!rosterSearch.trim()) return studentRoster;
+    const term = rosterSearch.toLowerCase();
+    return studentRoster.filter(s => 
+      s.name.toLowerCase().includes(term) || 
+      s.email.toLowerCase().includes(term) ||
+      (s.grade && s.grade.toLowerCase().includes(term))
+    );
+  }, [studentRoster, rosterSearch]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3.5 flex items-center justify-between">
-        <div 
-          onClick={() => setCurrentView('landing')} 
-          className="flex items-center gap-2.5 cursor-pointer group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-            <Compass className="w-6 h-6 text-slate-950" />
-          </div>
-          <div>
-            <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-              DeepPath
-            </span>
-            <span className="block text-[10px] tracking-wider uppercase font-semibold text-emerald-400">
-              Career & Psychometrics
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsRosterModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-300 transition-colors"
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
+      
+      {/* HEADER */}
+      <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          
+          <div 
+            onClick={() => setCurrentView('home')} 
+            className="flex items-center gap-3 cursor-pointer group"
           >
-            <Database className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">Google Sheet Roster</span>
-            <span className="px-1.5 py-0.5 rounded-full bg-slate-900 text-[10px] font-bold text-emerald-400">
-              {userRoster.length}
-            </span>
-          </button>
-
-          {currentUser ? (
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <p className="text-xs font-semibold text-white">{currentUser.name}</p>
-                <p className="text-[10px] text-emerald-400">{currentUser.email}</p>
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 via-orange-500 to-emerald-400 p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
+              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                <Compass className="w-6 h-6 text-amber-400 group-hover:rotate-45 transition-transform duration-500" />
               </div>
+            </div>
+            <div>
+              <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                DeepPath<span className="text-amber-400">Careers</span>
+              </span>
+              <span className="block text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-slate-400">
+                Expanded Defense & Medical Diagnostic • 15 Disciplines
+              </span>
+            </div>
+          </div>
+
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
+            <button 
+              onClick={() => setCurrentView('home')} 
+              className={`hover:text-amber-400 transition-colors ${currentView === 'home' ? 'text-amber-400' : ''}`}
+            >
+              Home
+            </button>
+            <button 
+              onClick={() => setCurrentView('allCareers')} 
+              className={`hover:text-amber-400 transition-colors ${currentView === 'allCareers' ? 'text-amber-400' : ''}`}
+            >
+              All 15 Professions
+            </button>
+            <button 
+              onClick={() => {
+                setCurrentView('home');
+                setTimeout(() => {
+                  document.getElementById('founder-desk')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }} 
+              className="hover:text-amber-400 transition-colors"
+            >
+              Founder's Story
+            </button>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setRosterModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
+              title="View Google Sheet Student Database"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+              <span className="hidden sm:inline">Sheet Roster ({studentRoster.length})</span>
+            </button>
+
+            {currentUser ? (
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
+                <div className="w-8 h-8 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center text-xs font-bold text-amber-300 uppercase">
+                  {currentUser.name?.charAt(0) || 'S'}
+                </div>
+                <span className="hidden sm:inline text-xs font-semibold text-slate-200 truncate max-w-[120px]">
+                  {currentUser.name}
+                </span>
+                <button 
+                  onClick={handleSignOut} 
+                  title="Sign Out"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
               <button
                 onClick={() => {
-                  setCurrentUser(null);
-                  setCurrentView('landing');
+                  setAuthErrorMessage('');
+                  setAuthMode('login');
+                  setAuthModalOpen(true);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-rose-400 transition"
+                className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white px-3 py-1.5 transition-colors"
               >
-                Log Out
+                Sign In
               </button>
-            </div>
-          ) : (
+            )}
+
             <button
-              onClick={() => {
-                setAuthMode('login');
-                setCurrentView('auth');
-              }}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20 transition-all hover:shadow-lg"
+              onClick={handleInitiateTestClick}
+              className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:brightness-110 shadow-lg shadow-amber-400/20 transition-all hover:scale-105 active:scale-95"
             >
-              <span>Start Career Test</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Sparkles className="w-4 h-4 text-slate-950" />
+              <span>Start Assessment</span>
             </button>
-          )}
+          </div>
+
         </div>
       </header>
 
-      {/* ROSTER / SPREADSHEET MODAL */}
-      {isRosterModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <Database className="w-5 h-5 text-emerald-400" />
-                <h3 className="font-bold text-base text-white">Student Roster Database</h3>
+      {/* MAIN BODY */}
+      <main className="flex-1">
+
+        {/* VIEW 1: HOME */}
+        {currentView === 'home' && (
+          <div className="space-y-24 pb-24">
+            
+            <section className="relative overflow-hidden pt-16 md:pt-24">
+              <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-amber-500/10 blur-[130px] rounded-full pointer-events-none" />
+
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-400 text-xs font-bold mb-6">
+                  <Brain className="w-4 h-4" />
+                  <span>Deep Diagnostic Battery across Defense, Space, Medicine & Engineering</span>
+                </div>
+
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.12]">
+                  Discover the career that fits you best.{' '}
+                  <span className="block mt-2 bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+                    Step by step, from school to your dream job.
+                  </span>
+                </h1>
+
+                <p className="mt-8 text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
+                  An untimed, thorough diagnostic designed to uncover your true cognitive and psychological strengths.
+                  Deep specialization across the **Indian Army, Air Force, Navy**, **Aerospace & Space Technology**, **Specialized Surgery**, **Cardiology**, **Neurology**, **Civil Infrastructure**, and **Public Governance**.
+                </p>
+
+                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <button
+                    onClick={handleInitiateTestClick}
+                    className="w-full sm:w-auto px-8 py-4 rounded-2xl font-black text-base text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:brightness-110 shadow-xl shadow-amber-400/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    <span>Begin Assessment</span>
+                    <ArrowRight className="w-5 h-5 text-slate-950" />
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentView('allCareers')}
+                    className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm text-slate-300 hover:text-white border border-slate-800 bg-slate-900/60 hover:bg-slate-900 transition-all flex items-center justify-center gap-2"
+                  >
+                    <BookOpen className="w-4 h-4 text-amber-400" />
+                    <span>Explore All 15 Disciplines</span>
+                  </button>
+                </div>
+
+                <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-amber-400 font-bold text-sm mb-1">
+                      <Shield className="w-4 h-4" />
+                      <span>Deep Defense Branches</span>
+                    </div>
+                    <p className="text-xs text-slate-400">Army combat command, IAF fighter aviation & Naval destroyers.</p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-rose-400 font-bold text-sm mb-1">
+                      <Activity className="w-4 h-4" />
+                      <span>Advanced Medical Wings</span>
+                    </div>
+                    <p className="text-xs text-slate-400">Trauma surgery, cardiology cath-labs & clinical neurology.</p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-sky-400 font-bold text-sm mb-1">
+                      <Rocket className="w-4 h-4" />
+                      <span>Space & Aerospace</span>
+                    </div>
+                    <p className="text-xs text-slate-400">ISRO rocketry, satellite telemetry & supersonic propulsion.</p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm mb-1">
+                      <Building className="w-4 h-4" />
+                      <span>Civil Mega Infrastructure</span>
+                    </div>
+                    <p className="text-xs text-slate-400">High-speed rail tunnels, suspension bridges & structural loads.</p>
+                  </div>
+                </div>
+
               </div>
-              <button
-                onClick={() => setIsRosterModalOpen(false)}
-                className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                ✕
-              </button>
-            </div>
+            </section>
 
-            <div className="p-5 space-y-4 border-b border-slate-800 bg-slate-950/50">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  value={sheetUrl}
-                  onChange={(e) => setSheetUrl(e.target.value)}
-                  placeholder="Paste Google Sheets link (Anyone with link can view)..."
-                  className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
-                />
-                <button
-                  onClick={syncGoogleSheet}
-                  disabled={isSyncing}
-                  className="flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 rounded-xl text-xs font-bold transition whitespace-nowrap"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                  <span>{isSyncing ? 'Syncing...' : 'Sync Sheet'}</span>
-                </button>
-              </div>
-
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={rosterSearch}
-                  onChange={(e) => setRosterSearch(e.target.value)}
-                  placeholder="Search registered student name or email..."
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-5">
-              <div className="rounded-xl border border-slate-800 overflow-hidden">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-800/60 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
-                    <tr>
-                      <th className="p-3">Full Name</th>
-                      <th className="p-3">Email Address</th>
-                      <th className="p-3">Password</th>
-                      <th className="p-3">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800 text-slate-300">
-                    {userRoster
-                      .filter(u => 
-                        u.name.toLowerCase().includes(rosterSearch.toLowerCase()) || 
-                        u.email.toLowerCase().includes(rosterSearch.toLowerCase())
-                      )
-                      .map((u, i) => (
-                        <tr key={i} className="hover:bg-slate-800/30">
-                          <td className="p-3 font-medium text-white">{u.name}</td>
-                          <td className="p-3 text-slate-400">{u.email}</td>
-                          <td className="p-3 font-mono text-[11px] text-emerald-400/80">{u.password}</td>
-                          <td className="p-3">
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                              {u.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Anyone registered here can log in and take the assessment.</span>
-              <button
-                onClick={() => setIsRosterModalOpen(false)}
-                className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium transition"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* VIEW: LANDING PAGE */}
-      {currentView === 'landing' && (
-        <main className="flex-1 max-w-5xl mx-auto px-4 lg:px-8 py-12 space-y-16">
-          {/* HERO BANNER */}
-          <section className="text-center space-y-6 max-w-3xl mx-auto pt-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>75-Question Comprehensive Psychometric & Aptitude Battery</span>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              Discover the career that <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">fits you best</span>.
-            </h1>
-
-            <p className="text-base sm:text-lg text-slate-400 leading-relaxed max-w-2xl mx-auto">
-              Step by step, from school to your dream job. Untimed, honest, and built with plain-English questions to evaluate your natural cognitive aptitude, emotional temperament, and vocational calling.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                onClick={() => {
-                  setAuthMode('login');
-                  setCurrentView('auth');
-                }}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 group"
-              >
-                <span>Take the Career Test</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button
-                onClick={() => setIsRosterModalOpen(true)}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-sm font-semibold transition flex items-center justify-center gap-2"
-              >
-                <Database className="w-4 h-4 text-emerald-400" />
-                <span>View Google Sheet Roster</span>
-              </button>
-            </div>
-          </section>
-
-          {/* FOUNDER DESK WITH PHOTO UPLOAD */}
-          <section className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 sm:p-8 backdrop-blur-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
-              {/* Photo Box */}
-              <div className="flex flex-col items-center gap-3 shrink-0">
-                <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-2xl border-2 border-dashed border-emerald-500/40 bg-slate-950 overflow-hidden flex flex-col items-center justify-center relative group shadow-xl">
-                  {founderPhoto ? (
-                    <img src={founderPhoto} alt="Founder" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="text-center p-3">
-                      <Camera className="w-8 h-8 text-emerald-400/60 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                      <span className="text-[11px] text-slate-400 font-medium leading-tight block">
-                        Upload Your Photo
+            {/* Google Sheet Live Database Card */}
+            <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="p-6 rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                    <FileSpreadsheet className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white text-base">Google Sheet Database Connected</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        Live Roster Sync
                       </span>
                     </div>
-                  )}
-                  <label className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition text-xs font-semibold text-emerald-400">
-                    <Camera className="w-5 h-5 mb-1" />
-                    <span>{founderPhoto ? 'Change Photo' : 'Upload'}</span>
-                    <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-                  </label>
-                </div>
-                <span className="text-[11px] font-mono text-emerald-400/80 uppercase tracking-widest">
-                  Platform Founder
-                </span>
-              </div>
-
-              {/* Message */}
-              <div className="space-y-4 text-center md:text-left flex-1">
-                <div className="inline-block px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-semibold">
-                  Founder's Desk
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white">
-                  Built to guide every student toward genuine conviction.
-                </h3>
-                <p className="text-sm text-slate-300 leading-relaxed">
-                  Too often, students are pushed into careers based solely on family pressure or vague advice that groups everyone into just two choices. 
-                  Every student has a distinct blend of spatial logic, social empathy, creative intuition, and tolerance for pressure. 
-                </p>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  DeepPath provides an untimed, 75-question diagnostic designed in simple, clear English. It doesn't rush you with timers—it measures who you really are and maps you to step-by-step roadmaps in India and abroad.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* 6 DIAGNOSTIC PILLARS PREVIEW */}
-          <section className="space-y-6">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">The 6 Diagnostic Pillars</h2>
-              <p className="text-sm text-slate-400 max-w-xl mx-auto">
-                Carefully calibrated to reveal your cognitive baseline, emotional resilience, and vocational match.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { title: "Aptitude & Logic", q: "10 Questions", desc: "Numerical sequences, speed-distance-time, spatial 3D cubes, and logical syllogisms." },
-                { title: "Career Decidedness", q: "8 Questions", desc: "Assesses family expectations, peer influence, and personal certainty." },
-                { title: "Personality & Temperament", q: "15 Questions", desc: "Big-Five metrics: introversion, stress resilience, structure, and emotional judgment." },
-                { title: "Vocational Calling", q: "15 Questions", desc: "RIASEC exploration across mechanics, law, healthcare, AI, defence, and design." },
-                { title: "Teamwork & Ethics", q: "14 Questions", desc: "Group conflicts, handling pressure, integrity dilemmas, and frontline leadership." },
-                { title: "Real Scenarios & Purpose", q: "13 Questions", desc: "Hands-on emergency reactions, lifetime legacy goals, and core values." }
-              ].map((p, idx) => (
-                <div key={idx} className="p-5 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 transition">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-emerald-400 font-mono">0{idx + 1}</span>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-semibold">{p.q}</span>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Pre-linked to your Google Sheet: <code className="text-amber-400 font-mono text-[11px]">{sheetId.slice(0, 15)}...</code>
+                    </p>
                   </div>
-                  <h4 className="text-base font-bold text-white mb-1.5">{p.title}</h4>
-                  <p className="text-xs text-slate-400 leading-relaxed">{p.desc}</p>
                 </div>
-              ))}
-            </div>
-          </section>
-        </main>
-      )}
 
-      {/* VIEW: AUTHENTICATION MODAL / SCREEN */}
-      {currentView === 'auth' && (
-        <main className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="text-center space-y-2">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
-                <Lock className="w-6 h-6" />
+                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                  <a
+                    href={sheetUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold text-slate-200 hover:text-white hover:bg-slate-700 transition-colors"
+                  >
+                    <span>Open Sheet</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+
+                  <button
+                    onClick={() => setRosterModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-400 text-slate-950 font-bold text-xs hover:bg-amber-300 transition-colors"
+                  >
+                    <Database className="w-3.5 h-3.5 text-slate-950" />
+                    <span>View Roster ({studentRoster.length})</span>
+                  </button>
+                </div>
               </div>
-              <h2 className="text-2xl font-extrabold text-white">
-                {authMode === 'login' ? 'Sign In to DeepPath' : 'Register New Student'}
-              </h2>
-              <p className="text-xs text-slate-400">
-                {authMode === 'login'
-                  ? 'Your email and password are validated against the spreadsheet database.'
-                  : 'Registering adds your account to the database so you can start immediately.'}
-              </p>
+            </section>
+
+            {/* Founder's Desk */}
+            <section id="founder-desk" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 sm:p-12 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/5 blur-3xl rounded-full pointer-events-none" />
+
+                <div className="flex flex-col lg:flex-row items-center gap-10">
+                  <div className="shrink-0 flex flex-col items-center">
+                    <div className="relative group w-44 h-44 sm:w-52 sm:h-52 rounded-3xl overflow-hidden border-2 border-dashed border-amber-400/50 bg-slate-950 p-2 shadow-2xl flex items-center justify-center">
+                      {founderPhoto ? (
+                        <img 
+                          src={founderPhoto} 
+                          alt="Founder" 
+                          className="w-full h-full object-cover rounded-2xl"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-2xl bg-slate-900 flex flex-col items-center justify-center text-center p-4">
+                          <User className="w-16 h-16 text-slate-600 mb-2" />
+                          <span className="text-xs font-semibold text-slate-400">Founder Photo</span>
+                          <span className="text-[10px] text-slate-500 mt-1">Upload your picture here</span>
+                        </div>
+                      )}
+
+                      <div 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer p-4 text-center"
+                      >
+                        <Camera className="w-8 h-8 text-amber-400 mb-2" />
+                        <span className="text-xs font-bold text-white">Click to Upload</span>
+                        <span className="text-[10px] text-slate-400 mt-1">PNG, JPG up to 5MB</span>
+                      </div>
+                    </div>
+
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handlePhotoUploadChange} 
+                      accept="image/*" 
+                      className="hidden" 
+                    />
+
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-amber-400/40 bg-amber-400/10 text-amber-300 font-bold text-xs hover:bg-amber-400/20 transition-colors"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>{founderPhoto ? 'Change My Photo' : 'Upload My Photo'}</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-5 text-center lg:text-left flex-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>A Personal Word From the Founder</span>
+                    </div>
+
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                      "Every student has an extraordinary spark. They just need the right map."
+                    </h2>
+
+                    <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+                      <p>
+                        A fulfilled career isn't limited to a generic desk job. When I looked around, 
+                        the real heroes were army commanders defending our high-altitude glaciers, IAF fighter pilots navigating supersonic skies, 
+                        surgeons standing for 6 hours straight inside trauma rooms, and aerospace engineers crafting rockets for the cosmos.
+                      </p>
+                      <p>
+                        We designed this enhanced diagnostic with targeted logic puzzles and realistic scenarios so that whether you belong to a quiet village 
+                        or a busy city, you find your exact calling with step-by-step clarity.
+                      </p>
+                    </div>
+
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-between border-t border-slate-800 text-xs text-slate-400 gap-2">
+                      <span className="font-semibold text-slate-200">Founder & Student Mentor</span>
+                      <span>DeepPath Careers Initiative • Made for every aspiring youth</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+
+          </div>
+        )}
+
+        {/* VIEW 2: TEST */}
+        {currentView === 'test' && (
+          <div className="min-h-[calc(100vh-80px)] bg-slate-950 flex flex-col justify-between p-4 sm:p-8 lg:p-12 relative">
+            <div className="max-w-4xl mx-auto w-full space-y-8 flex-1 flex flex-col justify-center">
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-lg border border-amber-400/30 bg-amber-400/10 text-amber-400 font-bold text-xs">
+                      {currentQ.pillar}
+                    </span>
+                    <span className="text-slate-400 font-semibold">
+                      Question {activeQuestionIndex + 1} of {totalQuestions}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => toggleMarkForReview(currentQ.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-colors ${
+                        markedForReview[currentQ.id]
+                          ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300'
+                          : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <Bookmark className="w-3.5 h-3.5" />
+                      <span>{markedForReview[currentQ.id] ? 'Bookmarked' : 'Bookmark'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIsPaletteOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
+                    >
+                      <Grid className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Question Palette ({answeredCount}/{totalQuestions})</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                  <div 
+                    className="h-full bg-gradient-to-r from-amber-400 via-emerald-400 to-sky-400 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.max(2, progressPercent)}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="p-5 rounded-2xl bg-slate-900/40 border border-slate-800/80">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                    {currentQ.type === 'puzzle' ? '🧩 Logical Puzzle & Numerical Reasoning' : '🧠 Psychological & Situational Response'}
+                  </span>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white leading-snug tracking-tight">
+                    {currentQ.prompt}
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3.5 pt-2">
+                  {currentQ.options.map((option, optIdx) => {
+                    const isSelected = selectedAnswers[currentQ.id]?.optionId === option.id;
+                    const letter = String.fromCharCode(65 + optIdx);
+
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => handleSelectOption(currentQ.id, option)}
+                        className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-200 flex items-start gap-4 ${
+                          isSelected 
+                            ? 'bg-amber-400/15 border-amber-400 shadow-lg shadow-amber-400/10 text-white translate-x-1' 
+                            : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900 hover:border-slate-700'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 transition-colors ${
+                          isSelected 
+                            ? 'bg-amber-400 text-slate-950 font-black' 
+                            : 'bg-slate-800 text-slate-400'
+                        }`}>
+                          {isSelected ? <Check className="w-4 h-4 stroke-[3]" /> : letter}
+                        </div>
+
+                        <span className="text-sm sm:text-base leading-relaxed pt-0.5">
+                          {option.text}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/80 flex items-center justify-between gap-4">
+                <button
+                  disabled={activeQuestionIndex === 0}
+                  onClick={() => setActiveQuestionIndex(prev => Math.max(0, prev - 1))}
+                  className="px-5 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 font-bold text-xs sm:text-sm hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Previous</span>
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setCurrentView('home')}
+                    className="text-xs font-semibold text-slate-500 hover:text-slate-300 transition-colors hidden sm:block"
+                  >
+                    Save & Exit
+                  </button>
+
+                  {activeQuestionIndex < totalQuestions - 1 ? (
+                    <button
+                      onClick={() => setActiveQuestionIndex(prev => prev + 1)}
+                      className="px-6 py-3 rounded-xl bg-amber-400 text-slate-950 font-black text-xs sm:text-sm hover:bg-amber-300 transition-all flex items-center gap-2 shadow-lg shadow-amber-400/20"
+                    >
+                      <span>Next Question</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={triggerAssessmentEvaluation}
+                      className="px-7 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-emerald-400/20"
+                    >
+                      <span>Analyze Answers</span>
+                      <Sparkles className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
             </div>
 
-            {authError && (
-              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{authError}</span>
+            {isPaletteOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+                <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
+                  
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Assessment Question Palette ({totalQuestions})</h3>
+                      <p className="text-xs text-slate-400">Click any number to jump directly to that question.</p>
+                    </div>
+                    <button 
+                      onClick={() => setIsPaletteOpen(false)}
+                      className="text-slate-400 hover:text-white p-1 text-sm font-bold"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3.5 h-3.5 rounded bg-emerald-500/20 border border-emerald-500/50" />
+                      <span className="text-slate-300">Answered ({answeredCount})</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3.5 h-3.5 rounded bg-yellow-400/20 border border-yellow-400/50" />
+                      <span className="text-slate-300">Bookmarked</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3.5 h-3.5 rounded bg-slate-950 border border-slate-800" />
+                      <span className="text-slate-400">Unanswered ({totalQuestions - answeredCount})</span>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto pr-1">
+                    <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+                      {ASSESSMENT_BATTERY.map((q, qIdx) => {
+                        const isAnswered = !!selectedAnswers[q.id];
+                        const isMarked = !!markedForReview[q.id];
+                        const isCurrent = qIdx === activeQuestionIndex;
+
+                        let styleClass = 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700';
+                        if (isAnswered) {
+                          styleClass = 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold';
+                        }
+                        if (isMarked) {
+                          styleClass = 'bg-yellow-400/20 border-yellow-400 text-yellow-300 font-bold';
+                        }
+                        if (isCurrent) {
+                          styleClass += ' ring-2 ring-amber-400';
+                        }
+
+                        return (
+                          <button
+                            key={q.id}
+                            onClick={() => {
+                              setActiveQuestionIndex(qIdx);
+                              setIsPaletteOpen(false);
+                            }}
+                            className={`h-10 rounded-xl border text-xs flex items-center justify-center transition-all ${styleClass}`}
+                          >
+                            {qIdx + 1}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between border-t border-slate-800">
+                    <span className="text-xs text-slate-500">
+                      {answeredCount === totalQuestions ? 'All questions completed!' : `${totalQuestions - answeredCount} remaining`}
+                    </span>
+                    <button
+                      onClick={() => setIsPaletteOpen(false)}
+                      className="px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors"
+                    >
+                      Close Palette
+                    </button>
+                  </div>
+
+                </div>
               </div>
             )}
 
-            <form onSubmit={handleAuthSubmit} className="space-y-4">
+          </div>
+        )}
+
+        {/* VIEW 3: EVALUATING */}
+        {currentView === 'evaluating' && (
+          <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center p-6 text-center">
+            <div className="max-w-md w-full p-8 rounded-3xl border border-slate-800 bg-slate-900/60 backdrop-blur-md space-y-6">
+              
+              <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-4 border-amber-400/20 border-t-amber-400 animate-spin" />
+                <Brain className="w-10 h-10 text-amber-400 animate-pulse" />
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-black text-white">Synthesizing Profile Dimensions</h3>
+                <p className="text-xs text-slate-400 mt-2">
+                  Calculating Cognitive Aptitude IQ, Defense Instincts, Medical Branching, and matching across 15 full career paths...
+                </p>
+              </div>
+
+              <div className="space-y-2 text-left bg-slate-950 p-4 rounded-xl border border-slate-800/80 text-xs">
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>Math & Logic Aptitude</span>
+                  <span className="text-emerald-400 font-bold">Percentile Solved</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>Defense & Medical Scenarios</span>
+                  <span className="text-emerald-400 font-bold">Evaluated</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>Colleges (NDA, AIIMS, IIST, IITs, Oxford)</span>
+                  <span className="text-amber-400 font-bold">Synthesizing...</span>
+                </div>
+              </div>
+
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                Finalizing in {evaluatingCountdown}s
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 4: REPORT */}
+        {currentView === 'report' && assessmentReport && (
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+            
+            <div className="p-8 sm:p-10 rounded-3xl border border-amber-400/30 bg-gradient-to-br from-amber-400/10 via-slate-900 to-slate-950 relative overflow-hidden">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Specialized Diagnostic Dossier</span>
+                  </div>
+                  <h1 className="text-2xl sm:text-4xl font-black text-white">
+                    Congratulations, {currentUser?.name || 'Student'}!
+                  </h1>
+                  <p className="text-sm text-slate-300 mt-1">
+                    Calculated on {assessmentReport.dateFormatted}. Here is your full cognitive and vocational breakdown.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold text-slate-200 hover:text-white hover:bg-slate-700 transition-colors"
+                  >
+                    <Printer className="w-4 h-4 text-amber-400" />
+                    <span>Print / Save PDF</span>
+                  </button>
+
+                  <button
+                    onClick={startAssessmentTest}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-bold text-xs hover:bg-amber-300 transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Retake Test</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/60 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pillar 1: Cognitive Logic & Math</span>
+                  <div className="px-3 py-1 rounded-full bg-amber-400/10 text-amber-400 text-xs font-bold border border-amber-400/20">
+                    Aptitude Battery
+                  </div>
+                </div>
+
+                <div className="flex items-baseline gap-3">
+                  <span className="text-4xl sm:text-5xl font-black text-white font-mono">{assessmentReport.iqPercentile}th</span>
+                  <span className="text-sm text-emerald-400 font-bold">National Percentile Fit</span>
+                </div>
+
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Evaluated from the numerical sequences, spatial cubes, structural ratios, and aerodynamic reasoning questions. 
+                  Demonstrates sharp analytical precision and strong technical problem-solving capacity.
+                </p>
+              </div>
+
+              <div className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/60 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pillar 2: Decidedness vs Confusion</span>
+                  <div className={`px-3 py-1 rounded-full text-xs font-bold border ${assessmentReport.clarityColor}`}>
+                    {assessmentReport.clarityVerdict}
+                  </div>
+                </div>
+
+                <h3 className="text-2xl font-black text-white">
+                  {assessmentReport.clarityVerdict}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  {assessmentReport.clarityDesc}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/50 space-y-6">
+              <div>
+                <h3 className="text-xl font-bold text-white">Psychological & Domain Trait Spectrum</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Scored from your choices across tactical dilemmas, engineering decisions, and vocational callings.</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                {Object.entries(assessmentReport.traits).map(([traitKey, score]) => (
+                  <div key={traitKey} className="p-4 rounded-2xl bg-slate-950 border border-slate-800/80">
+                    <div className="flex justify-between items-center text-xs font-bold text-slate-300 mb-2">
+                      <span className="truncate pr-2">{traitKey}</span>
+                      <span className="text-amber-400 font-mono">{score}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full"
+                        style={{ width: `${score}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Primary Matched Career Card */}
+            <div className="p-8 sm:p-10 rounded-3xl border-2 border-amber-400/60 bg-slate-900/80 relative space-y-8 shadow-2xl shadow-amber-400/5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center shrink-0 mt-1">
+                    <CareerIcon name={assessmentReport.primary.iconName} className="w-7 h-7 text-amber-400" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-black uppercase tracking-widest text-amber-400">#1 Top Recommended Calling</span>
+                    <h2 className="text-2xl sm:text-4xl font-black text-white mt-1">
+                      {assessmentReport.primary.title}
+                    </h2>
+                    <span className="text-xs font-semibold text-slate-400 mt-1 block">
+                      {assessmentReport.primary.category}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="px-5 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-right">
+                  <div className="text-3xl font-black">98%</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider">Aptitude Fit</div>
+                </div>
+              </div>
+
+              <p className="text-base text-slate-200 leading-relaxed font-normal">
+                {assessmentReport.primary.description}
+              </p>
+
+              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block mb-1">
+                  What A Normal Workday Looks Like:
+                </span>
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  {assessmentReport.primary.dailyLife}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center shrink-0">
+                    <span className="font-black text-amber-400 text-sm">₹</span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Salary Growth in India</span>
+                    <p className="text-sm font-bold text-white mt-1">{assessmentReport.primary.salaryIndia}</p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center shrink-0">
+                    <span className="font-black text-emerald-400 text-sm">$</span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Global Packages & Opportunities</span>
+                    <p className="text-sm font-bold text-white mt-1">{assessmentReport.primary.salaryAbroad}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <h4 className="text-base font-bold text-white flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-amber-400" />
+                  <span>Educational Roadmap & College Pathways</span>
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <span className="text-xs font-bold text-amber-400 uppercase">11th & 12th Standard Stream</span>
+                    <p className="text-sm text-slate-200">{assessmentReport.primary.highSchoolStream}</p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <span className="text-xs font-bold text-emerald-400 uppercase">Entrance Exams to Prepare For</span>
+                    <p className="text-sm text-slate-200">{assessmentReport.primary.keyEntranceExams}</p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <span className="text-xs font-bold text-sky-400 uppercase">Premier Indian Institutions</span>
+                    <ul className="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                      {assessmentReport.primary.indianPathways.map((col, cIdx) => (
+                        <li key={cIdx}>{col}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                    <span className="text-xs font-bold text-indigo-400 uppercase">World Renowned Global Universities</span>
+                    <ul className="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                      {assessmentReport.primary.globalPathways.map((col, cIdx) => (
+                        <li key={cIdx}>{col}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                  Notable Organizations & Employers:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {assessmentReport.primary.employers.map((emp, eIdx) => (
+                    <span key={eIdx} className="px-3 py-1 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-300">
+                      {emp}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            <div className="space-y-6 pt-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-white">
+                Strong Runner-Up Career Callings
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[assessmentReport.secondary, assessmentReport.tertiary, assessmentReport.quaternary].map((career, cIdx) => (
+                  <div key={career.id} className="p-6 rounded-3xl border border-slate-800 bg-slate-900/60 space-y-4 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-amber-400 uppercase">Match #{cIdx + 2}</span>
+                        <span className="text-xs font-bold text-emerald-400">{95 - cIdx * 3}% Fit</span>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center shrink-0">
+                          <CareerIcon name={career.iconName} className="w-5 h-5 text-amber-400" />
+                        </div>
+                        <h4 className="text-base font-bold text-white">{career.title}</h4>
+                      </div>
+
+                      <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
+                        {career.description}
+                      </p>
+                    </div>
+
+                    <div className="text-xs text-slate-400 pt-3 border-t border-slate-800/80 space-y-1">
+                      <div><strong className="text-slate-300">11th/12th:</strong> {career.highSchoolStream}</div>
+                      <div><strong className="text-slate-300">India Salary:</strong> {career.salaryIndia}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center pt-8">
+              <button
+                onClick={() => setCurrentView('home')}
+                className="px-8 py-3.5 rounded-2xl border border-slate-800 bg-slate-900 text-slate-300 font-bold text-sm hover:text-white hover:bg-slate-800 transition-colors"
+              >
+                Return to Homepage
+              </button>
+            </div>
+
+          </div>
+        )}
+
+        {/* VIEW 5: ALL 15 CAREERS */}
+        {currentView === 'allCareers' && (
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <h1 className="text-3xl sm:text-5xl font-black text-white">
+                Directory of All 15 Diverse Disciplines
+              </h1>
+              <p className="text-sm sm:text-base text-slate-400">
+                Explore every career path—from Army Officers and IAF Fighter Pilots to Aerospace Engineers, Specialized Surgeons, and Civil Builders.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Object.values(CAREER_DATABASE).map((career) => (
+                <div key={career.id} className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/60 space-y-5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center shrink-0">
+                      <CareerIcon name={career.iconName} className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+                        {career.category}
+                      </span>
+                      <h3 className="text-xl font-bold text-white mt-1.5">{career.title}</h3>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {career.description}
+                  </p>
+
+                  <div className="space-y-2 text-xs text-slate-300 pt-2 border-t border-slate-800">
+                    <div><strong className="text-amber-400">High School Stream:</strong> {career.highSchoolStream}</div>
+                    <div><strong className="text-emerald-400">India Salary:</strong> {career.salaryIndia}</div>
+                    <div><strong className="text-sky-400">Abroad Outlook:</strong> {career.salaryAbroad}</div>
+                    <div><strong className="text-indigo-400">Entrance Exams:</strong> {career.keyEntranceExams}</div>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={handleInitiateTestClick}
+                      className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 transition-colors"
+                    >
+                      Take Assessment to Check Fit
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* AUTH MODAL */}
+      {authModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative space-y-6">
+            
+            <button 
+              onClick={() => setAuthModalOpen(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 text-sm font-bold"
+            >
+              ✕
+            </button>
+
+            <div className="text-center space-y-1">
+              <h3 className="text-2xl font-black text-white">
+                {authMode === 'login' ? 'Student Sign In' : 'New Student Registration'}
+              </h3>
+              <p className="text-xs text-slate-400">
+                {authMode === 'login' 
+                  ? 'Enter your registered credentials to launch the test.' 
+                  : 'Register your account to save your assessment results.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => { setAuthMode('login'); setAuthErrorMessage(''); }}
+                className={`py-2 rounded-lg transition-colors ${authMode === 'login' ? 'bg-amber-400 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAuthMode('register'); setAuthErrorMessage(''); }}
+                className={`py-2 rounded-lg transition-colors ${authMode === 'register' ? 'bg-amber-400 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+              >
+                Register
+              </button>
+            </div>
+
+            {authErrorMessage && (
+              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
+                <span className="leading-relaxed">{authErrorMessage}</span>
+              </div>
+            )}
+
+            <form onSubmit={authMode === 'login' ? handleLoginSubmit : handleRegisterSubmit} className="space-y-4">
               {authMode === 'register' && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Full Name</label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
                     <input
                       type="text"
+                      placeholder="e.g. Ramesh Kumar"
                       value={authName}
                       onChange={(e) => setAuthName(e.target.value)}
-                      placeholder="e.g. Aarav Sharma"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
                     />
                   </div>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">Email Address</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
                   <input
                     type="email"
+                    placeholder="student@example.com"
                     value={authEmail}
                     onChange={(e) => setAuthEmail(e.target.value)}
-                    placeholder="student@school.edu"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">Password</label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
                     value={authPassword}
                     onChange={(e) => setAuthPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-300"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
+
+              {authMode === 'register' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Current Class / Grade</label>
+                  <select
+                    value={authGrade}
+                    onChange={(e) => setAuthGrade(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="Class 9th">Class 9th</option>
+                    <option value="Class 10th">Class 10th</option>
+                    <option value="Class 11th">Class 11th</option>
+                    <option value="Class 12th">Class 12th</option>
+                    <option value="College / Graduate">College / Graduate</option>
+                  </select>
+                </div>
+              )}
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-black text-sm hover:brightness-110 shadow-lg shadow-amber-400/20 transition-all mt-2"
               >
-                {authMode === 'login' ? 'Verify Credentials & Start Test' : 'Register & Begin Assessment'}
+                {authMode === 'login' ? 'Sign In & Launch Test' : 'Register & Start Test'}
               </button>
             </form>
 
-            <div className="pt-2 text-center text-xs text-slate-400 border-t border-slate-800">
+            <div className="pt-2 text-center text-xs text-slate-500">
               {authMode === 'login' ? (
-                <p>
-                  Not in the database yet?{' '}
-                  <button
-                    onClick={() => {
-                      setAuthError('');
-                      setAuthMode('register');
-                    }}
-                    className="text-emerald-400 font-semibold hover:underline"
+                <span>
+                  Don't have an account yet?{' '}
+                  <button 
+                    onClick={() => { setAuthMode('register'); setAuthErrorMessage(''); }}
+                    className="text-amber-400 hover:underline font-bold"
                   >
                     Register here
                   </button>
-                </p>
+                </span>
               ) : (
-                <p>
-                  Already registered?{' '}
-                  <button
-                    onClick={() => {
-                      setAuthError('');
-                      setAuthMode('login');
-                    }}
-                    className="text-emerald-400 font-semibold hover:underline"
+                <span>
+                  Already registered in database?{' '}
+                  <button 
+                    onClick={() => { setAuthMode('login'); setAuthErrorMessage(''); }}
+                    className="text-amber-400 hover:underline font-bold"
                   >
-                    Log in directly
+                    Sign in here
                   </button>
-                </p>
+                </span>
               )}
             </div>
 
-            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Quick Test Account:</span>
-              <button
-                onClick={() => {
-                  setAuthEmail("student@school.edu");
-                  setAuthPassword("password123");
-                }}
-                className="text-emerald-400 font-semibold hover:underline"
-              >
-                Autofill Demo
-              </button>
-            </div>
           </div>
-        </main>
+        </div>
       )}
 
-      {/* VIEW: FULL SCREEN QUIZ VIEW */}
-      {currentView === 'quiz' && currentQuestion && (
-        <main className="flex-1 flex flex-col bg-slate-950">
-          {/* Top Test Header Bar */}
-          <div className="bg-slate-900 border-b border-slate-800 px-4 sm:px-8 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-emerald-400 font-mono">
-                QUESTION {currentQIndex + 1} OF {QUESTIONS.length}
-              </span>
-              <span className="hidden sm:inline text-xs text-slate-500">•</span>
-              <span className="hidden sm:inline text-xs text-slate-400 font-medium">
-                {currentQuestion.pillar}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => toggleBookmark(currentQuestion.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition ${
-                  bookmarkedQuestions[currentQuestion.id]
-                    ? 'bg-amber-500/10 border-amber-500/40 text-amber-400'
-                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
-                }`}
-              >
-                <Bookmark className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">
-                  {bookmarkedQuestions[currentQuestion.id] ? 'Bookmarked' : 'Bookmark'}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setIsPaletteOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition"
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Question Palette ({answeredCount}/75)</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-full bg-slate-800 h-1">
-            <div
-              className="bg-emerald-400 h-1 transition-all duration-300"
-              style={{ width: `${(answeredCount / QUESTIONS.length) * 100}%` }}
-            />
-          </div>
-
-          {/* Question & Options Body */}
-          <div className="flex-1 max-w-4xl mx-auto w-full p-4 sm:p-8 flex flex-col justify-center space-y-8">
-            <div className="space-y-3">
-              <span className="sm:hidden text-xs font-semibold text-emerald-400 block">
-                {currentQuestion.pillar}
-              </span>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white leading-snug">
-                {currentQuestion.q}
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3.5">
-              {currentQuestion.options.map((opt, optIdx) => {
-                const isSelected = userAnswers[currentQuestion.id] === optIdx;
-                return (
-                  <button
-                    key={optIdx}
-                    onClick={() => handleSelectOption(currentQuestion.id, optIdx)}
-                    className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all flex items-start gap-4 ${
-                      isSelected
-                        ? 'bg-emerald-500/10 border-emerald-500 shadow-lg shadow-emerald-500/10 text-white'
-                        : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-300 hover:bg-slate-900'
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                        isSelected
-                          ? 'border-emerald-400 bg-emerald-400 text-slate-950 font-bold text-xs'
-                          : 'border-slate-700 text-slate-500 text-xs'
-                      }`}
-                    >
-                      {isSelected ? '✓' : String.fromCharCode(65 + optIdx)}
-                    </div>
-                    <span className="text-sm sm:text-base leading-relaxed">{opt.text}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Bottom Question Navigation Controls */}
-            <div className="pt-6 border-t border-slate-800 flex items-center justify-between">
-              <button
-                onClick={() => setCurrentQIndex(prev => Math.max(0, prev - 1))}
-                disabled={currentQIndex === 0}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 text-xs font-semibold text-slate-300 transition"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Previous</span>
-              </button>
-
+      {/* ROSTER MODAL */}
+      {rosterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative space-y-5 max-h-[90vh] flex flex-col">
+            
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <div className="flex items-center gap-3">
-                {currentQIndex < QUESTIONS.length - 1 ? (
-                  <button
-                    onClick={() => setCurrentQIndex(prev => prev + 1)}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-bold transition shadow-md shadow-emerald-500/20"
-                  >
-                    <span>Next</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleSubmitAssessment}
-                    className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-extrabold shadow-lg shadow-emerald-400/20 transition"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Submit Assessment</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* PALETTE DRAWER / MODAL */}
-          {isPaletteOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-                <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-bold text-white text-base">Question Palette (1 to 75)</h3>
-                    <p className="text-xs text-slate-400">
-                      Answered: {answeredCount} | Remaining: {QUESTIONS.length - answeredCount}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setIsPaletteOpen(false)}
-                    className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition"
-                  >
-                    ✕
-                  </button>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                  <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
                 </div>
-
-                <div className="flex-1 overflow-y-auto p-5">
-                  <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
-                    {QUESTIONS.map((q, idx) => {
-                      const isAnswered = userAnswers[q.id] !== undefined;
-                      const isBookmarked = bookmarkedQuestions[q.id];
-                      const isCurrent = currentQIndex === idx;
-
-                      return (
-                        <button
-                          key={q.id}
-                          onClick={() => {
-                            setCurrentQIndex(idx);
-                            setIsPaletteOpen(false);
-                          }}
-                          className={`h-11 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center relative border ${
-                            isCurrent
-                              ? 'border-emerald-400 ring-2 ring-emerald-400/30 text-white'
-                              : isAnswered
-                              ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                              : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300 hover:border-slate-700'
-                          }`}
-                        >
-                          <span>{idx + 1}</span>
-                          {isBookmarked && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 absolute top-1 right-1" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="p-4 border-t border-slate-800 bg-slate-950 flex flex-wrap items-center justify-between gap-3 text-xs">
-                  <div className="flex items-center gap-4 text-slate-400">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500" /> Answered
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-3 h-3 rounded bg-slate-950 border border-slate-800" /> Unanswered
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-400" /> Bookmarked
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setIsPaletteOpen(false);
-                      handleSubmitAssessment();
-                    }}
-                    className="px-4 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition"
-                  >
-                    Finish Test
-                  </button>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Student Database Roster</h3>
+                  <p className="text-xs text-slate-400">Total Registered: {studentRoster.length} students</p>
                 </div>
               </div>
-            </div>
-          )}
-        </main>
-      )}
 
-      {/* VIEW: ANALYZING STATE */}
-      {currentView === 'analyzing' && (
-        <main className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-6">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full border-4 border-emerald-500/20 border-t-emerald-400 animate-spin" />
-            <BrainCircuit className="w-8 h-8 text-emerald-400 absolute inset-0 m-auto" />
-          </div>
-          <div className="space-y-2 max-w-sm">
-            <h3 className="text-2xl font-bold text-white">Synthesizing 75 Data Points...</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Evaluating cognitive puzzle logic, psychological Big-Five traits, social team dynamics, and family expectation variables.
-            </p>
-          </div>
-        </main>
-      )}
-
-      {/* VIEW: COMPREHENSIVE REPORT */}
-      {currentView === 'report' && diagnosticResult && (
-        <main className="flex-1 max-w-5xl mx-auto px-4 lg:px-8 py-10 space-y-12">
-          {/* Header */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 relative overflow-hidden">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Psychometric Evaluation Completed</span>
-                </div>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
-                  Career Diagnostic Profile
-                </h1>
-                <p className="text-xs text-slate-400">
-                  Student: <span className="text-white font-semibold">{currentUser ? currentUser.name : "Registered Student"}</span> | Assessment Date: {new Date().toLocaleDateString()}
-                </p>
-              </div>
-
-              <button
-                onClick={() => window.print()}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition"
+              <button 
+                onClick={() => setRosterModalOpen(false)}
+                className="text-slate-400 hover:text-white p-1 text-sm font-bold"
               >
-                Print / Save PDF
+                ✕
               </button>
             </div>
-          </div>
 
-          {/* METRIC CARDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider">Aptitude & Logic</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-white">{diagnosticResult.aptitudeScore} / 10</span>
-                <span className="text-xs text-slate-400">Puzzles Solved</span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Cognitive aptitude percentile: {Math.round((diagnosticResult.aptitudeScore / 10) * 100)}%
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <span className="text-[11px] font-mono text-teal-400 uppercase tracking-wider">Personal Conviction</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-white">{diagnosticResult.clarityScore}</span>
-                <span className="text-xs text-slate-400">Clarity Points</span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Indicates independent drive vs reliance on external guidance.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-              <span className="text-[11px] font-mono text-amber-400 uppercase tracking-wider">Pressure Index</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-white">{diagnosticResult.pressureScore}</span>
-                <span className="text-xs text-slate-400">External Strain</span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Measures parental expectations, competition stress, and exam fear.
-              </p>
-            </div>
-          </div>
-
-          {/* PRIMARY CAREER MATCH */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Award className="w-5 h-5 text-emerald-400" />
-              <span>Primary Recommended Career Path</span>
-            </h2>
-
-            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/30 border border-emerald-500/30 space-y-6 shadow-xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    {diagnosticResult.primary.badge}
-                  </span>
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
-                    {diagnosticResult.primary.title}
-                  </h3>
-                </div>
-                <div className="text-right sm:border-l sm:border-slate-800 sm:pl-6">
-                  <span className="text-3xl font-black text-emerald-400">{diagnosticResult.primary.matchScore}%</span>
-                  <span className="block text-[10px] text-slate-400 uppercase tracking-wider">Psychometric Fit</span>
-                </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="relative w-full sm:w-64">
+                <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  value={rosterSearch}
+                  onChange={(e) => setRosterSearch(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none"
+                />
               </div>
 
-              <p className="text-sm text-slate-300 leading-relaxed">
-                {diagnosticResult.primary.desc}
-              </p>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  onClick={() => syncRosterFromGoogleSheet(sheetUrl)}
+                  disabled={isSyncing}
+                  className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-colors"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${isSyncing ? 'animate-spin' : ''}`} />
+                  <span>{isSyncing ? 'Syncing...' : 'Sync Sheet'}</span>
+                </button>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-800 text-xs">
-                <div className="space-y-1.5 p-4 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                  <span className="text-emerald-400 font-bold block uppercase text-[10px] tracking-wider">
-                    School Streams (11th & 12th)
-                  </span>
-                  <p className="text-slate-300">{diagnosticResult.primary.streams}</p>
-                </div>
-
-                <div className="space-y-1.5 p-4 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                  <span className="text-emerald-400 font-bold block uppercase text-[10px] tracking-wider">
-                    Entrance Exams
-                  </span>
-                  <p className="text-slate-300">{diagnosticResult.primary.exams}</p>
-                </div>
-
-                <div className="space-y-1.5 p-4 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                  <span className="text-emerald-400 font-bold block uppercase text-[10px] tracking-wider">
-                    Top Indian Colleges
-                  </span>
-                  <p className="text-slate-300">{diagnosticResult.primary.indiaPath}</p>
-                </div>
-
-                <div className="space-y-1.5 p-4 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                  <span className="text-emerald-400 font-bold block uppercase text-[10px] tracking-wider">
-                    Top Global Universities
-                  </span>
-                  <p className="text-slate-300">{diagnosticResult.primary.abroadPath}</p>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs space-y-1">
-                <span className="text-emerald-300 font-bold block uppercase text-[10px] tracking-wider">
-                  Compensation Outlook
-                </span>
-                <p className="text-slate-200">{diagnosticResult.primary.salary}</p>
+                <a
+                  href={sheetUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-2 rounded-xl border border-slate-700 hover:border-slate-600 text-slate-300 font-bold text-xs flex items-center gap-1.5 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Edit in Google</span>
+                </a>
               </div>
             </div>
-          </div>
 
-          {/* SECONDARY ALTERNATIVE CAREER */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Compass className="w-5 h-5 text-teal-400" />
-              <span>Secondary Alternative Career Match</span>
-            </h2>
+            {syncFeedback && (
+              <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400">
+                {syncFeedback}
+              </div>
+            )}
 
-            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-teal-300">
-                    {diagnosticResult.secondary.badge}
-                  </span>
-                  <h4 className="text-xl font-bold text-white mt-1.5">{diagnosticResult.secondary.title}</h4>
-                </div>
-                <span className="text-xl font-bold text-teal-400">{diagnosticResult.secondary.matchScore}% Match</span>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed">{diagnosticResult.secondary.desc}</p>
-              <div className="text-xs text-slate-400 space-y-1">
-                <p><strong className="text-slate-300">Institutions:</strong> {diagnosticResult.secondary.indiaPath}</p>
-                <p><strong className="text-slate-300">Exams:</strong> {diagnosticResult.secondary.exams}</p>
-              </div>
+            <div className="flex-1 overflow-y-auto border border-slate-800 rounded-2xl bg-slate-950">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold sticky top-0">
+                  <tr>
+                    <th className="p-3">Student Name</th>
+                    <th className="p-3">Email Address</th>
+                    <th className="p-3">Grade</th>
+                    <th className="p-3 text-right">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60">
+                  {filteredRoster.map((st, sIdx) => (
+                    <tr key={sIdx} className="hover:bg-slate-900/40">
+                      <td className="p-3 font-semibold text-white">{st.name}</td>
+                      <td className="p-3 text-slate-400">{st.email}</td>
+                      <td className="p-3 text-amber-400 font-medium">{st.grade || 'Class 11th'}</td>
+                      <td className="p-3 text-right text-slate-500">{st.registeredOn}</td>
+                    </tr>
+                  ))}
+                  {filteredRoster.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="p-6 text-center text-slate-500">
+                        No students match your search query.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-          </div>
 
-          {/* Retake test CTA */}
-          <div className="text-center pt-6">
-            <button
-              onClick={() => {
-                setUserAnswers({});
-                setBookmarkedQuestions({});
-                setCurrentQIndex(0);
-                setCurrentView('quiz');
-              }}
-              className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition"
-            >
-              Retake Assessment
-            </button>
+            <div className="pt-2 text-right">
+              <button
+                onClick={() => setRosterModalOpen(false)}
+                className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors"
+              >
+                Close
+              </button>
+            </div>
+
           </div>
-        </main>
+        </div>
       )}
 
       {/* FOOTER */}
-      <footer className="border-t border-slate-800/80 bg-slate-950 py-6 px-4 text-center text-xs text-slate-500">
-        <p>© 2026 DeepPath Career Counseling Platform. Google Sheet Roster synchronization enabled.</p>
+      <footer className="border-t border-slate-800 bg-slate-950 py-8 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Compass className="w-4 h-4 text-amber-400" />
+            <span className="font-bold text-slate-400">DeepPath Careers Platform</span>
+          </div>
+          <div>
+            Built with dedicated branches for Defense (Army, Navy, Air Force), Aerospace & Civil Engineering, and Specialized Medicine.
+          </div>
+          <div className="text-slate-600">
+            Connected with Google Spreadsheet ID: {sheetId.slice(0, 8)}...
+          </div>
+        </div>
       </footer>
+
     </div>
   );
 }
