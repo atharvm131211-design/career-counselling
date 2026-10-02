@@ -6,7 +6,8 @@ import {
   FileSpreadsheet, ExternalLink, Check, Database,
   Sliders, Eye, EyeOff, Bookmark, Zap, Activity, Brain, 
   Printer, Scale, Feather, Heart, Radio, Microscope,
-  Landmark, Palette, Dumbbell, Grid, Rocket, Plane, Anchor
+  Landmark, Palette, Dumbbell, Grid, Rocket, Plane, Anchor,
+  Building
 } from 'lucide-react';
 
 const ASSESSMENT_BATTERY = [
@@ -132,7 +133,7 @@ const ASSESSMENT_BATTERY = [
     ]
   },
 
-  // 11-20: SPECIALIZED DEFENSE BRANCHING (ARMY vs AIR FORCE vs NAVY vs AEROSPACE DEFENSE)
+  // 11-14: DEFENSE & TACTICAL INSTINCTS
   {
     id: 'q11',
     pillar: 'Defense & Tactical Instincts',
@@ -178,7 +179,7 @@ const ASSESSMENT_BATTERY = [
     ]
   },
 
-  // 15-22: MEDICAL SPECIALIZATION (SURGERY vs CARDIOLOGY vs NEUROLOGY vs PSYCHOLOGY)
+  // 15-18: MEDICAL & HEALTHCARE DOMAIN
   {
     id: 'q15',
     pillar: 'Medical & Healthcare Domain',
@@ -224,7 +225,7 @@ const ASSESSMENT_BATTERY = [
     ]
   },
 
-  // 19-26: ENGINEERING INFRASTRUCTURE & SPACE (AEROSPACE vs CIVIL vs COMPUTER SCIENCE)
+  // 19-22: ENGINEERING & INFRASTRUCTURE
   {
     id: 'q19',
     pillar: 'Engineering & Construction Systems',
@@ -252,7 +253,7 @@ const ASSESSMENT_BATTERY = [
     pillar: 'Engineering & Construction Systems',
     prompt: 'Where would you rather spend your active workdays?',
     options: [
-      { id: 'q21_a', text: 'At a space launch center (Sriharikota) running telemetry simulations and inspecting rocket rocket stages.', scoreType: 'aerospace', points: 5 },
+      { id: 'q21_a', text: 'At a space launch center (Sriharikota) running telemetry simulations and inspecting rocket stages.', scoreType: 'aerospace', points: 5 },
       { id: 'q21_b', text: 'Wearing a yellow hard-hat on site, inspecting massive steel rebar cages, pouring concrete, and supervising heavy cranes.', scoreType: 'civil', points: 5 },
       { id: 'q21_c', text: 'In a modern tech lab with multi-monitor workstation setups, writing neural networks, and optimizing backend systems.', scoreType: 'cs_ai', points: 5 },
       { id: 'q21_d', text: 'In an architectural design studio drawing 3D CAD blueprints, modeling miniature physical buildings, and choosing textures.', scoreType: 'architect', points: 5 }
@@ -270,7 +271,7 @@ const ASSESSMENT_BATTERY = [
     ]
   },
 
-  // 23-30: CAREER DECIDEDNESS & FAMILY PRESSURE
+  // 23-26: CAREER CLARITY & PRESSURE
   {
     id: 'q23',
     pillar: 'Career Clarity & Pressure',
@@ -316,7 +317,7 @@ const ASSESSMENT_BATTERY = [
     ]
   },
 
-  // 27-40: PSYCHOMETRIC TEMPERAMENT & WORK DYNAMICS
+  // 27-32: PERSONALITY & TEMPERAMENT
   {
     id: 'q27',
     pillar: 'Personality & Temperament',
@@ -384,7 +385,7 @@ const ASSESSMENT_BATTERY = [
     ]
   },
 
-  // 33-45: VOCATIONAL PASSION & RIASEC DOMAINS
+  // 33-37: VOCATIONAL PASSION & RIASEC DOMAINS
   {
     id: 'q33',
     pillar: 'Vocational Calling',
@@ -441,7 +442,7 @@ const ASSESSMENT_BATTERY = [
     ]
   },
 
-  // 38-50: LIFE PURPOSE, VALUES & WORK STYLE
+  // 38-40: LIFE PURPOSE, VALUES & WORK STYLE
   {
     id: 'q38',
     pillar: 'Life Purpose & Legacy',
@@ -871,29 +872,6 @@ const DEFAULT_STUDENTS = [
   { name: 'Priya Patel', email: 'priya@example.com', password: 'password123', grade: 'Class 12th', registeredOn: '2026-09-29' },
   { name: 'Aarav Verma', email: 'aarav@example.com', password: 'password123', grade: 'Class 10th', registeredOn: '2026-10-01' }
 ];
-
-const CareerIcon = ({ name, className = 'w-5 h-5' }) => {
-  switch (name) {
-    case 'Rocket': return <Rocket className={className} />;
-    case 'Plane': return <Plane className={className} />;
-    case 'Anchor': return <Anchor className={className} />;
-    case 'Shield': return <Shield className={className} />;
-    case 'Heart': return <Heart className={className} />;
-    case 'BookOpen': return <BookOpen className={className} />;
-    case 'Radio': return <Radio className={className} />;
-    case 'Microscope': return <Microscope className={className} />;
-    case 'Landmark': return <Landmark className={className} />;
-    case 'Dumbbell': return <Dumbbell className={className} />;
-    case 'Scale': return <Scale className={className} />;
-    case 'Feather': return <Feather className={className} />;
-    case 'BarChart3': return <BarChart3 className={className} />;
-    case 'Zap': return <Zap className={className} />;
-    case 'Palette': return <Palette className={className} />;
-    case 'Activity': return <Activity className={className} />;
-    case 'Building': return <Building className={className} />;
-    default: return <Compass className={className} />;
-  }
-};
 
 export default function App() {
   const [currentView, setCurrentView] = useState('home');
