@@ -24,7 +24,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'NUMBER PATTERN: Look at this sequence: 4, 9, 19, 39, 79, ... What number comes next?',
     options: [
-      { id: 'q1_a', text: '159 (Pattern: Each number is multiplied by 2 and then 1 is added: 79 × 2 + 1 = 159)', scoreType: 'logic', points: 5 },
+      { id: 'q1_a', text: '159 ', scoreType: 'logic', points: 5 },
       { id: 'q1_b', text: '149', scoreType: 'logic', points: 1 },
       { id: 'q1_c', text: '169', scoreType: 'logic', points: 1 },
       { id: 'q1_d', text: '158', scoreType: 'logic', points: 1 }
@@ -37,7 +37,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'DISTANCE & SPEED: A cyclist rides 36 km in 2 hours. If they double their speed, how long will it take them to cover 72 km?',
     options: [
-      { id: 'q2_a', text: '2 hours (Original speed = 18 km/h. Doubled speed = 36 km/h. Time = 72 ÷ 36 = 2 hrs)', scoreType: 'logic', points: 5 },
+      { id: 'q2_a', text: '2 hours ', scoreType: 'logic', points: 5 },
       { id: 'q2_b', text: '1 hour', scoreType: 'logic', points: 1 },
       { id: 'q2_c', text: '3 hours', scoreType: 'logic', points: 1 },
       { id: 'q2_d', text: '4 hours', scoreType: 'logic', points: 1 }
@@ -50,7 +50,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'RATIO IN NATURE: A farmer mixes organic fertilizer with water in a 2 : 7 ratio. If he uses 35 liters of water, how much fertilizer does he need?',
     options: [
-      { id: 'q3_a', text: '10 liters (7 units = 35 liters, so 1 unit = 5 liters. 2 units = 10 liters)', scoreType: 'logic', points: 5 },
+      { id: 'q3_a', text: '10 liters ', scoreType: 'logic', points: 5 },
       { id: 'q3_b', text: '12 liters', scoreType: 'logic', points: 1 },
       { id: 'q3_c', text: '14 liters', scoreType: 'logic', points: 1 },
       { id: 'q3_d', text: '8 liters', scoreType: 'logic', points: 1 }
@@ -63,7 +63,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'SPATIAL CUT: A wooden solid cube is painted blue on all 6 sides. It is then sawed into 64 equal smaller cubes. How many small cubes have ZERO painted faces?',
     options: [
-      { id: 'q4_a', text: '8 smaller cubes (The inner 2×2×2 core of the 4×4×4 cube has no exposed faces)', scoreType: 'logic', points: 5 },
+      { id: 'q4_a', text: '8 smaller cubes ', scoreType: 'logic', points: 5 },
       { id: 'q4_b', text: '16 smaller cubes', scoreType: 'logic', points: 1 },
       { id: 'q4_c', text: '0 smaller cubes', scoreType: 'logic', points: 1 },
       { id: 'q4_d', text: '4 smaller cubes', scoreType: 'logic', points: 1 }
@@ -89,7 +89,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'PERCENTAGE LOGIC: A book seller discounts a novel by 20%, but still earns a 20% profit on his cost price. If the cost price is ₹200, what was the printed mark price?',
     options: [
-      { id: 'q6_a', text: '₹300 (Selling price = ₹240 with 20% profit. If ₹240 is 80% of mark price, Mark Price = ₹300)', scoreType: 'logic', points: 5 },
+      { id: 'q6_a', text: '₹300 ', scoreType: 'logic', points: 5 },
       { id: 'q6_b', text: '₹280', scoreType: 'logic', points: 1 },
       { id: 'q6_c', text: '₹260', scoreType: 'logic', points: 1 },
       { id: 'q6_d', text: '₹320', scoreType: 'logic', points: 1 }
@@ -102,7 +102,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'FAMILY RELATION LOGIC: Pointing to a photograph of a woman, a man says: "Her daughter is the only granddaughter of my mother." Who is the woman to the man?',
     options: [
-      { id: 'q7_a', text: 'His wife (or his sister, assuming single lineage)', scoreType: 'logic', points: 5 },
+      { id: 'q7_a', text: 'His wife ', scoreType: 'logic', points: 5 },
       { id: 'q7_b', text: 'His grandmother', scoreType: 'logic', points: 1 },
       { id: 'q7_c', text: 'His niece', scoreType: 'logic', points: 1 },
       { id: 'q7_d', text: 'His aunt', scoreType: 'logic', points: 1 }
@@ -115,7 +115,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'WORK & TIME: 4 artisans can weave 4 handloom carpets in 4 days. At the exact same rate, how many days will 8 artisans take to weave 8 carpets?',
     options: [
-      { id: 'q8_a', text: '4 days (1 artisan takes 4 days to weave 1 carpet; therefore 8 artisans take 4 days to weave 8 carpets)', scoreType: 'logic', points: 5 },
+      { id: 'q8_a', text: '4 days ', scoreType: 'logic', points: 5 },
       { id: 'q8_b', text: '8 days', scoreType: 'logic', points: 1 },
       { id: 'q8_c', text: '2 days', scoreType: 'logic', points: 1 },
       { id: 'q8_d', text: '16 days', scoreType: 'logic', points: 1 }
@@ -128,7 +128,7 @@ const ASSESSMENT_BATTERY = [
     type: 'puzzle',
     prompt: 'GEOMETRY INTUITION: A circular running track has a radius of 70 meters. If an athlete runs exactly 2 complete laps around it, what approximate distance did they cover? (Use π ≈ 22/7)',
     options: [
-      { id: 'q9_a', text: '880 meters (Perimeter of 1 lap = 2 × 22/7 × 70 = 440 meters. 2 laps = 880 meters)', scoreType: 'logic', points: 5 },
+      { id: 'q9_a', text: '880 meters ', scoreType: 'logic', points: 5 },
       { id: 'q9_b', text: '440 meters', scoreType: 'logic', points: 1 },
       { id: 'q9_c', text: '660 meters', scoreType: 'logic', points: 1 },
       { id: 'q9_d', text: '1200 meters', scoreType: 'logic', points: 1 }
