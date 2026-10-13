@@ -10,6 +10,7 @@ import {
   Building
 } from 'lucide-react';
 
+// --- GRADE & STREAM TAILORED APTITUDE BATTERY (QUESTIONS 1-10) ---
 const getAptitudeQuestionsForGrade = (grade, stream) => {
   if (grade === 'Class 9th') {
     return [
@@ -426,6 +427,7 @@ const getAptitudeQuestionsForGrade = (grade, stream) => {
   }
 };
 
+// UNIVERSAL QUESTIONS 11 to 75 (Full 65 Universal Psychometric, RIASEC, Teamwork, and Purpose Questions)
 const UNIVERSAL_QUESTIONS = [
   {
     id: 'q11', pillar: 'Defense & Tactical Instincts',
@@ -726,9 +728,360 @@ const UNIVERSAL_QUESTIONS = [
       { id: 'q40_c', text: 'Leading surgical procedures or treating heart and neurological conditions as an elite doctor.', scoreType: 'surgeon', points: 5 },
       { id: 'q40_d', text: 'Chief Structural Engineer building state mega-projects or leading district governance as an IAS officer.', scoreType: 'civil', points: 5 }
     ]
+  },
+  {
+    id: 'q41', pillar: 'RIASEC Vocational Calling',
+    prompt: 'When you have free time on weekends, what kind of project do you instinctively choose to work on?',
+    options: [
+      { id: 'q41_a', text: 'Building physical electronics, repairing gadgets, or tinkering with mechanical tools.', scoreType: 'civil', points: 5 },
+      { id: 'q41_b', text: 'Reading science fiction, writing poetry, sketching, or editing cinematic video clips.', scoreType: 'architect', points: 5 },
+      { id: 'q41_c', text: 'Coding custom software tools, web apps, or solving algorithmic coding challenges.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q41_d', text: 'Volunteering in community camps, teaching younger kids, or listening to people.', scoreType: 'psychology', points: 5 }
+    ]
+  },
+  {
+    id: 'q42', pillar: 'RIASEC Vocational Calling',
+    prompt: 'If you were invited to give a 15-minute presentation in front of your school assembly, what topic would you choose?',
+    options: [
+      { id: 'q42_a', text: 'How space exploration and rocket technology will colonize Mars in the next 30 years.', scoreType: 'aerospace', points: 5 },
+      { id: 'q42_b', text: 'The importance of mental health awareness and overcoming teenage anxiety.', scoreType: 'psychology', points: 5 },
+      { id: 'q42_c', text: 'How artificial intelligence and machine learning are transforming modern civilization.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q42_d', text: 'The tales of Indian military bravery and Kargil war heroes who saved our nation.', scoreType: 'army', points: 5 }
+    ]
+  },
+  {
+    id: 'q43', pillar: 'Work Environment & Collaboration',
+    prompt: 'How do you handle disagreements when working in a team of 4 people?',
+    options: [
+      { id: 'q43_a', text: 'I present clear, objective facts and numerical calculations to prove which method is correct.', scoreType: 'logic', points: 5 },
+      { id: 'q43_b', text: 'I listen patiently to everyone\'s feelings and find a warm compromise that keeps everyone happy.', scoreType: 'empathy', points: 5 },
+      { id: 'q43_c', text: 'I take leadership charge, assign clear duties, and keep everyone focused on finishing on time.', scoreType: 'courage', points: 5 },
+      { id: 'q43_d', text: 'I prefer working independently on my assigned portion without endless group debates.', scoreType: 'introvert', points: 5 }
+    ]
+  },
+  {
+    id: 'q44', pillar: 'Work Environment & Collaboration',
+    prompt: 'When facing a massive exam or test tomorrow morning, how does your body and mind react tonight?',
+    options: [
+      { id: 'q44_a', text: 'Calm and prepared: I finished my revision early and will get a full 8 hours of sleep.', scoreType: 'conscientious', points: 5 },
+      { id: 'q44_b', text: 'High adrenaline: I pull a late-night study sprint fuelled by caffeine and determination.', scoreType: 'spontaneous', points: 5 },
+      { id: 'q44_c', text: 'Anxious and restless: I worry whether I studied the right topics.', scoreType: 'sensitive', points: 5 },
+      { id: 'q44_d', text: 'Confident: I trust my overall understanding and concept clarity rather than rote memorization.', scoreType: 'logic', points: 5 }
+    ]
+  },
+  {
+    id: 'q45', pillar: 'Advanced Cognitive Reasoning',
+    prompt: 'LOGICAL MATRIX: If all engineers are problem solvers, and some problem solvers are artists, which deduction is valid?',
+    options: [
+      { id: 'q45_a', text: 'Some engineers might be artists, but it is not guaranteed for all.', scoreType: 'logic', points: 5 },
+      { id: 'q45_b', text: 'All artists are engineers.', scoreType: 'logic', points: 1 },
+      { id: 'q45_c', text: 'No engineer can ever be an artist.', scoreType: 'logic', points: 1 },
+      { id: 'q45_d', text: 'Every problem solver is an artist.', scoreType: 'logic', points: 1 }
+    ]
+  },
+  {
+    id: 'q46', pillar: 'Advanced Cognitive Reasoning',
+    prompt: 'PROBABILITY INTUITION: A bag contains 3 red marbles and 2 blue marbles. If you draw two marbles consecutively without replacement, what is the probability both are red?',
+    options: [
+      { id: 'q46_a', text: '3/10 or 30% (3/5 × 2/4 = 6/20 = 3/10)', scoreType: 'logic', points: 5 },
+      { id: 'q46_b', text: '9/25 or 36%', scoreType: 'logic', points: 1 },
+      { id: 'q46_c', text: '1/2 or 50%', scoreType: 'logic', points: 1 },
+      { id: 'q46_d', text: '1/4 or 25%', scoreType: 'logic', points: 1 }
+    ]
+  },
+  {
+    id: 'q47', pillar: 'Advanced Cognitive Reasoning',
+    prompt: 'SPATIAL ROTATION: Imagine a cardboard L-shaped letter facing upright. If you rotate it 90 degrees clockwise and then flip it horizontally, what does it look like?',
+    options: [
+      { id: 'q47_a', text: 'A horizontal base pointing left with a vertical stroke rising downwards.', scoreType: 'logic', points: 5 },
+      { id: 'q47_b', text: 'An upright normal L shape.', scoreType: 'logic', points: 1 },
+      { id: 'q47_c', text: 'A completely inverted V shape.', scoreType: 'logic', points: 1 },
+      { id: 'q47_d', text: 'A straight diagonal line.', scoreType: 'logic', points: 1 }
+    ]
+  },
+  {
+    id: 'q48', pillar: 'Advanced Cognitive Reasoning',
+    prompt: 'VERBAL ANALOGY: Compass is to Navigation as Microscope is to ...?',
+    options: [
+      { id: 'q48_a', text: 'Microbiology & Cellular Examination', scoreType: 'logic', points: 5 },
+      { id: 'q48_b', text: 'Star Gazing & Astronomy', scoreType: 'logic', points: 1 },
+      { id: 'q48_c', text: 'Audio Recording & Sound', scoreType: 'logic', points: 1 },
+      { id: 'q48_d', text: 'Weather Forecasting', scoreType: 'logic', points: 1 }
+    ]
+  },
+  {
+    id: 'q49', pillar: 'Advanced Cognitive Reasoning',
+    prompt: 'CRITICAL EVALUATION: When reading news articles about scientific breakthroughs on social media, what is your first instinct?',
+    options: [
+      { id: 'q49_a', text: 'Check if peer-reviewed university research papers or official ISRO/NASA journals back it up.', scoreType: 'investigative', points: 5 },
+      { id: 'q49_b', text: 'Share it instantly with friends because it sounds exciting and futuristic.', scoreType: 'extravert', points: 4 },
+      { id: 'q49_c', text: 'Wonder how this technology will impact human jobs and the stock market economy.', scoreType: 'enterprising', points: 4 },
+      { id: 'q49_d', text: 'Reflect on the ethical and philosophical questions this breakthrough raises for society.', scoreType: 'psychology', points: 4 }
+    ]
+  },
+  {
+    id: 'q50', pillar: 'Personal Values & Integrity',
+    prompt: 'If you witnessed a coworker or classmate taking credit for a project you built entirely by yourself:',
+    options: [
+      { id: 'q50_a', text: 'I calmly present the original version, timestamps, and raw git/notebook files to prove ownership with facts.', scoreType: 'logic', points: 5 },
+      { id: 'q50_b', text: 'I confront them privately with firmness and demand they set the record straight immediately.', scoreType: 'courage', points: 5 },
+      { id: 'q50_c', text: 'I feel hurt, but stay silent to avoid an ugly public confrontation.', scoreType: 'sensitive', points: 4 },
+      { id: 'q50_d', text: 'I talk to our mentor/teacher to ensure the truth is known fairly.', scoreType: 'empathy', points: 4 }
+    ]
+  },
+  {
+    id: 'q51', pillar: 'Personal Values & Integrity',
+    prompt: 'What kind of work culture brings out your absolute best performance?',
+    options: [
+      { id: 'q51_a', text: 'High discipline, strict accountability, clear chain of command, and missions of national importance.', scoreType: 'army', points: 5 },
+      { id: 'q51_b', text: 'Absolute intellectual freedom, cutting-edge R&D labs, and encouragement to test radical new ideas.', scoreType: 'aerospace', points: 5 },
+      { id: 'q51_c', text: 'Deep collaboration, emotional safety, mutual empathy, and direct human impact.', scoreType: 'psychology', points: 5 },
+      { id: 'q51_d', text: 'Fast-moving meritocracy where hard work, financial acumen, and leadership reap massive rewards.', scoreType: 'enterprising', points: 5 }
+    ]
+  },
+  {
+    id: 'q52', pillar: 'Future Vision & Ambition',
+    prompt: 'When you imagine your ideal office or workspace 15 years from now, what does it look like?',
+    options: [
+      { id: 'q52_a', text: 'A high-tech aerospace cleanroom or rocket launch control bunker.', scoreType: 'aerospace', points: 5 },
+      { id: 'q52_b', text: 'A sterile, state-of-the-art hospital operating theatre or neuroscience lab.', scoreType: 'surgeon', points: 5 },
+      { id: 'q52_c', text: 'A government secretariat office or high court chamber upholding justice and administration.', scoreType: 'civil_services', points: 5 },
+      { id: 'q52_d', text: 'A modern architectural firm or Silicon Valley tech campus overlooking a skyline.', scoreType: 'cs_ai', points: 5 }
+    ]
+  },
+  {
+    id: 'q53', pillar: 'Future Vision & Ambition',
+    prompt: 'If you could master any superpower instantly, which one would you pick?',
+    options: [
+      { id: 'q53_a', text: 'The ability to instantly heal any physical disease or trauma in human bodies.', scoreType: 'surgeon', points: 5 },
+      { id: 'q35_b', text: 'The ability to instantly understand, calculate, and solve any complex engineering or mathematical equation.', scoreType: 'logic', points: 5 },
+      { id: 'q53_c', text: 'The ability to command courage, discipline, and unity across thousands of people during crises.', scoreType: 'courage', points: 5 },
+      { id: 'q53_d', text: 'The ability to instantly soothe emotional pain and bring mental peace to anyone in distress.', scoreType: 'psychology', points: 5 }
+    ]
+  },
+  {
+    id: 'q54', pillar: 'Work Style & Resilience',
+    prompt: 'How do you handle failure after working hard for months toward a major goal (like an entrance exam or sports match)?',
+    options: [
+      { id: 'q54_a', text: 'I analyze what went wrong objectively, adjust my preparation strategy, and start training harder.', scoreType: 'resilient', points: 5 },
+      { id: 'q54_b', text: 'I feel deeply disappointed and take a few days off to process my emotions before bouncing back.', scoreType: 'sensitive', points: 4 },
+      { id: 'q54_c', text: 'I use the frustration as fuel to prove my critics wrong on the next attempt.', scoreType: 'courage', points: 5 },
+      { id: 'q54_d', text: 'I consult my mentors and family to find an alternative backup pathway.', scoreType: 'empathy', points: 4 }
+    ]
+  },
+  {
+    id: 'q55', pillar: 'Work Style & Resilience',
+    prompt: 'Do you prefer deep, uninterrupted solitary focus or fast-moving collaborative team meetings?',
+    options: [
+      { id: 'q55_a', text: 'Deep solitary focus: I can work for 4 hours straight in complete silence without a single break.', scoreType: 'introvert', points: 5 },
+      { id: 'q55_b', text: 'Fast-moving team collaboration: Bouncing ideas off energetic colleagues sparks my best insights.', scoreType: 'extravert', points: 5 },
+      { id: 'q55_c', text: 'A balanced blend of morning strategy syncs and afternoon solo execution.', scoreType: 'conscientious', points: 4 },
+      { id: 'q55_d', text: 'Outdoor field action and hands-on site coordination.', scoreType: 'tactical', points: 5 }
+    ]
+  },
+  {
+    id: 'q56', pillar: 'Real-World Problem Solving',
+    prompt: 'If you noticed that students in your school were suffering from severe exam stress and anxiety, what would you do?',
+    options: [
+      { id: 'q56_a', text: 'Design and organize a peer counseling and mindfulness workshop to teach them stress management techniques.', scoreType: 'psychology', points: 5 },
+      { id: 'q56_b', text: 'Build a mobile app or online study planner that helps students organize their exam prep efficiently.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q56_c', text: 'Petition school authorities to reform the examination schedule and grading pressure.', scoreType: 'lawyer', points: 5 },
+      { id: 'q56_d', text: 'Focus on my own exams and offer help only to my closest friends when asked.', scoreType: 'introvert', points: 3 }
+    ]
+  },
+  {
+    id: 'q57', pillar: 'Real-World Problem Solving',
+    prompt: 'When you watch a documentary about deep space or ocean trenches, what thought dominates your curiosity?',
+    options: [
+      { id: 'q57_a', text: 'How engineers built the submarines and rockets that made exploring those extreme environments possible.', scoreType: 'aerospace', points: 5 },
+      { id: 'q57_b', text: 'Discovering new biological lifeforms, ecosystems, and medical compounds hidden in nature.', scoreType: 'investigative', points: 5 },
+      { id: 'q57_c', text: 'The poetic and philosophical insignificance of humanity compared to the vast universe.', scoreType: 'artistic', points: 5 },
+      { id: 'q57_d', text: 'The financial cost and economic viability of funding such deep space or ocean missions.', scoreType: 'enterprising', points: 4 }
+    ]
+  },
+  {
+    id: 'q58', pillar: 'Leadership & Influence',
+    prompt: 'If you were appointed team captain of a disaster relief drive in your city, what is your first leadership action?',
+    options: [
+      { id: 'q58_a', text: 'Assess supplies, map out disaster zones, establish command chains, and deploy teams efficiently.', scoreType: 'army', points: 5 },
+      { id: 'q58_b', text: 'Set up medical first-aid stations and ensure injured victims receive immediate emotional and physical care.', scoreType: 'surgeon', points: 5 },
+      { id: 'q58_c', text: 'Raise emergency funds, coordinate with local government authorities, and mobilize public volunteers.', scoreType: 'civil_services', points: 5 },
+      { id: 'q58_d', text: 'Document the crisis on camera to broadcast live updates and attract nationwide donations.', scoreType: 'artistic', points: 4 }
+    ]
+  },
+  {
+    id: 'q59', pillar: 'Leadership & Influence',
+    prompt: 'How do you convince someone who is deeply stubborn and refuses to listen to reason?',
+    options: [
+      { id: 'q59_a', text: 'Present undeniable empirical data, statistics, and logical proof until they cannot argue otherwise.', scoreType: 'logic', points: 5 },
+      { id: 'q59_b', text: 'Understand their emotional fears and pride first, then address their concerns with warmth and patience.', scoreType: 'empathy', points: 5 },
+      { id: 'q59_c', text: 'Use persuasive rhetoric, storytelling, and compelling analogies that shift their perspective.', scoreType: 'lawyer', points: 5 },
+      { id: 'q59_d', text: 'Stand firm with authoritative confidence and enforce the correct protocol.', scoreType: 'courage', points: 4 }
+    ]
+  },
+  {
+    id: 'q60', pillar: 'Continuous Growth & Mastery',
+    prompt: 'When learning a complex new software tool, musical instrument, or sport:',
+    options: [
+      { id: 'q60_a', text: 'I practice systematically every single day with structured discipline until I master every nuance.', scoreType: 'conscientious', points: 5 },
+      { id: 'q60_b', text: 'I experiment wildly, make mistakes, and learn through trial and error.', scoreType: 'spontaneous', points: 5 },
+      { id: 'q60_c', text: 'I read the manual and tutorial guides thoroughly before touching the equipment.', scoreType: 'logic', points: 4 },
+      { id: 'q60_d', text: 'I learn best by having an expert mentor sit beside me and coach me.', scoreType: 'teaching', points: 4 }
+    ]
+  },
+  {
+    id: 'q61', pillar: 'Ethics & Social Responsibility',
+    prompt: 'If an AI technology you helped build could automate 50% of jobs in an industry, but caused widespread unemployment:',
+    options: [
+      { id: 'q61_a', text: 'I would advocate for mandatory government retraining programs and ethical safety guardrails before deployment.', scoreType: 'lawyer', points: 5 },
+      { id: 'q61_b', text: 'Technological progress is unstoppable; society must adapt to higher efficiency and new job categories.', scoreType: 'enterprising', points: 5 },
+      { id: 'q61_c', text: 'I would refuse to work on automation tech that harms human livelihoods; human welfare comes first.', scoreType: 'psychology', points: 5 },
+      { id: 'q61_d', text: 'I focus strictly on the technical coding excellence; social policy is for politicians to solve.', scoreType: 'cs_ai', points: 4 }
+    ]
+  },
+  {
+    id: 'q62', pillar: 'Ethics & Social Responsibility',
+    prompt: 'When you see an injustice or rule violation in daily life that does not directly affect you:',
+    options: [
+      { id: 'q62_a', text: 'I speak up and intervene because ignoring injustice makes us complicit in the wrongdoing.', scoreType: 'courage', points: 5 },
+      { id: 'q62_b', text: 'I report it formally through official grievance channels with documented proof.', scoreType: 'lawyer', points: 5 },
+      { id: 'q62_c', text: 'I offer support and comfort to whoever was mistreated.', scoreType: 'empathy', points: 5 },
+      { id: 'q62_d', text: 'I mind my own business unless asked for help, to avoid unnecessary trouble.', scoreType: 'introvert', points: 3 }
+    ]
+  },
+  {
+    id: 'q63', pillar: 'Final Self-Assessment',
+    prompt: 'Which of these statements best describes your natural superpower?',
+    options: [
+      { id: 'q63_a', text: 'Unshakable calm and tactical execution during high-pressure crises.', scoreType: 'courage', points: 5 },
+      { id: 'q63_b', text: 'Deep empathy, active listening, and understanding human emotional struggles.', scoreType: 'psychology', points: 5 },
+      { id: 'q63_c', text: 'Brilliant analytical logic and solving complex mathematical or coding riddles.', scoreType: 'logic', points: 5 },
+      { id: 'q63_d', text: 'Visionary leadership, enterprise building, and rallying people toward grand goals.', scoreType: 'enterprising', points: 5 }
+    ]
+  },
+  {
+    id: 'q64', pillar: 'Final Self-Assessment',
+    prompt: 'What environment drains your energy the fastest?',
+    options: [
+      { id: 'q64_a', text: 'Boring, repetitive desk paperwork with zero physical or intellectual challenge.', scoreType: 'exploring', points: 5 },
+      { id: 'q64_b', text: 'Loud, chaotic, aggressive arguments with zero emotional respect or listening.', scoreType: 'empathy', points: 5 },
+      { id: 'q64_c', text: 'Disorganized environments lacking clear rules, accountability, or factual structure.', scoreType: 'conscientious', points: 5 },
+      { id: 'q64_d', text: 'Stiff, overly rigid bureaucracies that stifle creativity and independent thought.', scoreType: 'artistic', points: 5 }
+    ]
+  },
+  {
+    id: 'q65', pillar: 'Final Self-Assessment',
+    prompt: 'When you receive constructive feedback on a mistake, what is your initial emotional response?',
+    options: [
+      { id: 'q65_a', text: 'Gratitude: I appreciate someone helping me spot a blind spot so I can improve.', scoreType: 'resilient', points: 5 },
+      { id: 'q65_b', text: 'Defensiveness: I feel stung at first, but calm down once I analyze if they were right.', scoreType: 'sensitive', points: 4 },
+      { id: 'q65_c', text: 'Curiosity: I want to examine the exact data points behind their critique.', scoreType: 'logic', points: 5 },
+      { id: 'q65_d', text: 'Determination: I will work twice as hard to ensure nobody ever questions my competence again.', scoreType: 'courage', points: 5 }
+    ]
+  },
+  {
+    id: 'q66', pillar: 'Final Self-Assessment',
+    prompt: 'How do you feel about public recognition and receiving awards on stage?',
+    options: [
+      { id: 'q66_a', text: 'I enjoy it as a validation of hard work, but I care more about the actual work itself.', scoreType: 'conscientious', points: 5 },
+      { id: 'q66_b', text: 'I feel terribly awkward and prefer celebrating quietly with close friends.', scoreType: 'introvert', points: 5 },
+      { id: 'q66_c', text: 'I love commanding the stage and inspiring others with my success story.', scoreType: 'extravert', points: 5 },
+      { id: 'q66_d', text: 'I credit my entire team and mentors for the achievement.', scoreType: 'empathy', points: 5 }
+    ]
+  },
+  {
+    id: 'q67', pillar: 'Final Self-Assessment',
+    prompt: 'What role does intuition play in your decision-making process?',
+    options: [
+      { id: 'q67_a', text: 'A strong gut feeling often guides me correctly when facts are incomplete.', scoreType: 'intuitive', points: 5 },
+      { id: 'q67_b', text: 'I rely 100% on hard empirical evidence and spreadsheets, ignoring gut feelings.', scoreType: 'logic', points: 5 },
+      { id: 'q67_c', text: 'I balance intuitive empathy with logical consequences before deciding.', scoreType: 'psychology', points: 5 },
+      { id: 'q67_d', text: 'I follow established precedents and traditional guidelines.', scoreType: 'conventional', points: 5 }
+    ]
+  },
+  {
+    id: 'q68', pillar: 'Final Self-Assessment',
+    prompt: 'How comfortable are you taking financial or career risks?',
+    options: [
+      { id: 'q68_a', text: 'Very comfortable: High risk brings high reward and extraordinary breakthroughs.', scoreType: 'enterprising', points: 5 },
+      { id: 'q68_b', text: 'Calculated risk only: I analyze downside probabilities and secure safety nets first.', scoreType: 'logic', points: 5 },
+      { id: 'q68_c', text: 'I prefer secure, stable, predictable career paths with guaranteed government pensions.', scoreType: 'conventional', points: 5 },
+      { id: 'q68_d', text: 'I care more about serving a noble mission than financial risk and reward.', scoreType: 'army', points: 5 }
+    ]
+  },
+  {
+    id: 'q69', pillar: 'Final Self-Assessment',
+    prompt: 'When reading historical biographies of great leaders, what chapters do you read with the most fascination?',
+    options: [
+      { id: 'q69_a', text: 'Their wartime command decisions, overcoming impossible odds, and defending their nation.', scoreType: 'army', points: 5 },
+      { id: 'q69_b', text: 'Their scientific breakthroughs, sleepless nights in laboratories, and inventing new technologies.', scoreType: 'aerospace', points: 5 },
+      { id: 'q69_c', text: 'Their social reform movements, fighting for civil rights, and lifting the underprivileged.', scoreType: 'psychology', points: 5 },
+      { id: 'q69_d', text: 'Their entrepreneurial rise, building global industries, and mastering economic markets.', scoreType: 'enterprising', points: 5 }
+    ]
+  },
+  {
+    id: 'q70', pillar: 'Final Self-Assessment',
+    prompt: 'How do you approach learning complex topics you initially find boring?',
+    options: [
+      { id: 'q70_a', text: 'I connect the boring theory to real-world practical applications that matter to me.', scoreType: 'logic', points: 5 },
+      { id: 'q70_b', text: 'I force myself through sheer discipline and daily study checklists.', scoreType: 'conscientious', points: 5 },
+      { id: 'q70_c', text: 'I find an engaging teacher, documentary, or interactive video that brings the topic alive.', scoreType: 'teaching', points: 5 },
+      { id: 'q70_d', text: 'I study only what is strictly necessary to pass exams.', scoreType: 'spontaneous', points: 3 }
+    ]
+  },
+  {
+    id: 'q71', pillar: 'Final Self-Assessment',
+    prompt: 'What is your view on rules and regulations?',
+    options: [
+      { id: 'q71_a', text: 'Essential for maintaining civilization, safety, and operational discipline.', scoreType: 'conventional', points: 5 },
+      { id: 'q71_b', text: 'Important, but meant to be challenged and reformed when they become unjust or obsolete.', scoreType: 'lawyer', points: 5 },
+      { id: 'q71_c', text: 'Guidelines that smart innovators optimize and bypass when creative speed is required.', scoreType: 'enterprising', points: 5 },
+      { id: 'q71_d', text: 'Sacred protocols that save lives in combat, aviation, and surgery.', scoreType: 'army', points: 5 }
+    ]
+  },
+  {
+    id: 'q72', pillar: 'Final Self-Assessment',
+    prompt: 'How do you feel about public speaking and media visibility?',
+    options: [
+      { id: 'q72_a', text: 'I enjoy commanding attention and articulating grand ideas on stage or television.', scoreType: 'extravert', points: 5 },
+      { id: 'q72_b', text: 'I prefer working behind the scenes as a strategic mastermind or researcher.', scoreType: 'introvert', points: 5 },
+      { id: 'q72_c', text: 'I speak publicly only when presenting empirical data or defending legal/constitutional arguments.', scoreType: 'lawyer', points: 5 },
+      { id: 'q72_d', text: 'I speak to mentor students and heal patients with warm, personal reassurance.', scoreType: 'psychology', points: 5 }
+    ]
+  },
+  {
+    id: 'q73', pillar: 'Final Self-Assessment',
+    prompt: 'When you encounter a homeless or destitute person asking for help on the street:',
+    options: [
+      { id: 'q73_a', text: 'I feel deep empathy, give food or money, and wonder how society can eradicate poverty.', scoreType: 'psychology', points: 5 },
+      { id: 'q73_b', text: 'I support government welfare programs and economic policies that create mass employment.', scoreType: 'enterprising', points: 4 },
+      { id: 'q73_c', text: 'I analyze the systemic economic failures that caused the destitution.', scoreType: 'logic', points: 4 },
+      { id: 'q73_d', text: 'I volunteer in community relief shelters whenever possible.', scoreType: 'empathy', points: 5 }
+    ]
+  },
+  {
+    id: 'q74', pillar: 'Final Self-Assessment',
+    prompt: 'What motivates you to wake up early in the morning with enthusiasm?',
+    options: [
+      { id: 'q74_a', text: 'A thrilling mission, tough fitness challenge, or exciting new project to conquer.', scoreType: 'army', points: 5 },
+      { id: 'q74_b', text: 'Solving a fascinating puzzle, coding challenge, or scientific experiment.', scoreType: 'cs_ai', points: 5 },
+      { id: 'q74_c', text: 'Knowing that today I will help patients heal or teach students who depend on me.', scoreType: 'surgeon', points: 5 },
+      { id: 'q74_d', text: 'The opportunity to build my enterprise and achieve financial independence.', scoreType: 'enterprising', points: 5 }
+    ]
+  },
+  {
+    id: 'q75', pillar: 'Final Self-Assessment',
+    prompt: 'FINAL VERDICT: When you look at the 15 diverse career paths in this platform, which feeling is strongest?',
+    options: [
+      { id: 'q75_a', text: 'I feel inspired to serve my nation as an Armed Forces Officer, Fighter Pilot, or Submarine Commander.', scoreType: 'army', points: 5 },
+      { id: 'q75_b', text: 'I feel destined to build rockets and explore space as an Aerospace Engineer.', scoreType: 'aerospace', points: 5 },
+      { id: 'q75_c', text: 'I want to save human lives as an elite Surgeon, Cardiologist, or Neurologist.', scoreType: 'surgeon', points: 5 },
+      { id: 'q75_d', text: 'I want to build grand infrastructure, lead administration as IAS, or heal minds as a Psychologist.', scoreType: 'civil', points: 5 }
+    ]
   }
 ];
 
+// 15 COMPREHENSIVE CAREERS DATABASE
 const CAREER_DATABASE = {
   'army_defence_officer': {
     id: 'army_defence_officer',
@@ -1613,7 +1966,7 @@ export default function App() {
                 DeepPath<span className="text-amber-400">Careers</span>
               </span>
               <span className="block text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-slate-400">
-                Grade & Stream Adaptive Diagnostic
+                Grade & Stream Adaptive Diagnostic • 75 Questions
               </span>
             </div>
           </div>
@@ -1693,7 +2046,7 @@ export default function App() {
               className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:brightness-110 shadow-lg shadow-amber-400/20 transition-all hover:scale-105 active:scale-95"
             >
               <Sparkles className="w-4 h-4 text-slate-950" />
-              <span>Start Assessment</span>
+              <span>Start 75-Q Test</span>
             </button>
           </div>
 
@@ -1713,7 +2066,7 @@ export default function App() {
               <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-400 text-xs font-bold mb-6">
                   <Brain className="w-4 h-4" />
-                  <span>Grade & Stream Adaptive Assessment Platform</span>
+                  <span>The Full 75-Question Adaptive Diagnostic Platform</span>
                 </div>
 
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.12]">
@@ -1724,8 +2077,7 @@ export default function App() {
                 </h1>
 
                 <p className="mt-8 text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto font-normal leading-relaxed">
-                  Questions adapt instantly based on whether you are in Class 9th (simpler arithmetic), Class 10th (standard logic), 
-                  or Class 11th/12th (**Science**, **Commerce with Math**, or **Humanities** stream puzzles). Universal personality and career scenarios follow.
+                  The complete 75-question battery is back! The first 10 aptitude questions adapt dynamically based on whether you are in Class 9th, 10th, or 11th/12th (**Science**, **Commerce with Math**, or **Humanities**). Followed by 65 universal personality and career scenarios.
                 </p>
 
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -1733,7 +2085,7 @@ export default function App() {
                     onClick={handleInitiateTestClick}
                     className="w-full sm:w-auto px-8 py-4 rounded-2xl font-black text-base text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:brightness-110 shadow-xl shadow-amber-400/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
                   >
-                    <span>Begin Assessment</span>
+                    <span>Begin 75-Question Assessment</span>
                     <ArrowRight className="w-5 h-5 text-slate-950" />
                   </button>
 
@@ -1856,7 +2208,7 @@ export default function App() {
                         or in Class 11th/12th specializing in Commerce, Humanities, or Science, our platform adapts to your academic maturity.
                       </p>
                       <p>
-                        We designed this enhanced diagnostic with targeted adaptive puzzles so that you find your exact calling with step-by-step clarity.
+                        We designed this full 75-question diagnostic with targeted adaptive puzzles so that you find your exact calling with step-by-step clarity.
                       </p>
                     </div>
 
@@ -1923,7 +2275,7 @@ export default function App() {
               <div className="space-y-6">
                 <div className="p-5 rounded-2xl bg-slate-900/40 border border-slate-800/80">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                    {activeQuestionIndex < 10 ? '🧩 Grade-Adapted Aptitude & Logic' : '🧠 Universal Psychological & Situational Response'}
+                    {activeQuestionIndex < 10 ? '🧩 Grade & Stream Adapted Aptitude' : '🧠 Universal Psychological & Situational Response'}
                   </span>
                   <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white leading-snug tracking-tight">
                     {currentQ.prompt}
@@ -1993,7 +2345,7 @@ export default function App() {
                       onClick={triggerAssessmentEvaluation}
                       className="px-7 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-emerald-400/20"
                     >
-                      <span>Analyze Answers</span>
+                      <span>Analyze All 75 Answers</span>
                       <Sparkles className="w-4 h-4" />
                     </button>
                   )}
@@ -2098,9 +2450,9 @@ export default function App() {
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-white">Synthesizing Profile Dimensions</h3>
+                <h3 className="text-2xl font-black text-white">Synthesizing All 75 Dimensions</h3>
                 <p className="text-xs text-slate-400 mt-2">
-                  Calculating Cognitive Aptitude IQ for {currentUser?.grade} ({currentUser?.stream}), Defense Instincts, Medical Branching, and matching across 15 full career paths...
+                  Calculating Cognitive Aptitude IQ for {currentUser?.grade} ({currentUser?.stream}), Personality, Teamwork, and matching across 15 full career paths...
                 </p>
               </div>
 
@@ -2110,7 +2462,7 @@ export default function App() {
                   <span className="text-emerald-400 font-bold">Percentile Solved</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-400">
-                  <span>Defense & Medical Scenarios</span>
+                  <span>65 Universal Psychometric Questions</span>
                   <span className="text-emerald-400 font-bold">Evaluated</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-400">
@@ -2135,7 +2487,7 @@ export default function App() {
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Specialized Diagnostic Dossier</span>
+                    <span>75-Question Diagnostic Dossier</span>
                   </div>
                   <h1 className="text-2xl sm:text-4xl font-black text-white">
                     Congratulations, {currentUser?.name || 'Student'}!
@@ -2206,7 +2558,7 @@ export default function App() {
             <div className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/50 space-y-6">
               <div>
                 <h3 className="text-xl font-bold text-white">Psychological & Domain Trait Spectrum</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Scored from your universal universal choices across tactical dilemmas, engineering decisions, and vocational callings.</p>
+                <p className="text-xs text-slate-400 mt-0.5">Scored from your choices across all 75 questions.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
@@ -2721,7 +3073,7 @@ export default function App() {
             <span className="font-bold text-slate-400">DeepPath Careers Platform</span>
           </div>
           <div>
-            Built with grade and stream adaptive aptitude questions (Class 9th, 10th, 11th/12th Science, Commerce, Humanities).
+            Built with the full 75-question battery (Grade 9th, 10th, 11th/12th Science, Commerce, Humanities).
           </div>
           <div className="text-slate-600">
             Connected with Google Spreadsheet ID: {sheetId.slice(0, 8)}...
